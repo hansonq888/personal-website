@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import { useParams } from "react-router-dom";
 import { projects } from "../data/projects";
 
@@ -9,10 +10,11 @@ export default function ProjectDetail() {
 
   return (
     <div className="min-h-screen p-10 bg-black">
-      <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+      <h1 className="text-5xl font-bold mb-4">{project.title}</h1>
       <img src={project.image} alt={project.title} className="mb-6" />
-      <p className="mb-4">{project.description}</p>
+      <h2 className="text-2xl mb-4">{project.description}</h2>
       <p>Tech used: {project.tech.join(", ")}</p>
+      {project.journal}
       <a
         href={project.github}
         target="_blank"
