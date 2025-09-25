@@ -11,7 +11,7 @@ export default function About() {
         
         <ParallaxLayer factor={1.2} speed={1} style={{backgroundImage: `url(/AboutBackground.png)`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: '100%' }}>
           <div className="flex flex-col items-center p-6">
-            <h1 className="mt-20 instrument-serif-regular text-9xl">About Me</h1>
+            <h1 className="mt-20 jersey-10-regular text-9xl">About Me</h1>
             {/* <FloatingObject src={"/Frisbee.png"} initialX={50} initialY={400} size={100} />
             <FloatingObject src={"/Piano.png"} initialX={150} initialY={400} size={100} />
             <FloatingObject src={"/Headphones.png"} initialX={250} initialY={400} size={100} />
@@ -56,7 +56,7 @@ export default function About() {
         />
         <ParallaxLayer factor={1} offset={2} speed={0.1}>
           <div>
-            <h1 className="text-5xl">Nothing to see here...</h1>
+            <h1 className="text-5xl">Nothing to see here... yet</h1>
           </div>
         </ParallaxLayer>
         <ParallaxLayer offset={3} factor={1} speed={0} style={{ backgroundColor: '#000' }} />

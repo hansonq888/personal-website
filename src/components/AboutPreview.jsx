@@ -16,7 +16,7 @@ export default function AboutPreview() {
               to="/about"
               className="hover:bg-white bg-white px-6 py-3 text-lg text-black font-medium"
             >
-              Learn More
+              More about me
             </Link>
           </div>
         </div>
