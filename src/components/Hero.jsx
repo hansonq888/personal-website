@@ -48,7 +48,7 @@ export default function Hero() {
 
   return (
     <section className="flex flex-col items-center justify-center min-h-screen text-center bg-cover bg-contain bg-no-repeat"
-    style={{ backgroundImage: "url('/public/HeroBackground.png')"}}>
+    style={{ backgroundImage: "url('/HeroBackground.png')"}}>
         <Cloud src="/Cloud1.png" speed={0.2} initialX={1000} initialY={200} width={450}/>
         <Cloud src="/Cloud2.png" speed={0.5} initialX={-50} initialY={100} width={450} direction={-1} />
         <Cloud src="/Cloud3.png" speed={0.8} initialX={-100} initialY={400} width={500} direction={-1} />
