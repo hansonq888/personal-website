@@ -5,7 +5,7 @@ import { MdEmail } from "react-icons/md";
 export default function Contact() {
   return (
     <div className="p-10 min-h-screen flex flex-col items-center justify-center" >
-      <h1 className="text-9xl font-extrabold mb-12 text-white drop-shadow-lg">
+      <h1 className="text-5xl font-extrabold mb-12 text-white drop-shadow-lg">
         Contact Me
       </h1>
 
@@ -15,7 +15,7 @@ export default function Contact() {
           to="https://www.linkedin.com/in/hanson-q/"
           target="_blank"
           rel="noopener noreferrer"
-          className="group border-4 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
+          className="group border-2 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
                      transform transition duration-300 hover:scale-105 hover:shadow-2xl"
         >
           <FaLinkedin className="w-16 h-16 mx-auto text-white group-hover:text-blue-400 transition" />
@@ -27,7 +27,7 @@ export default function Contact() {
         {/* Email */}
         <Link
           to="mailto:hansonq888@gmail.com"
-          className="group border-4 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
+          className="group border-2 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
                      transform transition duration-300 hover:scale-105 hover:shadow-2xl"
         >
           <MdEmail className="w-16 h-16 mx-auto text-white group-hover:text-red-400 transition" />
@@ -41,7 +41,7 @@ export default function Contact() {
           to="https://github.com/hansonq888"
           target="_blank"
           rel="noopener noreferrer"
-          className="group border-4 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
+          className="group border-2 border-white rounded-2xl p-8 text-center backdrop-blur-lg 
                      transform transition duration-300 hover:scale-105 hover:shadow-2xl"
         >
           <FaGithub className="w-16 h-16 mx-auto text-white group-hover:text-gray-400 transition" />
