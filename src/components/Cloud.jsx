@@ -5,8 +5,6 @@ export default function Cloud({
   speed,          // horizontal speed multiplier
   initialX,       // starting horizontal position
   initialY,       // vertical fixed position
-  width = 100,
-  height = "auto",
   shadow = "drop-shadow-2xl",
   fadeDistance = 400, // distance over which cloud fades
   direction = 1
@@ -16,33 +14,35 @@ export default function Cloud({
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY; // amount scrolled in y direction
+      const scrollY = window.scrollY;
 
       // horizontal movement: scrollY affects X position
       setOffsetX(scrollY * speed * direction);
 
       // fade out as scroll increases
       const newOpacity = Math.max(0, 1 - scrollY / fadeDistance);
-      setOpacity(newOpacity); // fade out when scroll
+      setOpacity(newOpacity);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [speed, fadeDistance]);
+  }, [speed, fadeDistance, direction]);
 
   return (
     <img
       src={src}
       alt="cloud"
-      className={`absolute pointer-events-none select-none ${shadow}`}
+      className={`absolute pointer-events-none select-none ${shadow}
+        w-38 sm:w-42 md:w-72 lg:w-[450px]`} 
       style={{
-        left: initialX + offsetX, // horizontal movement
-        top: initialY,            // fixed vertical position
-        width: width,
-        height: height,
+        right: initialX,                 // always hugs the right edge
+        top: initialY,
+        transform: `translateX(${offsetX}px)`, // let scroll still move it
         opacity: opacity,
         transition: "opacity 0.2s linear",
+        height: "auto",
       }}
     />
+
   );
 }
