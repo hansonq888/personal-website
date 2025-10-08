@@ -3,8 +3,8 @@ import { Parallax, ParallaxLayer } from "@react-spring/parallax";
 
 export default function About() {
   return (
-    <>
-      <Parallax pages={4}>
+    <div className="min-h-screen">
+      <Parallax pages={3.5}>
         
         <ParallaxLayer
           factor={1.2}
@@ -79,8 +79,8 @@ export default function About() {
           </div>
         </ParallaxLayer>
 
-        <ParallaxLayer offset={3} factor={1} speed={0} style={{ backgroundColor: '#000' }} />
+        <ParallaxLayer offset={2.5} factor={1} speed={0} style={{ backgroundColor: '#000' }} />
       </Parallax>
-    </>
+    </div>
   );
 }
