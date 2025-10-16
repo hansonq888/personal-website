@@ -62,15 +62,28 @@ export default function ProjectsPreview() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-zinc-600">Read more</span>
-                  <a
-                    href={p.github}
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs underline text-[#0b5cd5] hover:text-black"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    GitHub
-                  </a>
+                  <div className="flex gap-3">
+                    {p.website && (
+                      <a
+                        href={p.website}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs underline text-[#0b5cd5] hover:text-black"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Live Demo
+                      </a>
+                    )}
+                    <a
+                      href={p.github}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs underline text-[#0b5cd5] hover:text-black"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      GitHub
+                    </a>
+                  </div>
                 </div>
               </div>
             </Link>

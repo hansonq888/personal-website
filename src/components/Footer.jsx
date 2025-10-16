@@ -111,9 +111,7 @@ export default function Footer() {
         {/* Bottom section - more compact */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center space-x-2 text-white/70 text-sm">
-            <span>Made with</span>
-            <FaHeart className="w-3 h-3 text-red-400" />
-            <span>by Hanson Qin</span>
+            <span>Made by Hanson Qin</span>
           </div>
           
           <div className="text-xs text-white/50">

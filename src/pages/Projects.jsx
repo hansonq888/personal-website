@@ -42,6 +42,31 @@ export default function Projects() {
                   <span key={t} className="text-xs px-2 py-1 bg-[#e0f2ff] text-[#0b5cd5] border border-[#9ec5ff]">{t}</span>
                 ))}
               </div>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-xs text-zinc-600">Read more</span>
+                <div className="flex gap-3">
+                  {proj.website && (
+                    <a
+                      href={proj.website}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs underline text-[#0b5cd5] hover:text-black"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Live Demo
+                    </a>
+                  )}
+                  <a
+                    href={proj.github}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs underline text-[#0b5cd5] hover:text-black"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    GitHub
+                  </a>
+                </div>
+              </div>
             </div>
           </Link>
         ))}

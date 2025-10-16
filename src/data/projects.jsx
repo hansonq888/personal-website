@@ -5,6 +5,16 @@ import ProjectJournal from "../components/ProjectJournal";
 
 export const projects = [
   {
+    id: "macroboard",
+    title: "MacroBoard",
+    description: "A full-stack economic data visualization dashboard with AI-powered insights",
+    journalFile: "macroboard",
+    image: "/macroboardSS.png",
+    tech: ["FastAPI", "React", "Python", "OpenAI", "Vercel", "Render"],
+    github: "https://github.com/hansonq888/econ-dashboard",
+    website: "https://macroboard.org",
+  },
+  {
     id: "realtor-website",
     title: "Realtor Website",
     description: "A personal realtor website made with React",
