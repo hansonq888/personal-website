@@ -47,8 +47,7 @@ export default function Hero() {
 
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen text-center bg-cover bg-contain bg-no-repeat"
-    style={{ backgroundImage: "url('/HeroBackground.png')"}}>
+    <section className="flex flex-col items-center justify-center min-h-screen text-center">
         <Cloud src="/Cloud1.png" speed={0.2} initialX={"-14%"} initialY={"35%"} width={450}/>
         <Cloud src="/Cloud2.png" speed={0.5} initialX={"67%"} initialY={"15%"} width={450} direction={-1} />
         <Cloud src="/Cloud3.png" speed={0.8} initialX={"77%"} initialY={"60%"} width={500} direction={-1} />
@@ -58,7 +57,6 @@ export default function Hero() {
         <span className="animate-blink">|</span>
       </h1>
     </div>
-      <p className="text-lg text-white-600 mt-1">Welcome to my website!</p>
     </section>
     
   );
