@@ -20,10 +20,42 @@ export default function ProjectDetail() {
 
   if (!project) return <p>Project not found</p>;
 
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    return match ? match[1] : null;
+  };
+
   return (
     <div className="min-h-screen p-10 bg-black text-white">
       <h1 className="text-5xl font-bold mb-4">{project.title}</h1>
-      <img src={project.image} alt={project.title} className="mb-6" />
+      
+      {/* Video for Priority Email Labeler */}
+      {project.id === "priority-email-labeler" && project.video ? (
+        <div className="mb-6">
+          <div 
+            className="relative aspect-video max-w-2xl mx-auto rounded-lg overflow-hidden cursor-pointer group"
+            onClick={() => window.open(project.video, '_blank')}
+          >
+            <img
+              src={`https://img.youtube.com/vi/${getYouTubeVideoId(project.video)}/maxresdefault.jpg`}
+              alt={`${project.title} Demo`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-50 transition-all duration-300">
+              <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <p className="text-center text-white/70 mt-2">Click to watch demo video</p>
+        </div>
+      ) : (
+        <img src={project.image} alt={project.title} className="mb-6" />
+      )}
+      
       <h2 className="text-2xl mb-4">{project.description}</h2>
       <p>Tech used: {project.tech.join(", ")}</p>
       
