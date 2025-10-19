@@ -50,12 +50,15 @@ export default function Contact() {
       {/* Simple contact info */}
       <div className="text-center space-y-2 instrument-serif-regular">
         <p className="text-lg text-white">
-          hansonq888@gmail.com
+          <a href="mailto:hansonq888@gmail.com" className="hover:text-blue-300 transition-colors">
+            hansonq888@gmail.com
+          </a>
         </p>
         <p className="text-lg text-white">
-          hanson.qin@yale.edu
+          <a href="mailto:hanson.qin@yale.edu" className="hover:text-blue-300 transition-colors">
+            hanson.qin@yale.edu
+          </a>
         </p>
-        <p className="text-sm text-white/70 mt-4">Let's create something amazing together!</p>
       </div>
 
       <div className="mt-12 w-32 h-px bg-white/30"></div>

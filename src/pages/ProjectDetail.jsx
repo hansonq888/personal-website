@@ -55,13 +55,15 @@ export default function ProjectDetail() {
       <div className="prose prose-invert max-w-none mt-6">
         <ReactMarkdown rehypePlugins={[rehypeRaw]}>{content}</ReactMarkdown>
       </div>
-      <a
-        href={project.github}
-        target="_blank"
-        className="text-blue-500 underline mt-4 block"
-      >
-        GitHub Repository
-      </a>
+      {project.github && project.id !== "spam-email-detector" && (
+        <a
+          href={project.github}
+          target="_blank"
+          className="text-blue-500 underline mt-4 block"
+        >
+          GitHub Repository
+        </a>
+      )}
     </div>
   );
 }

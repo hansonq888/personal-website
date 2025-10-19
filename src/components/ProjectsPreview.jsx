@@ -84,7 +84,9 @@ export default function ProjectsPreview() {
                     {p.download && p.id !== "live-chord-detector" && (
                       <a href={p.download} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" download>Download</a>
                     )}
-                    <a href={p.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
+                    {p.github && p.id !== "spam-email-detector" && (
+                      <a href={p.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
+                    )}
                   </div>
                 </div>
               </div>

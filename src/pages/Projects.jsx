@@ -3,7 +3,16 @@ import { projects } from "../data/projects";
 
 export default function Projects() {
   return (
-    <div className="min-h-screen p-10 bg-black">
+    <div 
+      className="min-h-screen p-10"
+      style={{ 
+        backgroundImage: "url('/auroras.png')", 
+        backgroundRepeat: 'no-repeat', 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <h1 className="text-6xl font-bold mb-5 instrument-serif-regular text-white">My Projects</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -63,7 +72,9 @@ export default function Projects() {
                   {proj.download && proj.id !== "live-chord-detector" && (
                     <a href={proj.download} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" download>Download</a>
                   )}
-                  <a href={proj.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
+                  {proj.github && proj.id !== "spam-email-detector" && (
+                    <a href={proj.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
+                  )}
                 </div>
               </div>
             </div>

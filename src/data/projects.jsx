@@ -36,10 +36,10 @@ export const projects = [
   {
     id: "priority-email-labeler",
     title: "Priority Email Labeler",
-    description: "AI-powered Gmail integration that automatically labels important emails using machine learning. This is an evolution of my spam email detector project.",
+    description: "Machine Learning-powered Gmail integration that automatically labels important emails using AI. This is an evolution of my spam email detector project.",
     journalFile: "priority-email-labeler",
     image: "/priorityEmailSS.png",
-    tech: ["Python", "FastAPI", "Gmail API", "Machine Learning", "Google Cloud"],
+    tech: ["Machine Learning", "Python", "FastAPI", "Gmail API", "Google Cloud"],
     github: "https://github.com/hansonq888/priority-email-detector",
     relatedProject: "spam-email-detector",
   },
@@ -59,7 +59,6 @@ export const projects = [
     journalFile: "spam-detector",
     image: "/SpamDetectorSS.png",
     tech: ["Python", "API", "ML"],
-    github: "https://github.com/hansonq888/priority-email-detector",
   },
   {
     id: "personal-website",
