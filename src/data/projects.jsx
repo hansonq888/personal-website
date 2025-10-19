@@ -34,6 +34,16 @@ export const projects = [
     download: "https://drive.google.com/uc?export=download&id=1N83rAu9avdOqpdn7tuwPQVj3uWGsBDAy",
   },
   {
+    id: "priority-email-labeler",
+    title: "Priority Email Labeler",
+    description: "AI-powered Gmail integration that automatically labels important emails using machine learning. This is an evolution of my spam email detector project.",
+    journalFile: "priority-email-labeler",
+    image: "/priorityEmailSS.png",
+    tech: ["Python", "FastAPI", "Gmail API", "Machine Learning", "Google Cloud"],
+    github: "https://github.com/hansonq888/priority-email-detector",
+    relatedProject: "spam-email-detector",
+  },
+  {
     id: "typing-game",
     title: "Typing Game",
     description: "A simple speed typing game",
