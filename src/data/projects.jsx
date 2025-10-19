@@ -24,6 +24,16 @@ export const projects = [
     github: "https://github.com/hansonq888/carol-wang-realtor",
   },
   {
+    id: "live-chord-detector",
+    title: "Live Chord Detector v1.0",
+    description: "Real-time machine learning system that identifies musical chords from live audio",
+    journalFile: "live-chord-detector",
+    image: "/chordDetectorSS.png",
+    tech: ["Python", "Machine Learning", "Audio Processing", "Random Forest", "Real-time"],
+    github: "https://github.com/hansonq888/Chord-Detector-ML-Version",
+    download: "/chord-detector.zip",
+  },
+  {
     id: "typing-game",
     title: "Typing Game",
     description: "A simple speed typing game",
@@ -32,7 +42,7 @@ export const projects = [
     tech: ["Javascript", "CSS", "HTML"],
     github: "https://github.com/hansonq888/typing-game",
   },
-    {
+  {
     id: "spam-email-detector",
     title: "ML Spam Email Detector",
     description: "A desktop app that detects spam emails",

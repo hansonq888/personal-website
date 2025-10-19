@@ -10,6 +10,8 @@ export default function AboutPreview() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+          // Disconnect observer after first trigger to prevent unnecessary re-renders
+          observer.disconnect();
         }
       },
       {
@@ -39,7 +41,8 @@ export default function AboutPreview() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
               style={{ 
-                transitionDelay: '0.2s'
+                transitionDelay: '0.2s',
+                willChange: isVisible ? 'auto' : 'transform, opacity'
               }}
             >
               Hi there!
@@ -49,7 +52,8 @@ export default function AboutPreview() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
               style={{ 
-                transitionDelay: '0.4s'
+                transitionDelay: '0.4s',
+                willChange: isVisible ? 'auto' : 'transform, opacity'
               }}
             >
               I'm a second-year student at Yale, studying Computer Science and Economics. I'm passionate about software engineering and building projects that solve real problems. This website showcases some of my work, projects, and explorations in tech.
@@ -60,7 +64,8 @@ export default function AboutPreview() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
               style={{ 
-                transitionDelay: '0.6s'
+                transitionDelay: '0.6s',
+                willChange: isVisible ? 'auto' : 'transform, opacity'
               }}
             >
               More about me

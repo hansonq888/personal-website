@@ -11,7 +11,7 @@ export default function Projects() {
           <Link
             key={proj.id}
             to={`/projects/${proj.id}`}
-            className="group overflow-hidden rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+            className="group overflow-hidden rounded-2xl border border-white/20 bg-gray-900 hover:bg-gray-800 shadow-md hover:shadow-lg transition-all"
           >
             <div className="px-4 py-3 border-b border-white/10 text-white">
               <h2 className="text-lg font-semibold instrument-serif-regular">{proj.title}</h2>
@@ -26,11 +26,42 @@ export default function Projects() {
                   <span key={t} className="text-[11px] px-2 py-0.5 bg-white/10 text-white border border-white/20 instrument-serif-regular">{t}</span>
                 ))}
               </div>
+              
+              {/* Special highlighting for MacroBoard live link and Chord Detector download */}
+              {(proj.id === "macroboard" && proj.website) || (proj.id === "live-chord-detector" && proj.download) ? (
+                <div className="mt-4 mb-3">
+                  {proj.id === "macroboard" && proj.website && (
+                    <a 
+                      href={proj.website} 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                      target="_blank" 
+                      rel="noreferrer"
+                    >
+                      🌐 Visit Live Site
+                    </a>
+                  )}
+                  {proj.id === "live-chord-detector" && proj.download && (
+                    <a 
+                      href={proj.download} 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                      download
+                    >
+                      📥 Download Project
+                    </a>
+                  )}
+                </div>
+              ) : null}
+              
               <div className="mt-3 flex items-center justify-between text-white/70 text-xs">
                 <span>Read more</span>
                 <div className="flex gap-3">
-                  {proj.website && (
+                  {proj.website && proj.id !== "macroboard" && (
                     <a href={proj.website} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Live</a>
+                  )}
+                  {proj.download && proj.id !== "live-chord-detector" && (
+                    <a href={proj.download} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" download>Download</a>
                   )}
                   <a href={proj.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
                 </div>

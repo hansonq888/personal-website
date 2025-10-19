@@ -13,18 +13,27 @@ export default function Cloud({
   const [opacity, setOpacity] = useState(1);
 
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      const scrollY = window.scrollY;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
 
-      // horizontal movement: scrollY affects X position
-      setOffsetX(scrollY * speed * direction);
+          // horizontal movement: scrollY affects X position
+          setOffsetX(scrollY * speed * direction);
 
-      // fade out as scroll increases
-      const newOpacity = Math.max(0, 1 - scrollY / fadeDistance);
-      setOpacity(newOpacity);
+          // fade out as scroll increases
+          const newOpacity = Math.max(0, 1 - scrollY / fadeDistance);
+          setOpacity(newOpacity);
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [speed, fadeDistance, direction]);
 
@@ -41,6 +50,7 @@ export default function Cloud({
         opacity: opacity,
         transition: "opacity 0.2s linear",
         height: "auto",
+        willChange: "transform, opacity", // Optimize for animations
       }}
     />
 

@@ -9,7 +9,7 @@ export default function Home() {
     <div className="border-y border-white/15">
         <Hero />
         {/* Transition image between Hero and the paper section */}
-        <img src="/transition.png" alt="transition" className="w-full block relative z-20" style={{ marginTop: 'clamp(-80px, -10vw, -140px)' }} />
+        <img src="/transition.png" alt="transition" className="w-full block relative z-20" style={{ marginTop: 'clamp(-80px, -10vw, -140px)' }} loading="lazy" />
         <div className="relative z-10" style={{ marginTop: 'clamp(-150px, -19vw, -250px)' }}>
           <div className="relative">
             <AboutPreview />
@@ -23,6 +23,7 @@ export default function Home() {
                 left: '0', 
                 transform: 'translateY(50%)' 
               }}
+              loading="lazy"
             />
           </div>
           <div 

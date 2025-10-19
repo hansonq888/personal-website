@@ -10,7 +10,7 @@ export default function Hero() {
   useEffect(() => {
     if (isPaused) return; // don't do anything if paused
 
-    const speed = 90; // typing speed
+    const speed = 150; // typing speed - increased for better performance
     const interval = setInterval(() => {
       if (typingForward) {
         // typing forward

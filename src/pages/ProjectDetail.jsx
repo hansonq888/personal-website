@@ -26,6 +26,32 @@ export default function ProjectDetail() {
       <img src={project.image} alt={project.title} className="mb-6" />
       <h2 className="text-2xl mb-4">{project.description}</h2>
       <p>Tech used: {project.tech.join(", ")}</p>
+      
+      {/* Special highlighting for MacroBoard live link and Chord Detector download */}
+      {(project.id === "macroboard" && project.website) || (project.id === "live-chord-detector" && project.download) ? (
+        <div className="my-8 max-w-md">
+          {project.id === "macroboard" && project.website && (
+            <a 
+              href={project.website} 
+              className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+              target="_blank" 
+              rel="noreferrer"
+            >
+              🌐 Visit Live Site
+            </a>
+          )}
+          {project.id === "live-chord-detector" && project.download && (
+            <a 
+              href={project.download} 
+              className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+              download
+            >
+              📥 Download Project
+            </a>
+          )}
+        </div>
+      ) : null}
+      
       <div className="prose prose-invert max-w-none mt-6">
         <ReactMarkdown rehypePlugins={[rehypeRaw]}>{content}</ReactMarkdown>
       </div>

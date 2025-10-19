@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { projects } from "../data/projects";
+import { useMemo } from "react";
 
 export default function ProjectsPreview() {
-  const featured = projects.slice(0, 3);
+  const featured = useMemo(() => projects.slice(0, 3), []);
 
   return (
     <section
@@ -24,7 +25,7 @@ export default function ProjectsPreview() {
             <Link
               key={p.id}
               to={`/projects/${p.id}`}
-              className="group overflow-hidden rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+              className="group overflow-hidden rounded-2xl border border-white/20 bg-gray-900 hover:bg-gray-800 shadow-md hover:shadow-lg transition-all"
             >
               {/* Sleek header */}
               <div className="px-4 py-3 border-b border-white/10 text-white">
@@ -46,11 +47,42 @@ export default function ProjectsPreview() {
                     <span key={t} className="text-[11px] px-2 py-0.5 bg-white/10 text-white border border-white/20 instrument-serif-regular">{t}</span>
                   ))}
                 </div>
+                
+                {/* Special highlighting for MacroBoard live link and Chord Detector download */}
+                {(p.id === "macroboard" && p.website) || (p.id === "live-chord-detector" && p.download) ? (
+                  <div className="mb-3">
+                    {p.id === "macroboard" && p.website && (
+                      <a 
+                        href={p.website} 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                        target="_blank" 
+                        rel="noreferrer"
+                      >
+                        🌐 Visit Live Site
+                      </a>
+                    )}
+                    {p.id === "live-chord-detector" && p.download && (
+                      <a 
+                        href={p.download} 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                        download
+                      >
+                        📥 Download Project
+                      </a>
+                    )}
+                  </div>
+                ) : null}
+                
                 <div className="flex items-center justify-between text-white/70 text-xs">
                   <span>Read more</span>
                   <div className="flex gap-3">
-                    {p.website && (
+                    {p.website && p.id !== "macroboard" && (
                       <a href={p.website} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Live</a>
+                    )}
+                    {p.download && p.id !== "live-chord-detector" && (
+                      <a href={p.download} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" download>Download</a>
                     )}
                     <a href={p.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
                   </div>
