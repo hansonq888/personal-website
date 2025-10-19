@@ -31,7 +31,7 @@ export const projects = [
     image: "/chordDetectorSS.png",
     tech: ["Python", "Machine Learning", "Audio Processing", "Random Forest", "Real-time"],
     github: "https://github.com/hansonq888/Chord-Detector-ML-Version",
-    download: "/chord-detector.zip",
+    download: "https://drive.google.com/uc?export=download&id=1N83rAu9avdOqpdn7tuwPQVj3uWGsBDAy",
   },
   {
     id: "typing-game",
