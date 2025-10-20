@@ -39,7 +39,7 @@ export default function ProjectsPreview() {
               </div>
 
               <div className="aspect-video overflow-hidden bg-white border border-zinc-200">
-                {p.video ? (
+                {p.video && p.id !== "priority-email-labeler" ? (
                   <div 
                     className="relative h-full w-full cursor-pointer"
                     onClick={(e) => {
@@ -73,14 +73,15 @@ export default function ProjectsPreview() {
               </div>
               <div className="p-4 text-white">
                 <p className="text-sm text-white/80 instrument-serif-regular mb-2">{p.description}</p>
+                
                 <div className="flex flex-wrap gap-2 mb-4">
                   {p.tech?.slice(0, 3).map((t) => (
                     <span key={t} className="text-[11px] px-2 py-0.5 bg-white/10 text-white border border-white/20 instrument-serif-regular">{t}</span>
                   ))}
                 </div>
                 
-                {/* Special highlighting for MacroBoard live link and Chord Detector download */}
-                {(p.id === "macroboard" && p.website) || (p.id === "live-chord-detector" && p.download) ? (
+                {/* Action buttons for MacroBoard live link, Chord Detector download, Priority Email video, and deployment status */}
+                {(p.id === "macroboard" && p.website) || (p.id === "live-chord-detector" && p.download) || (p.id === "priority-email-labeler" && p.video) || p.status === "not-deployed" ? (
                   <div className="mb-3">
                     {p.id === "macroboard" && p.website && (
                       <a 
@@ -102,6 +103,22 @@ export default function ProjectsPreview() {
                       >
                         📥 Download Project
                       </a>
+                    )}
+                    {p.id === "priority-email-labeler" && p.video && (
+                      <a 
+                        href={p.video} 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="block w-full border border-red-500/50 bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20" 
+                        target="_blank" 
+                        rel="noreferrer"
+                      >
+                        🎥 Watch Demo Video
+                      </a>
+                    )}
+                    {p.status === "not-deployed" && (
+                      <div className="block w-full border border-amber-500/50 bg-amber-900/30 text-amber-200 font-semibold py-2 px-4 rounded-2xl text-center">
+                        ⚠️ Not Yet Deployed
+                      </div>
                     )}
                   </div>
                 ) : null}

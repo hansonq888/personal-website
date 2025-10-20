@@ -33,7 +33,7 @@ export default function Projects() {
             </div>
             <div className="p-4 text-white">
               <div className="aspect-video mb-4 overflow-hidden">
-                {proj.video ? (
+                {proj.video && proj.id !== "priority-email-labeler" ? (
                   <div 
                     className="relative h-full w-full cursor-pointer"
                     onClick={(e) => {
@@ -60,14 +60,15 @@ export default function Projects() {
                 )}
               </div>
               <p className="text-sm text-white/80 instrument-serif-regular">{proj.description}</p>
+              
               <div className="mt-3 flex flex-wrap gap-2">
                 {(proj.tech || []).slice(0,3).map((t) => (
                   <span key={t} className="text-[11px] px-2 py-0.5 bg-white/10 text-white border border-white/20 instrument-serif-regular">{t}</span>
                 ))}
               </div>
               
-              {/* Special highlighting for MacroBoard live link and Chord Detector download */}
-              {(proj.id === "macroboard" && proj.website) || (proj.id === "live-chord-detector" && proj.download) ? (
+              {/* Action buttons for MacroBoard live link, Chord Detector download, Priority Email video, and deployment status */}
+              {(proj.id === "macroboard" && proj.website) || (proj.id === "live-chord-detector" && proj.download) || (proj.id === "priority-email-labeler" && proj.video) || proj.status === "not-deployed" ? (
                 <div className="mt-4 mb-3">
                   {proj.id === "macroboard" && proj.website && (
                     <a 
@@ -89,6 +90,22 @@ export default function Projects() {
                     >
                       📥 Download Project
                     </a>
+                  )}
+                  {proj.id === "priority-email-labeler" && proj.video && (
+                    <a 
+                      href={proj.video} 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="block w-full border border-red-500/50 bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20" 
+                      target="_blank" 
+                      rel="noreferrer"
+                    >
+                      🎥 Watch Demo Video
+                    </a>
+                  )}
+                  {proj.status === "not-deployed" && (
+                    <div className="block w-full border border-amber-500/50 bg-amber-900/30 text-amber-200 font-semibold py-2 px-4 rounded-2xl text-center">
+                      ⚠️ Not Yet Deployed
+                    </div>
                   )}
                 </div>
               ) : null}

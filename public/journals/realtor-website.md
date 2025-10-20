@@ -22,4 +22,3 @@ Using Firebase made backend management much easier, but I also had to handle sec
 
 I am planning to deploy the website soon and continue improving features like search and filtering for listings.
 
-![Firebase Admin Screenshot](/public/realtorFirebaseSS.png)
