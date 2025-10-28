@@ -39,7 +39,7 @@ export default function ProjectsPreview() {
               </div>
 
               <div className="aspect-video overflow-hidden bg-white border border-zinc-200">
-                {p.video && p.id !== "priority-email-labeler" ? (
+                {p.video && p.id !== "priority-email-labeler" && p.id !== "live-chord-detector" ? (
                   <div 
                     className="relative h-full w-full cursor-pointer"
                     onClick={(e) => {
@@ -80,7 +80,6 @@ export default function ProjectsPreview() {
                   ))}
                 </div>
                 
-                {/* Action buttons for MacroBoard live link, Chord Detector download, Priority Email video, and deployment status */}
                 {(p.id === "macroboard" && p.website) || (p.id === "live-chord-detector" && p.download) || (p.id === "priority-email-labeler" && p.video) || p.status === "not-deployed" ? (
                   <div className="mb-3">
                     {p.id === "macroboard" && p.website && (

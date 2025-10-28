@@ -67,7 +67,6 @@ export default function Projects() {
                 ))}
               </div>
               
-              {/* Action buttons for MacroBoard live link, Chord Detector download, Priority Email video, and deployment status */}
               {(proj.id === "macroboard" && proj.website) || (proj.id === "live-chord-detector" && proj.download) || (proj.id === "priority-email-labeler" && proj.video) || proj.status === "not-deployed" ? (
                 <div className="mt-4 mb-3">
                   {proj.id === "macroboard" && proj.website && (

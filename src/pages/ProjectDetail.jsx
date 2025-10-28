@@ -39,8 +39,7 @@ export default function ProjectDetail() {
         <header className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 inter-unique leading-tight">{project.title}</h1>
           
-          {/* Video for Priority Email Labeler */}
-          {project.id === "priority-email-labeler" && project.video ? (
+          {(project.id === "priority-email-labeler" || project.id === "live-chord-detector") && project.video ? (
             <div className="mb-8">
               <div 
                 className="relative aspect-video max-w-2xl rounded-lg overflow-hidden cursor-pointer group border-2 border-white"
@@ -118,7 +117,7 @@ export default function ProjectDetail() {
         </section>
         
         {/* Action buttons */}
-        {(project.id === "macroboard" && project.website) || (project.id === "live-chord-detector" && project.download) ? (
+        {(project.id === "macroboard" && project.website) || (project.id === "live-chord-detector" && (project.download || project.video)) ? (
           <div className="mb-8 flex flex-col sm:flex-row gap-4">
             {project.id === "macroboard" && project.website && (
               <a 
@@ -137,6 +136,16 @@ export default function ProjectDetail() {
                 download
               >
                 📥 Download Project
+              </a>
+            )}
+            {project.id === "live-chord-detector" && project.video && (
+              <a 
+                href={project.video} 
+                className="flex-1 max-w-xs border border-red-500/50 bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-3 px-6 rounded-lg text-center transition-all duration-200 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20 inter-unique" 
+                target="_blank" 
+                rel="noreferrer"
+              >
+                🎥 Watch Demo Video
               </a>
             )}
           </div>
