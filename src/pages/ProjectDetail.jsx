@@ -60,14 +60,16 @@ export default function ProjectDetail() {
               </div>
               <p className="text-white/70 mt-3 inter-unique">Click to watch demo video</p>
               
-              {/* Priority Email Screenshot */}
-              <div className="mt-6">
-                <img 
-                  src="/priorityEmailSS.png" 
-                  alt="Priority Email Labeler Screenshot" 
-                  className="max-w-full h-auto max-h-96 object-contain rounded-lg shadow-lg border-2 border-white" 
-                />
-              </div>
+              {/* Priority Email Screenshot - only for priority email labeler */}
+              {project.id === "priority-email-labeler" && (
+                <div className="mt-6">
+                  <img 
+                    src="/priorityEmailSS.png" 
+                    alt="Priority Email Labeler Screenshot" 
+                    className="max-w-full h-auto max-h-96 object-contain rounded-lg shadow-lg border-2 border-white" 
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <div className="mb-8">
