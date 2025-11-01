@@ -22,7 +22,7 @@ export const projects = [
     image: "/RealtorWebsiteGif.gif",
     tech: ["React", "Tailwind", "Firebase"],
     github: "https://github.com/hansonq888/carol-wang-realtor",
-    status: "not-deployed",
+    website: "https://carolwangprec.com",
   },
   {
     id: "live-chord-detector",

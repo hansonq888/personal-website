@@ -73,21 +73,21 @@ export default function Hero() {
       </div>
       
       <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-2xl mx-auto px-4">
-        {/* Priority Email Labeler */}
+        {/* Realtor Website */}
         <div className="flex-1 max-w-xs">
           <div 
             className="relative aspect-video rounded-lg overflow-hidden bg-gray-800 border border-white/20 cursor-pointer group"
-            onClick={() => window.location.href = '/projects/priority-email-labeler'}
+            onClick={() => window.location.href = '/projects/realtor-website'}
           >
             <img
-              src="/priorityEmailSS.png"
-              alt="Priority Email Labeler"
+              src="/RealtorWebsiteGif.gif"
+              alt="Realtor Website"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
             <div className="absolute bottom-2 left-2 right-2">
-              <h3 className="text-white text-sm font-semibold">Priority Email Labeler</h3>
-              <p className="text-white/70 text-xs">ML Gmail integration</p>
+              <h3 className="text-white text-sm font-semibold">Realtor Website</h3>
+              <p className="text-white/70 text-xs">React real estate site</p>
             </div>
             <div className="absolute top-2 right-2">
               <div className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">

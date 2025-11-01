@@ -33,7 +33,7 @@ export default function Projects() {
             </div>
             <div className="p-4 text-white">
               <div className="aspect-video mb-4 overflow-hidden">
-                {proj.video && proj.id !== "priority-email-labeler" ? (
+                {proj.video && proj.id !== "priority-email-labeler" && proj.id !== "live-chord-detector" ? (
                   <div 
                     className="relative h-full w-full cursor-pointer"
                     onClick={(e) => {
@@ -67,9 +67,9 @@ export default function Projects() {
                 ))}
               </div>
               
-              {(proj.id === "macroboard" && proj.website) || (proj.id === "live-chord-detector" && proj.download) || (proj.id === "priority-email-labeler" && proj.video) || proj.status === "not-deployed" ? (
+              {(proj.id === "macroboard" && proj.website) || (proj.id === "realtor-website" && proj.website) || (proj.id === "live-chord-detector" && proj.download) || (proj.id === "priority-email-labeler" && proj.video) ? (
                 <div className="mt-4 mb-3">
-                  {proj.id === "macroboard" && proj.website && (
+                  {(proj.id === "macroboard" || proj.id === "realtor-website") && proj.website && (
                     <a 
                       href={proj.website} 
                       onClick={(e) => e.stopPropagation()} 
@@ -101,18 +101,13 @@ export default function Projects() {
                       🎥 Watch Demo Video
                     </a>
                   )}
-                  {proj.status === "not-deployed" && (
-                    <div className="block w-full border border-amber-500/50 bg-amber-900/30 text-amber-200 font-semibold py-2 px-4 rounded-2xl text-center">
-                      ⚠️ Not Yet Deployed
-                    </div>
-                  )}
                 </div>
               ) : null}
               
               <div className="mt-3 flex items-center justify-between text-white/70 text-xs">
                 <span>Read more</span>
                 <div className="flex gap-3">
-                  {proj.website && proj.id !== "macroboard" && (
+                  {proj.website && proj.id !== "macroboard" && proj.id !== "realtor-website" && (
                     <a href={proj.website} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Live</a>
                   )}
                   {proj.download && proj.id !== "live-chord-detector" && (

@@ -117,9 +117,9 @@ export default function ProjectDetail() {
         </section>
         
         {/* Action buttons */}
-        {(project.id === "macroboard" && project.website) || (project.id === "live-chord-detector" && (project.download || project.video)) ? (
+        {(project.id === "macroboard" && project.website) || (project.id === "realtor-website" && project.website) || (project.id === "live-chord-detector" && (project.download || project.video)) ? (
           <div className="mb-8 flex flex-col sm:flex-row gap-4">
-            {project.id === "macroboard" && project.website && (
+            {(project.id === "macroboard" || project.id === "realtor-website") && project.website && (
               <a 
                 href={project.website} 
                 className="flex-1 max-w-xs border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg inter-unique" 

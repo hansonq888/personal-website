@@ -80,9 +80,9 @@ export default function ProjectsPreview() {
                   ))}
                 </div>
                 
-                {(p.id === "macroboard" && p.website) || (p.id === "live-chord-detector" && p.download) || (p.id === "priority-email-labeler" && p.video) || p.status === "not-deployed" ? (
+                {(p.id === "macroboard" && p.website) || (p.id === "realtor-website" && p.website) || (p.id === "live-chord-detector" && p.download) || (p.id === "priority-email-labeler" && p.video) ? (
                   <div className="mb-3">
-                    {p.id === "macroboard" && p.website && (
+                    {(p.id === "macroboard" || p.id === "realtor-website") && p.website && (
                       <a 
                         href={p.website} 
                         onClick={(e) => e.stopPropagation()} 
@@ -114,18 +114,13 @@ export default function ProjectsPreview() {
                         🎥 Watch Demo Video
                       </a>
                     )}
-                    {p.status === "not-deployed" && (
-                      <div className="block w-full border border-amber-500/50 bg-amber-900/30 text-amber-200 font-semibold py-2 px-4 rounded-2xl text-center">
-                        ⚠️ Not Yet Deployed
-                      </div>
-                    )}
                   </div>
                 ) : null}
                 
                 <div className="flex items-center justify-between text-white/70 text-xs">
                   <span>Read more</span>
                   <div className="flex gap-3">
-                    {p.website && p.id !== "macroboard" && (
+                    {p.website && p.id !== "macroboard" && p.id !== "realtor-website" && (
                       <a href={p.website} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Live</a>
                     )}
                     {p.download && p.id !== "live-chord-detector" && (
