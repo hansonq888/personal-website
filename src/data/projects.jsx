@@ -55,6 +55,14 @@ export const projects = [
     tech: ["C", "System Programming", "Unix", "Process Management", "Signals"],
   },
   {
+    id: "mini-compiler",
+    title: "Mini-Compiler",
+    description: "A tiny BASIC-like compiler that lexes, parses, and transpiles to C.",
+    journalFile: "mini-compiler",
+    image: "/compilerGIF.gif",
+    tech: ["C++", "Compilers", "Parsing", "Transpilation"],
+  },
+  {
     id: "personal-website",
     title: "My Personal Website!",
     description: "A website to act as my portfolio.",
