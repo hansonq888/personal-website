@@ -63,6 +63,14 @@ export const projects = [
     tech: ["C++", "Compilers", "Parsing", "Transpilation"],
   },
   {
+    id: "my-allocator",
+    title: "My Allocator",
+    description: "A custom memory allocator implementation with malloc, calloc, and free functions built for a systems programming class.",
+    journalFile: "my-allocator",
+    image: "/allocator_gif.gif",
+    tech: ["C", "Systems Programming", "Memory Management", "sbrk", "mmap"],
+  },
+  {
     id: "personal-website",
     title: "My Personal Website!",
     description: "A website to act as my portfolio.",
