@@ -139,16 +139,21 @@ export default function Layout() {
         aria-hidden
       />
       {/* Music toggle — bottom left, home page only */}
-      {isHomePage && (
-        <button
-          type="button"
-          onClick={toggleMusic}
-          className="fixed bottom-4 md:bottom-8 left-4 md:left-12 z-20 geist-light text-white/75 text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
-          aria-label={isMusicPlaying ? "Pause music" : "Play music"}
-        >
-          {isMusicPlaying ? "♪ Pause" : "♪ Play"}
-        </button>
-      )}
+      <AnimatePresence mode="wait">
+        {isHomePage && (
+          <motion.button
+            type="button"
+            onClick={toggleMusic}
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0, transition: { delay: 0.5, duration: 0.6, ease: calmEase } }}
+            exit={{ opacity: 0, x: 24, transition: { duration: 0.5, ease: calmEase } }}
+            className="fixed bottom-4 md:bottom-8 left-4 md:left-12 z-20 geist-light text-white/75 text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+            aria-label={isMusicPlaying ? "Pause music" : "Play music"}
+          >
+            {isMusicPlaying ? "♪ Pause" : "♪ Play"}
+          </motion.button>
+        )}
+      </AnimatePresence>
       {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && <Navbar />}
       <main className="flex-1 min-h-0 relative flex flex-col">
         <AnimatePresence mode="wait" initial={false}>
