@@ -142,9 +142,9 @@ export default function Hero() {
       </div>
 
       {/* Top left — labels */}
-      <div ref={newHavenRef} className="absolute top-8 left-8 md:left-12 z-10">
+      <div ref={newHavenRef} className="absolute top-4 md:top-8 left-4 md:left-12 z-10">
         <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block">
-          Developer & builder
+          Student developer & builder
         </span>
         <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block mt-1">
           New Haven, CT
@@ -152,7 +152,7 @@ export default function Hero() {
       </div>
 
       {/* Top right — about me */}
-      <div className="absolute top-8 right-8 md:right-12 z-10 text-right max-w-md md:max-w-lg">
+      <div className="absolute top-4 md:top-8 right-4 md:right-12 z-10 text-right max-w-[75%] md:max-w-md md:max-w-lg px-2 md:px-0">
         <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed">
           <span className="geist-light-italic text-white/75">
             Yale sophomore studying CS & Mathematics.
@@ -203,7 +203,7 @@ export default function Hero() {
       </div>
 
       {/* Bottom right — nav */}
-      <div className="absolute bottom-8 right-8 md:right-12 z-10 flex flex-col items-end gap-4">
+      <div className="absolute bottom-4 md:bottom-8 right-4 md:right-12 z-10 flex flex-col items-end gap-4">
         <div className="flex flex-wrap justify-end gap-2">
           <Link
             to="/about"

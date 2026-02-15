@@ -37,6 +37,31 @@ export default function Layout() {
 
   const audioRef = useRef(null);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const clickSoundRef = useRef(null);
+
+  useEffect(() => {
+    clickSoundRef.current = new Audio("/tic.wav");
+    return () => {
+      if (clickSoundRef.current) {
+        clickSoundRef.current.pause();
+        clickSoundRef.current.src = "";
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const playClickSound = (e) => {
+      const target = e.target.closest("button, a[href]");
+      if (target && clickSoundRef.current) {
+        const sound = clickSoundRef.current;
+        sound.volume = 0.45;
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+      }
+    };
+    document.addEventListener("click", playClickSound, true);
+    return () => document.removeEventListener("click", playClickSound, true);
+  }, []);
 
   useEffect(() => {
     const audio = new Audio("/music.mp3");
@@ -118,14 +143,14 @@ export default function Layout() {
         <button
           type="button"
           onClick={toggleMusic}
-          className="fixed bottom-8 left-8 md:left-12 z-20 geist-light text-white/75 text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+          className="fixed bottom-4 md:bottom-8 left-4 md:left-12 z-20 geist-light text-white/75 text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
           aria-label={isMusicPlaying ? "Pause music" : "Play music"}
         >
           {isMusicPlaying ? "♪ Pause" : "♪ Play"}
         </button>
       )}
       {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && <Navbar />}
-      <main className="flex-grow relative">
+      <main className="flex-1 min-h-0 relative flex flex-col">
         <AnimatePresence mode="wait" initial={false}>
           {outlet && (
             <motion.div
@@ -135,14 +160,18 @@ export default function Layout() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="absolute inset-0 min-h-screen"
+              className="min-h-full w-full"
             >
               {outlet}
             </motion.div>
           )}
         </AnimatePresence>
       </main>
-      {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && <Footer />}
+      {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && (
+        <div className="mt-auto flex-shrink-0">
+          <Footer />
+        </div>
+      )}
     </div>
   );
 }

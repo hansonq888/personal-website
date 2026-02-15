@@ -8,7 +8,7 @@ export default function About() {
     <div className="relative min-h-screen overflow-hidden">
       {/* Thin vertical line — left, same as other pages */}
       <motion.div
-        className="absolute left-8 md:left-12 top-24 bottom-44 w-0.5 bg-white/20 z-[1]"
+        className="absolute left-4 md:left-12 top-20 md:top-24 bottom-36 md:bottom-44 w-0.5 bg-white/20 z-[1]"
         aria-hidden
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
@@ -18,7 +18,7 @@ export default function About() {
 
       {/* Top left — labels */}
       <motion.div
-        className="absolute top-8 left-8 md:left-12 z-10"
+        className="absolute top-4 md:top-8 left-4 md:left-12 z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.55, delay: 0.1, ease }}
@@ -33,7 +33,7 @@ export default function About() {
 
       {/* Top right — about copy + baby photo (polaroid) below */}
       <motion.div
-        className="absolute top-8 right-8 md:right-12 z-10 text-right max-w-md flex flex-col items-end"
+        className="absolute top-4 md:top-8 right-4 md:right-12 z-10 text-right max-w-[75%] md:max-w-md flex flex-col items-end px-2 md:px-0"
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.55, delay: 0.2, ease }}
@@ -64,7 +64,7 @@ export default function About() {
 
       {/* Bottom left — headline */}
       <motion.div
-        className="absolute bottom-8 left-8 md:left-12 z-10 pt-4"
+        className="absolute bottom-4 md:bottom-8 left-4 md:left-12 z-10 pt-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.3, ease }}
@@ -79,7 +79,7 @@ export default function About() {
 
       {/* Bottom right — go back */}
       <motion.div
-        className="absolute bottom-8 right-8 md:right-12 z-10"
+        className="absolute bottom-4 md:bottom-8 right-4 md:right-12 z-10"
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.4, ease }}
