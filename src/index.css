@@ -7,6 +7,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Oranienbaum&display=swap');
+
+/* Lumen-style home: display + elegant sans */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+/* Hero: bold, wide, blocky */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&display=swap');
+
+/* Hero: Montserrat super bold */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;0,800;0,900;1,700;1,800&display=swap');
+
+/* Hero: Urbanist */
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Headings: Jersey 25 */
+@import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+
+/* Project titles: MonteCarlo */
+@import url('https://fonts.googleapis.com/css2?family=MonteCarlo&display=swap');
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 /* @plugin "@tailwindcss/typography"; */
@@ -19,6 +39,13 @@
     100% {
       transform: translateX(250%)
     }
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -48,6 +75,42 @@ html, body {
   font-family: "Jersey 10", sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+
+/* Shooting Star — local font from public/fonts */
+@font-face {
+  font-family: "Shooting Star";
+  src: url("/fonts/shooting-star-personal-use/Shooting%20Star.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Moralana — local font from public/fonts */
+@font-face {
+  font-family: "Moralana";
+  src: url("/fonts/Moralana%20DEMO.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.jersey-25-heading {
+  font-family: "Jersey 25", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.hero-name-font {
+  font-family: "Shooting Star", cursive;
+}
+
+.project-title-font {
+  font-family: "Moralana", serif;
+}
+
+h1, h2, h3 {
+  font-family: "Jersey 25", sans-serif;
 }
 
 .barriecito-regular {
@@ -93,6 +156,130 @@ html, body {
   font-family: "Oranienbaum", serif;
   font-weight: 400;
   font-style: normal;
+}
+
+/* Lumen-style home typography */
+.syne-display {
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.syne-italic {
+  font-family: "Syne", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.dm-sans {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.dm-sans-italic {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Gradient text for hero — light pink and orange */
+.gradient-text-hero {
+  background: linear-gradient(135deg, #fbcfe8 0%, #f9a8d4 35%, #fdba74 65%, #fed7aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-hero-sub {
+  background: linear-gradient(135deg, #fdba74 0%, #f9a8d4 50%, #fbcfe8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero: Archivo — bold, wide, blocky, modern */
+.archivo-hero {
+  font-family: "Archivo", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+.archivo-hero-wide {
+  font-family: "Archivo", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0.08em;
+}
+
+.archivo-hero-body {
+  font-family: "Archivo", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.03em;
+}
+
+.archivo-hero-body-italic {
+  font-family: "Archivo", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+/* Hero: Montserrat super bold */
+.montserrat-hero {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+.montserrat-hero-wide {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 0.05em;
+}
+
+.montserrat-hero-body {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.01em;
+}
+
+.montserrat-hero-body-italic {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+/* Urbanist — for headline/name only (semi-bold) */
+.geist {
+  font-family: "Urbanist", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Urbanist — for labels, description, links */
+.geist-light {
+  font-family: "Urbanist", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.geist-italic {
+  font-family: "Urbanist", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.geist-light-italic {
+  font-family: "Urbanist", sans-serif;
+  font-weight: 400;
+  font-style: italic;
 }
 
 .animate-loading-bar {

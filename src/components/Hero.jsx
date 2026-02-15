@@ -1,134 +1,244 @@
-import { useState, useEffect } from "react";
-import Cloud from "../components/Cloud";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
+
+const GLOW_BTN_MAX = 120;
+const GLOW_BTN_MIN = 40;
+const GLOW_NAME_MAX = 180;
+const GLOW_NAME_MIN = 60;
+const NAME_TEXT = "Hanson Qin";
+const BREATH_CYCLE_MS = 16000; // one full inhale+exhale (much slower)
+const ROTATE_LETTER_INDICES = [1, 4, 8]; // a few letters get subtle rotation (a, o, i)
 
 export default function Hero() {
-  const fullText = "hanson qin";
-  const [text, setText] = useState(""); // to change text
-  const [typingForward, setTypingForward] = useState(true); // to change typing forward or not
-  const [isPaused, setIsPaused] = useState(false); // to change whether paused or not
+  const nameRef = useRef(null);
+  const sectionRef = useRef(null);
+  const newHavenRef = useRef(null);
+  const cursorRef = useRef({ x: 0, y: 0 });
+  const [glowButtons, setGlowButtons] = useState(() => Array(5).fill(0));
+  const [glowLetters, setGlowLetters] = useState(() => Array(NAME_TEXT.length).fill(0));
+  const [lineCoords, setLineCoords] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 });
+  const [breath, setBreath] = useState(0);
+  const [breathTime, setBreathTime] = useState(0);
+
+  const handleMouseMove = useCallback((e) => {
+    const pos = { x: e.clientX, y: e.clientY };
+    cursorRef.current = pos;
+    if (nameRef.current) {
+      const letters = nameRef.current.querySelectorAll(".letter");
+      if (letters.length > 0) {
+        const newGlow = Array.from(letters).map((el) => {
+          const rect = el.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const d = Math.hypot(e.clientX - cx, e.clientY - cy);
+          return d < GLOW_NAME_MIN ? 1 : d > GLOW_NAME_MAX ? 0 : 1 - (d - GLOW_NAME_MIN) / (GLOW_NAME_MAX - GLOW_NAME_MIN);
+        });
+        setGlowLetters(newGlow);
+      }
+    }
+    if (sectionRef.current) {
+      const btns = sectionRef.current.querySelectorAll("[data-glow-btn]");
+      if (btns.length > 0) {
+        const newBtnGlow = Array.from(btns).map((el) => {
+          const rect = el.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const d = Math.hypot(e.clientX - cx, e.clientY - cy);
+          return d < GLOW_BTN_MIN ? 1 : d > GLOW_BTN_MAX ? 0 : 1 - (d - GLOW_BTN_MIN) / (GLOW_BTN_MAX - GLOW_BTN_MIN);
+        });
+        setGlowButtons(newBtnGlow);
+      }
+    }
+  }, []);
 
   useEffect(() => {
-    if (isPaused) return; // don't do anything if paused
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove]);
 
-    const speed = 150; // typing speed - increased for better performance
-    const interval = setInterval(() => {
-      if (typingForward) {
-        // typing forward
-        setText((prev) => {
-          if (prev.length < fullText.length) return fullText.substring(0, prev.length + 1);
-          else {
-            // full text, pause 5 seconds
-            setIsPaused(true);
-            setTimeout(() => {
-              setTypingForward(false); // now typing backwards
-              setIsPaused(false); // un pause
-            }, 10000);
-            return prev;
-          }
-        });
-      } else {
-        // deleting
-        setText((prev) => {
-          if (prev.length > 0) return fullText.substring(0, prev.length - 1);
-          else {
-            setIsPaused(true);
-            setTimeout(() => {
-              setTypingForward(true); // now typing backwards
-              setIsPaused(false); // un pause
-            }, 2000);
-            return prev;
-          }
-        });
-      }
-    }, speed);
+  useEffect(() => {
+    const start = performance.now();
+    let rafId;
+    const tick = () => {
+      const t = (performance.now() - start) / BREATH_CYCLE_MS;
+      setBreathTime(t);
+      const b = (1 + Math.sin(t * 2 * Math.PI)) / 2;
+      setBreath(b);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
-    return () => clearInterval(interval); // cleansup the interval
-  }, [typingForward, isPaused]); // dependencies
+  useEffect(() => {
+    const updateLine = () => {
+      if (!sectionRef.current || !newHavenRef.current || !nameRef.current) return;
+      const section = sectionRef.current.getBoundingClientRect();
+      const from = newHavenRef.current.getBoundingClientRect();
+      const to = nameRef.current.getBoundingClientRect();
+      const gap = 32;
+      const x = from.left - section.left;
+      const y1 = from.bottom - section.top + gap;
+      const y2 = to.top - section.top - gap;
+      setLineCoords({ x1: x, y1, x2: x, y2 });
+    };
+    updateLine();
+    window.addEventListener("resize", updateLine);
+    const t = requestAnimationFrame(updateLine);
+    return () => {
+      window.removeEventListener("resize", updateLine);
+      cancelAnimationFrame(t);
+    };
+  }, []);
 
-
-  // Helper function to extract YouTube video ID
-  const getYouTubeVideoId = (url) => {
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-    return match ? match[1] : null;
+  const getGlowStyle = (intensity, breathAmount = 0.5) => {
+    const combined = Math.min(1, intensity * 0.6 + 0.05 + 0.9 * breathAmount);
+    return {
+      textShadow: combined > 0
+        ? `0 0 ${14 + combined * 28}px rgba(255,255,255,${0.08 + combined * 0.35}), 0 0 ${32 + combined * 50}px rgba(255,255,255,${0.04 + combined * 0.12})`
+        : "none",
+      transition: "text-shadow 0.25s ease-out",
+    };
   };
 
   return (
-    <section className="flex flex-col items-center justify-center min-h-screen text-center">
-        <Cloud src="/Cloud1.png" speed={0.2} initialX={"-14%"} initialY={"35%"} width={450}/>
-        <Cloud src="/Cloud2.png" speed={0.5} initialX={"67%"} initialY={"15%"} width={450} direction={-1} />
-        <Cloud src="/Cloud3.png" speed={0.8} initialX={"77%"} initialY={"60%"} width={500} direction={-1} />
-    <div className="overflow-hidden"> {/* over flow hidden to hide that white trail thingy */}
-      <h1 className="text-9xl font-bold text-white">
-        {text}
-        <span className="animate-blink">|</span>
-      </h1>
-    </div>
-    
-    {/* New! Section */}
-    <div className="mt-24 mb-4">
-      <div className="flex items-center justify-center mb-4">
-        <span className="bg-yellow-500 text-black px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-          NEW!
+    <section ref={sectionRef} className="relative min-h-screen overflow-hidden">
+      {/* Thin line from New Haven to name */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+        aria-hidden
+      >
+        <line
+          x1={lineCoords.x1}
+          y1={lineCoords.y1}
+          x2={lineCoords.x2}
+          y2={lineCoords.y2}
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="2"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      {/* White star — right under the SVG line */}
+      <div
+        className="absolute z-10 pointer-events-none -translate-x-1/2"
+        style={{
+          left: lineCoords.x1,
+          top: lineCoords.y2 + 12,
+        }}
+        aria-hidden
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          className="text-white/75 drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]"
+        >
+          <path
+            d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6L12 2z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+
+      {/* Top left — labels */}
+      <div ref={newHavenRef} className="absolute top-8 left-8 md:left-12 z-10">
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block">
+          Developer & builder
+        </span>
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block mt-1">
+          New Haven, CT
         </span>
       </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-2xl mx-auto px-4">
-        {/* Realtor Website */}
-        <div className="flex-1 max-w-xs">
-          <div 
-            className="relative aspect-video rounded-lg overflow-hidden bg-gray-800 border border-white/20 cursor-pointer group"
-            onClick={() => window.location.href = '/projects/realtor-website'}
-          >
-            <img
-              src="/RealtorWebsiteGif.gif"
-              alt="Realtor Website"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
-            <div className="absolute bottom-2 left-2 right-2">
-              <h3 className="text-white text-sm font-semibold">Realtor Website</h3>
-              <p className="text-white/70 text-xs">React real estate site</p>
-            </div>
-            <div className="absolute top-2 right-2">
-              <div className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">
-                View Project
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Chord Detector */}
-        <div className="flex-1 max-w-xs">
-          <div 
-            className="relative aspect-video rounded-lg overflow-hidden bg-gray-800 border border-white/20 cursor-pointer group"
-            onClick={() => window.location.href = '/projects/live-chord-detector'}
-          >
-            <img
-              src="/chordDetectorSS.png"
-              alt="Live Chord Detector"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent group-hover:from-black/60 transition-all duration-300"></div>
-            <div className="absolute bottom-2 left-2 right-2">
-              <h3 className="text-white text-sm font-semibold">Live Chord Detector</h3>
-              <p className="text-white/70 text-xs">Real-time ML music</p>
-            </div>
-            <div 
-              className="absolute top-2 right-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open("https://drive.google.com/uc?export=download&id=1N83rAu9avdOqpdn7tuwPQVj3uWGsBDAy", '_blank');
-              }}
-            >
-              <div className="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold cursor-pointer hover:bg-green-700 transition-colors">
-                📥 Download
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Top right — about me */}
+      <div className="absolute top-8 right-8 md:right-12 z-10 text-right max-w-md md:max-w-lg">
+        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed">
+          <span className="geist-light-italic text-white/75">
+            Yale sophomore studying CS & Mathematics.
+          </span>{" "}
+          I build software, dabble in ML and design, and like to mix code and creativity. When I'm not coding, I'm on the ultimate field or messing with music.
+        </p>
+        <Link
+          to="/about"
+          data-glow-btn
+          className="geist-light text-white/75 text-xs tracking-widest mt-4 inline-block transition-opacity hover:opacity-90"
+          style={getGlowStyle(glowButtons[0] ?? 0)}
+        >
+          More about me →
+        </Link>
       </div>
-    </div>
+
+      {/* Center — name (each letter breathes at a different time via phase offset) */}
+      <div className="absolute inset-0 z-10 flex justify-center items-center pointer-events-none">
+        <h1
+          ref={nameRef}
+          className="hero-name-font text-[clamp(2.5rem,10vw,6rem)] md:text-[clamp(3.5rem,12vw,8rem)] leading-[0.92] text-white/75 font-bold flex justify-center items-center flex-wrap pointer-events-auto"
+        >
+          {NAME_TEXT.split("").map((char, i) => {
+            const phase = (breathTime + i * 0.18) * 2 * Math.PI;
+            const letterBreath = (1 + Math.sin(phase)) / 2;
+            const scale = 0.96 + 0.08 * letterBreath;
+            const rotateDeg = ROTATE_LETTER_INDICES.includes(i)
+              ? (letterBreath - 0.5) * 6
+              : 0;
+            const transform =
+              rotateDeg !== 0
+                ? `scale(${scale}) rotate(${rotateDeg}deg)`
+                : `scale(${scale})`;
+            return (
+              <span
+                key={i}
+                className="letter inline-block origin-center"
+                style={{
+                  ...getGlowStyle(glowLetters[i] ?? 0, letterBreath),
+                  transform,
+                }}
+              >
+                {char}
+              </span>
+            );
+          })}
+        </h1>
+      </div>
+
+      {/* Bottom right — nav */}
+      <div className="absolute bottom-8 right-8 md:right-12 z-10 flex flex-col items-end gap-4">
+        <div className="flex flex-wrap justify-end gap-2">
+          <Link
+            to="/about"
+            data-glow-btn
+            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+            style={getGlowStyle(glowButtons[1] ?? 0)}
+          >
+            About
+          </Link>
+          <Link
+            to="/projects"
+            data-glow-btn
+            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+            style={getGlowStyle(glowButtons[2] ?? 0)}
+          >
+            Projects
+          </Link>
+          <Link
+            to="/contact"
+            data-glow-btn
+            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+            style={getGlowStyle(glowButtons[3] ?? 0)}
+          >
+            Contact
+          </Link>
+        </div>
+        <Link
+          to="/projects"
+          data-glow-btn
+          className="geist-light text-white/75 text-xs tracking-widest transition-opacity hover:opacity-90"
+          style={getGlowStyle(glowButtons[4] ?? 0)}
+        >
+          Explore work
+        </Link>
+      </div>
     </section>
-    
   );
 }

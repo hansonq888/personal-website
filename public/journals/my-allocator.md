@@ -44,3 +44,4 @@ The first-fit strategy is simple but has real trade-offs. In a production alloca
 
 Since this was a class project that I built on afterward, I'm not sharing the full codebase publicly. If you want to dig into specific parts (like how I handle the sbrk vs mmap decision, or the block structure layout), I'm happy to explain or share snippets.
 
+

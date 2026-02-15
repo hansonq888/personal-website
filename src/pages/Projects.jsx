@@ -1,126 +1,111 @@
 import { Link } from "react-router-dom";
 import { projects } from "../data/projects";
 
-// Helper function to extract YouTube video ID
-const getYouTubeVideoId = (url) => {
-  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
-  return match ? match[1] : null;
-};
+const SHOW_IDS = [
+  "macroboard",
+  "realtor-website",
+  "live-chord-detector",
+  "priority-email-labeler",
+  "mini-shell",
+  "mini-compiler",
+];
+const displayedProjects = projects.filter((p) => SHOW_IDS.includes(p.id));
+
+const CARD_POSITIONS = [
+  { top: "34%", left: "80%" },
+  { top: "42%", left: "48%" },
+  { top: "62%", left: "22%" },
+  { top: "22%", left: "28%" },
+  { top: "72%", left: "65%" },
+  { top: "78%", left: "46%" },
+];
+
+function firstSentence(text) {
+  if (!text || typeof text !== "string") return "";
+  const match = text.match(/^[^.]*\.?/);
+  return match ? match[0].trim() : text;
+}
 
 export default function Projects() {
   return (
-    <div 
-      className="min-h-screen p-10"
-      style={{ 
-        backgroundImage: "url('/auroras.png')", 
-        backgroundRepeat: 'no-repeat', 
-        backgroundSize: 'cover', 
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      <h1 className="text-6xl font-bold mb-5 instrument-serif-regular text-white">My Projects</h1>
+    <div className="relative h-screen overflow-hidden flex flex-col">
+      {/* Thin vertical line — left */}
+      <div
+        className="absolute left-8 md:left-12 top-24 bottom-44 w-0.5 bg-white/20 z-[1]"
+        aria-hidden
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((proj) => (
+      {/* Top left — labels */}
+      <div className="absolute top-8 left-8 md:left-12 z-10">
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block">
+          Work
+        </span>
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block mt-1">
+          Projects
+        </span>
+      </div>
+
+      {/* Top right — intro */}
+      <div className="absolute top-8 right-8 md:right-12 z-10 text-right max-w-md">
+        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed">
+          <span className="geist-light-italic text-white/75">Things I've built.</span>
+          {" "}Click through to read more or try them out.
+        </p>
+      </div>
+
+      {/* Project cards — scattered around the page */}
+      {displayedProjects.map((proj, i) => {
+        const pos = CARD_POSITIONS[i] ?? { top: "50%", left: "50%" };
+        const isFeatured = i < 3;
+        const cardSize = isFeatured
+          ? "w-52 md:w-64"
+          : "w-36 md:w-40";
+        const titleSize = isFeatured
+          ? "text-lg md:text-xl"
+          : "text-sm md:text-base";
+        return (
           <Link
             key={proj.id}
             to={`/projects/${proj.id}`}
-            className="group overflow-hidden rounded-2xl border border-white/20 bg-gray-900 hover:bg-gray-800 shadow-md hover:shadow-lg transition-all"
+            className={`geist-light absolute z-10 ${cardSize} flex flex-col -translate-x-1/2 -translate-y-1/2 group rounded-lg transition-shadow duration-300 hover:shadow-[0_0_20px_rgba(255,255,255,0.12),0_0_40px_rgba(255,255,255,0.06)]`}
+            style={{ top: pos.top, left: pos.left }}
           >
-            <div className="px-4 py-3 border-b border-white/10 text-white">
-              <h2 className="text-lg font-semibold instrument-serif-regular">{proj.title}</h2>
-            </div>
-            <div className="p-4 text-white">
-              <div className="aspect-video mb-4 overflow-hidden">
-                {proj.video && proj.id !== "priority-email-labeler" && proj.id !== "live-chord-detector" ? (
-                  <div 
-                    className="relative h-full w-full cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      window.open(proj.video, '_blank');
-                    }}
-                  >
-                    <img
-                      src={`https://img.youtube.com/vi/${getYouTubeVideoId(proj.video)}/maxresdefault.jpg`}
-                      alt={proj.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-50 transition-all duration-300">
-                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-                        <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <img src={proj.image} alt={proj.title} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                )}
+            <span className={`jersey-25-heading text-white/90 ${titleSize} font-medium text-left mb-2`}>
+              {proj.title}
+            </span>
+            {proj.image && (
+              <div className="aspect-video w-full overflow-hidden">
+                <img
+                  src={proj.image}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <p className="text-sm text-white/80 instrument-serif-regular">{proj.description}</p>
-              
-              <div className="mt-3 flex flex-wrap gap-2">
-                {(proj.tech || []).slice(0,3).map((t) => (
-                  <span key={t} className="text-[11px] px-2 py-0.5 bg-white/10 text-white border border-white/20 instrument-serif-regular">{t}</span>
-                ))}
-              </div>
-              
-              {(proj.id === "macroboard" && proj.website) || (proj.id === "realtor-website" && proj.website) || (proj.id === "live-chord-detector" && proj.download) || (proj.id === "priority-email-labeler" && proj.video) ? (
-                <div className="mt-4 mb-3">
-                  {(proj.id === "macroboard" || proj.id === "realtor-website") && proj.website && (
-                    <a 
-                      href={proj.website} 
-                      onClick={(e) => e.stopPropagation()} 
-                      className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
-                      target="_blank" 
-                      rel="noreferrer"
-                    >
-                      🌐 Visit Live Site
-                    </a>
-                  )}
-                  {proj.id === "live-chord-detector" && proj.download && (
-                    <a 
-                      href={proj.download} 
-                      onClick={(e) => e.stopPropagation()} 
-                      className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
-                      download
-                    >
-                      📥 Download Project
-                    </a>
-                  )}
-                  {proj.id === "priority-email-labeler" && proj.video && (
-                    <a 
-                      href={proj.video} 
-                      onClick={(e) => e.stopPropagation()} 
-                      className="block w-full border border-red-500/50 bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20" 
-                      target="_blank" 
-                      rel="noreferrer"
-                    >
-                      🎥 Watch Demo Video
-                    </a>
-                  )}
-                </div>
-              ) : null}
-              
-              <div className="mt-3 flex items-center justify-between text-white/70 text-xs">
-                <span>Read more</span>
-                <div className="flex gap-3">
-                  {proj.website && proj.id !== "macroboard" && proj.id !== "realtor-website" && (
-                    <a href={proj.website} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Live</a>
-                  )}
-                  {proj.download && proj.id !== "live-chord-detector" && (
-                    <a href={proj.download} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" download>Download</a>
-                  )}
-                  {proj.github && proj.id !== "spam-email-detector" && (
-                    <a href={proj.github} onClick={(e) => e.stopPropagation()} className="underline hover:text-white" target="_blank" rel="noreferrer">Code</a>
-                  )}
-                </div>
-              </div>
-            </div>
+            )}
+            {proj.description && (
+              <p className={`geist-light text-white/70 mt-2 ${isFeatured ? "text-xs" : "text-[10px]"}`}>
+                {firstSentence(proj.description)}
+              </p>
+            )}
           </Link>
-        ))}
+        );
+      })}
+
+      {/* Bottom left — headline */}
+      <div className="absolute bottom-8 left-8 md:left-12 z-10 pt-4">
+        <h1 className="project-title-font text-[clamp(2rem,8vw,4rem)] text-white/75 font-bold leading-tight">
+          Projects
+        </h1>
+      </div>
+
+      {/* Bottom right — back */}
+      <div className="absolute bottom-8 right-8 md:right-12 z-10">
+        <Link
+          to="/"
+          className="geist-light text-white/75 text-sm border border-white/30 rounded-full px-5 py-2.5 hover:bg-white/10 transition-colors tracking-wider inline-block"
+        >
+          Home
+        </Link>
       </div>
     </div>
   );

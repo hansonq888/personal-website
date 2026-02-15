@@ -19,7 +19,7 @@ export const projects = [
     title: "Realtor Website",
     description: "A personal realtor website made with React",
     journalFile: "realtor-website",
-    image: "/RealtorWebsiteGif.gif",
+    image: "/realtor.png",
     tech: ["React", "Tailwind", "Firebase"],
     github: "https://github.com/hansonq888/carol-wang-realtor",
     website: "https://carolwangprec.com",

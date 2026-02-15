@@ -1,86 +1,96 @@
-import FloatingObject from "../components/FloatingObject";
-import { Parallax, ParallaxLayer } from "@react-spring/parallax";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+
+const ease = [0.33, 1, 0.68, 1];
 
 export default function About() {
   return (
-    <div className="min-h-screen">
-      <Parallax pages={3.5}>
-        
-        <ParallaxLayer
-          factor={1.2}
-          speed={1}
-          style={{
-            backgroundImage: `url(/AboutBackground.png)`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            width: '100%'
-          }}
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Thin vertical line — left, same as other pages */}
+      <motion.div
+        className="absolute left-8 md:left-12 top-24 bottom-44 w-0.5 bg-white/20 z-[1]"
+        aria-hidden
+        initial={{ scaleY: 0 }}
+        animate={{ scaleY: 1 }}
+        transition={{ duration: 0.6, delay: 0.15, ease }}
+        style={{ originY: 0 }}
+      />
+
+      {/* Top left — labels */}
+      <motion.div
+        className="absolute top-8 left-8 md:left-12 z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.55, delay: 0.1, ease }}
+      >
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block">
+          Who
+        </span>
+        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block mt-1">
+          About
+        </span>
+      </motion.div>
+
+      {/* Top right — about copy + baby photo (polaroid) below */}
+      <motion.div
+        className="absolute top-8 right-8 md:right-12 z-10 text-right max-w-md flex flex-col items-end"
+        initial={{ opacity: 0, x: 12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.55, delay: 0.2, ease }}
+      >
+        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed mb-4">
+          <span className="geist-light-italic text-white/75">Yale sophomore studying CS & Mathematics.</span>
+          {" "}I build software, dabble in ML and design, and like to mix code and creativity.
+        </p>
+        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed mb-4">
+          Outside of academics, I love playing ultimate frisbee, exploring music production, and staying active. I'm always excited to learn new skills, tackle challenging problems, and share knowledge with others.
+        </p>
+        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed mb-6">
+          This site is a space to showcase my work, projects, and explorations in technology, design, and music.
+        </p>
+        <motion.div
+          className="bg-white/75 pt-2 pr-2 pl-2 pb-8 shadow-lg w-fit"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.3, ease }}
         >
-          <div className="flex flex-col items-center p-6 text-center md:text-left">
-            <h1 className="mt-20 jersey-10-regular text-9xl">About Me</h1>
-            <p>Hi there! My name is Hanson and I am a sophomore at Yale University studying Computer Science and Economics.</p>
-          </div>
+          <img
+            src="/AboutPhoto.jpg"
+            alt=""
+            className="w-40 md:w-48 object-cover block"
+          />
+        </motion.div>
+      </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-35 m-10 md:m-20 items-center">
-            <img
-              src="./AboutPhoto.jpg"
-              alt="baby photo"
-              className="shadow-xl w-full max-w-[350px] border-t-10 border-l-10 border-r-10 border-b-30 border-white 
-                        justify-self-center md:justify-self-end"
-            />
+      {/* Bottom left — headline */}
+      <motion.div
+        className="absolute bottom-8 left-8 md:left-12 z-10 pt-4"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.3, ease }}
+      >
+        <h1 className="project-title-font text-[clamp(2rem,8vw,4rem)] text-white/75 font-bold leading-tight">
+          About
+        </h1>
+        <span className="geist-light text-white/45 text-xs tracking-widest block mt-2">
+          New Haven, CT
+        </span>
+      </motion.div>
 
-            <p className="text-lg instrument-serif-regular break-words text-center md:text-left 
-                          justify-self-center md:justify-self-start max-w-[500px]">
-              Hi! I’m Hanson Qin, a sophomore at Yale University majoring in Computer Science and Economics. 
-              I’m passionate about software development, machine learning, and UX/UI design, and I enjoy building projects that combine creativity and technology.
-              <br /><br />
-              Outside of academics, I love playing ultimate frisbee, exploring music production, and staying active through sports and fitness. 
-              I’m always excited to learn new skills, tackle challenging problems, and share knowledge with others.
-              <br /><br />
-              This website is a space to showcase some of my work, projects, and explorations in technology, design, and personal growth.
-            </p>
-          </div>
-
-
-        </ParallaxLayer>
-
-        {/* Stars: Leave untouched */}
-        <ParallaxLayer
-          offset={0}
-          speed={2}
-          factor={2}
-          style={{
-            backgroundImage: `url(/AboutStars.png)`,
-            backgroundSize: 'contain',     
-            backgroundPosition: 'top left', 
-            backgroundRepeat: 'no-repeat',
-            height: '12vw',          
-            width: '100%'
-          }}
-        />
-        <ParallaxLayer
-          offset={0}
-          speed={2}
-          factor={2}
-          style={{
-            backgroundImage: `url(/AboutStars.png)`,
-            backgroundSize: 'contain',     
-            backgroundPosition: 'top right', 
-            backgroundRepeat: 'no-repeat',
-            height: '12vw',          
-            width: '100%'
-          }}
-        />
-
-        <ParallaxLayer factor={1} offset={2} speed={0.1}>
-          <div className="text-center">
-            <h1 className="text-5xl">Nothing to see here... yet</h1>
-          </div>
-        </ParallaxLayer>
-
-        <ParallaxLayer offset={2.5} factor={1} speed={0} style={{ backgroundColor: '#000' }} />
-      </Parallax>
+      {/* Bottom right — go back */}
+      <motion.div
+        className="absolute bottom-8 right-8 md:right-12 z-10"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.4, ease }}
+      >
+        <Link
+          to="/"
+          className="geist-light text-white/75 text-sm border border-white/30 rounded-full px-5 py-2.5 hover:bg-white/10 transition-colors tracking-wider inline-block"
+        >
+          Go back
+        </Link>
+      </motion.div>
     </div>
   );
 }

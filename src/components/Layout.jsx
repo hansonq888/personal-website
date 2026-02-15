@@ -1,31 +1,148 @@
-import React from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom"; {/* Outlet acts as a placeholder, NavLink connects  */} 
-import Navbar from "./Navbar";  // assuming Navbar.jsx is in the same folder or adjust path
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { Outlet, useLocation, useOutlet } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import Navbar from "./Navbar";
 import Footer from "./Footer";
+
+const calmEase = [0.33, 1, 0.68, 1]; // gentle ease-out
+const CURSOR_GLOW_LERP = 0.08;
+const pageVariants = {
+  initial: (isContact) => ({
+    opacity: 0,
+    x: isContact ? 24 : -24,
+  }),
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, ease: calmEase },
+  },
+  exit: (isContact) => ({
+    opacity: 0,
+    x: isContact ? -24 : 24,
+    transition: { duration: 0.5, ease: calmEase },
+  }),
+};
 
 export default function Layout() {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
-  const isContactPage = location.pathname === '/contact';
+  const outlet = useOutlet();
+  const isHomePage = location.pathname === "/";
+  const isContactPage = location.pathname === "/contact";
+  const isProjectsPage = location.pathname === "/projects";
+  const isAboutPage = location.pathname === "/about";
+  const isMinimalLayout = isHomePage || isContactPage || isProjectsPage || isAboutPage;
+
+  const cursorRef = useRef({ x: 0, y: 0 });
+  const [glowPos, setGlowPos] = useState({ x: 0, y: 0 });
+
+  const audioRef = useRef(null);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio("/music.mp3");
+    audio.loop = true;
+    audioRef.current = audio;
+    audio.play().then(() => setIsMusicPlaying(true)).catch(() => {});
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isMusicPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch(() => {});
+    }
+    setIsMusicPlaying((prev) => !prev);
+  }, [isMusicPlaying]);
+
+  const handleMouseMove = useCallback((e) => {
+    cursorRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove]);
+
+  useEffect(() => {
+    let rafId;
+    const tick = () => {
+      const target = cursorRef.current;
+      setGlowPos((prev) => ({
+        x: prev.x + (target.x - prev.x) * CURSOR_GLOW_LERP,
+        y: prev.y + (target.y - prev.y) * CURSOR_GLOW_LERP,
+      }));
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   return (
-    <div 
-      className={`flex flex-col w-full min-h-screen ${
-        (isHomePage || isContactPage) ? 'bg-cover bg-no-repeat bg-fixed' : ''
-      }`}
+    <div
+      className={`flex flex-col w-full min-h-screen bg-cover bg-center bg-no-repeat ${isMinimalLayout ? "bg-black" : ""}`}
       style={
-        isHomePage
-          ? { backgroundImage: "url('/HeroBackground.png')" }
-          : isContactPage
-            ? { backgroundImage: "url('/jellyfish.svg')", backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', backgroundAttachment: 'fixed' }
-            : {}
+        isMinimalLayout
+          ? {
+              backgroundImage: "url(/purpleblurry.png)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              ...(isProjectsPage ? { backgroundAttachment: "fixed" } : {}),
+            }
+          : {}
       }
     >
-      <Navbar />  {/* Use the full-featured Navbar here */}
-      <main className="flex-grow"> 
-        <Outlet /> {/* This renders child routes. Outlet is a placeholder */} 
+      {/* Cursor-following glow — on every page */}
+      <div
+        className="pointer-events-none fixed rounded-full mix-blend-soft-light"
+        style={{
+          left: glowPos.x,
+          top: glowPos.y,
+          width: 200,
+          height: 200,
+          transform: "translate(-50%, -50%)",
+          background: "radial-gradient(circle, rgba(255, 255, 255, 0.81) 0%, transparent 80%)",
+          filter: "blur(100px)",
+          zIndex: 0,
+        }}
+        aria-hidden
+      />
+      {/* Music toggle — bottom left, home page only */}
+      {isHomePage && (
+        <button
+          type="button"
+          onClick={toggleMusic}
+          className="fixed bottom-8 left-8 md:left-12 z-20 geist-light text-white/75 text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
+          aria-label={isMusicPlaying ? "Pause music" : "Play music"}
+        >
+          {isMusicPlaying ? "♪ Pause" : "♪ Play"}
+        </button>
+      )}
+      {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && <Navbar />}
+      <main className="flex-grow relative">
+        <AnimatePresence mode="wait" initial={false}>
+          {outlet && (
+            <motion.div
+              key={location.pathname}
+              custom={isContactPage || isProjectsPage || isAboutPage}
+              variants={pageVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="absolute inset-0 min-h-screen"
+            >
+              {outlet}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
-      {!isHomePage && <Footer />}
+      {!isHomePage && !isContactPage && !isProjectsPage && !isAboutPage && <Footer />}
     </div>
   );
 }
