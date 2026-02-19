@@ -9,14 +9,14 @@ const previewProjects = projects.filter((p) => PREVIEW_IDS.includes(p.id));
 export default function Home() {
   return (
     <PageShell isHome scrollContent={false}>
-      <div className="h-full flex flex-col min-h-0 min-w-0 overflow-hidden w-full max-w-full">
-      {/* Center — name + about preview (compact Hero) */}
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="h-full min-h-full flex flex-col min-h-0 min-w-0 overflow-hidden w-full max-w-full">
+      {/* Center — name + about preview (compact Hero); on mobile cap height so bottom previews stay visible */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden max-h-[65vh] md:max-h-none">
         <Hero compact />
       </div>
 
-      {/* Bottom — 3 previews as buttons (larger, same hover as buttons) */}
-      <div className="flex-shrink-0 grid grid-cols-3 divide-x divide-white/20 border-t border-white/20 min-h-0 max-h-[28vh] md:max-h-[26vh]">
+      {/* Bottom — 3 previews; pinned to bottom of viewport */}
+      <div className="mt-auto flex-shrink-0 grid grid-cols-3 divide-x divide-white/20 border-t border-white/20 min-h-[100px] max-h-[18vh] md:max-h-[20vh]">
         <Link
           to="/experiences"
           className="group block p-3 md:p-4 min-w-0 overflow-hidden border border-white/20 hover:bg-white transition-colors"

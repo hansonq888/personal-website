@@ -197,7 +197,7 @@ export default function Hero({ compact = false }) {
           {compact ? (
             <Link
               to="/about"
-              className="geist-light flex items-center justify-center gap-1.5 text-white/90 hover:text-white text-xs md:text-sm tracking-wide mt-2 max-w-md text-center transition-colors"
+              className="geist-light flex items-center justify-center gap-1.5 text-white/90 hover:text-white text-xs md:text-sm tracking-wide mt-1 md:mt-2 max-w-md text-center transition-colors line-clamp-2"
             >
               <span>Yale sophomore originally from Vancouver, Canada. I build software, work in ML and design…</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0" aria-hidden>
