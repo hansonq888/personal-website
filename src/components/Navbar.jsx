@@ -12,10 +12,10 @@ export default function Navbar() {
         
         {/* Desktop Nav Links - Left Side */}
         <div className="hidden md:flex space-x-8 text-white instrument-serif-regular">
-          <NavLink to="/" className="hover:text-blue-400 text-base font-medium">Home</NavLink>
-          <NavLink to="/about" className="hover:text-blue-400 text-base font-medium">About</NavLink>
-          <NavLink to="/contact" className="hover:text-blue-400 text-base font-medium">Contact</NavLink>
-          <NavLink to="/projects" className="hover:text-blue-400 text-base font-medium">Projects</NavLink>
+          <NavLink to="/" className="hover:text-white/80 text-base font-medium">Home</NavLink>
+          <NavLink to="/about" className="hover:text-white/80 text-base font-medium">About</NavLink>
+          <NavLink to="/projects" className="hover:text-white/80 text-base font-medium">Projects</NavLink>
+          <NavLink to="/contact" className="hover:text-white/80 text-base font-medium">Contact</NavLink>
         </div>
 
         {/* Social Icons - Right Side */}
@@ -42,10 +42,10 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-transparent px-8 pb-4 flex flex-col space-y-3 text-white instrument-serif-regular">
-          <NavLink to="/" onClick={() => setIsOpen(false)} className="hover:text-blue-400 text-base">Home</NavLink>
-          <NavLink to="/about" onClick={() => setIsOpen(false)} className="hover:text-blue-400 text-base">About</NavLink>
-          <NavLink to="/contact" onClick={() => setIsOpen(false)} className="hover:text-blue-400 text-base">Contact</NavLink>
-          <NavLink to="/projects" onClick={() => setIsOpen(false)} className="hover:text-blue-400 text-base">Projects</NavLink>
+          <NavLink to="/" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">Home</NavLink>
+          <NavLink to="/about" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">About</NavLink>
+          <NavLink to="/projects" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">Projects</NavLink>
+          <NavLink to="/contact" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">Contact</NavLink>
 
           {/* Social Icons for Mobile */}
           <div className="flex space-x-6 mt-4">

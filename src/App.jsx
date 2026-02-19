@@ -4,11 +4,14 @@ import "./App.css";
 import { LoadingScreen } from "./components/LoadingScreen";
 import "./index.css";
 
+import { MusicProvider } from "./context/MusicContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import Projects from "./pages/Projects";
+import Contact from "./pages/Contact";
+import Experiences from "./pages/Experiences";
+import Skills from "./pages/Skills";
 import ProjectDetail from "./pages/ProjectDetail";
 
 const router = createBrowserRouter([
@@ -18,77 +21,77 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <Home /> },
       { path: "/about", element: <About /> },
+      { path: "/projects", element: <Projects /> },
       { path: "/contact", element: <Contact /> },
-      { path: "/projects", element: <Projects />},
-      { path: "/projects", element: <Projects />},
-      {path: "/projects/:id", element: <ProjectDetail />}
+      { path: "/experiences", element: <Experiences /> },
+      { path: "/skills", element: <Skills /> },
+      { path: "/projects/:id", element: <ProjectDetail /> },
     ],
   },
 ]);
+
+const MAX_LOAD_WAIT_MS = 6000;
+const MIN_LOAD_DISPLAY_MS = 600;
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {
-    const checkLoadingComplete = () => {
-      // Check if all critical resources are loaded
-      const images = document.querySelectorAll('img');
-      const videos = document.querySelectorAll('video');
-      const totalResources = images.length + videos.length;
-      let loadedResources = 0;
+    let cancelled = false;
+    const startTime = Date.now();
 
-      if (totalResources === 0) {
-        // If no resources to load, complete immediately
-        setLoadingProgress(100);
-        return;
-      }
-
-      const updateProgress = () => {
-        loadedResources++;
-        const progress = Math.round((loadedResources / totalResources) * 100);
-        setLoadingProgress(progress);
-        
-        if (loadedResources >= totalResources) {
-          // All resources loaded, complete loading
-          setTimeout(() => setIsLoaded(true), 500); // Small delay for smooth transition
-        }
-      };
-
-      // Check images
-      images.forEach(img => {
-        if (img.complete) {
-          updateProgress();
-        } else {
-          img.addEventListener('load', updateProgress);
-          img.addEventListener('error', updateProgress); // Count errors as "loaded"
-        }
-      });
-
-      // Check videos
-      videos.forEach(video => {
-        if (video.readyState >= 3) { // HAVE_FUTURE_DATA
-          updateProgress();
-        } else {
-          video.addEventListener('canplaythrough', updateProgress);
-          video.addEventListener('error', updateProgress);
-        }
-      });
-
-      // Fallback: complete loading after 3 seconds regardless
+    const finishLoading = () => {
+      if (cancelled) return;
+      const elapsed = Date.now() - startTime;
+      const wait = Math.max(0, MIN_LOAD_DISPLAY_MS - elapsed);
       setTimeout(() => {
-        if (!isLoaded) {
-          setLoadingProgress(100);
-          setIsLoaded(true);
-        }
-      }, 3000);
+        if (cancelled) return;
+        setLoadingProgress(100);
+        // LoadingScreen will call onComplete after progress hits 100 (after its 300ms delay)
+      }, wait);
     };
 
-    // Start checking after a short delay to allow initial render
-    const timer = setTimeout(checkLoadingComplete, 100);
-    
-    return () => clearTimeout(timer);
-  }, [isLoaded]);
+    // Wait for fonts to be ready (includes custom @font-face fonts)
+    const fontsReady = document.fonts && document.fonts.ready
+      ? document.fonts.ready
+      : Promise.resolve();
+
+    fontsReady
+      .then(() => {
+        if (cancelled) return;
+        return new Promise((resolve) => setTimeout(resolve, 80));
+      })
+      .then(() => {
+        if (cancelled) return;
+        finishLoading();
+      })
+      .catch(() => {
+        if (!cancelled) finishLoading();
+      });
+
+    // Progress bar crawl while waiting
+    const progressInterval = setInterval(() => {
+      setLoadingProgress((p) => {
+        if (p >= 90) return p;
+        return Math.min(90, p + 4);
+      });
+    }, 120);
+
+    // Fallback: force done after max wait
+    const fallback = setTimeout(() => {
+      if (!cancelled) {
+        setLoadingProgress(100);
+        setTimeout(() => setIsLoaded(true), 200);
+      }
+    }, MAX_LOAD_WAIT_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(progressInterval);
+      clearTimeout(fallback);
+    };
+  }, []);
 
   return (
     <>
@@ -96,11 +99,13 @@ function App() {
         <LoadingScreen onComplete={() => setIsLoaded(true)} progress={loadingProgress} />
       ) : (
         <div
-          className={`min-h-screen transition-opacity duration-300 ${
+          className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full transition-opacity duration-300 ${
             isLoaded ? "opacity-100" : "opacity-0"
-          } bg-black text-gray-100`}
+          } bg-black text-white`}
         >
-          <RouterProvider router={router} />
+          <MusicProvider>
+            <RouterProvider router={router} />
+          </MusicProvider>
         </div>
       )}
     </>

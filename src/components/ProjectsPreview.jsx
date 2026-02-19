@@ -17,10 +17,10 @@ export default function ProjectsPreview() {
     >
       <div className="relative z-10 max-w-7xl mx-auto pt-10 pb-0">
         <div className="flex items-end justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Featured Projects</h2>
+          <h2 className="octosale text-3xl font-bold text-white">Featured Projects</h2>
           <Link
             to="/projects"
-            className="text-sm md:text-base bg-white text-black px-4 py-2 hover:opacity-90 border border-black"
+            className="text-sm md:text-base bg-transparent text-white px-4 py-2 border-2 border-white hover:bg-white hover:text-black transition-colors"
           >
             View all projects
           </Link>
@@ -31,7 +31,7 @@ export default function ProjectsPreview() {
             <Link
               key={p.id}
               to={`/projects/${p.id}`}
-              className="group overflow-hidden rounded-2xl border border-white/20 bg-gray-900 hover:bg-gray-800 shadow-md hover:shadow-lg transition-all"
+              className="group overflow-hidden border-2 border-white/20 bg-black hover:bg-white/5 hover:border-white/40 transition-all"
             >
               {/* Sleek header */}
               <div className="px-4 py-3 border-b border-white/10 text-white">
@@ -55,7 +55,7 @@ export default function ProjectsPreview() {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-50 transition-all duration-300">
-                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-14 h-14 bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
                         <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
@@ -72,7 +72,7 @@ export default function ProjectsPreview() {
                 )}
               </div>
               <div className="p-4 text-white">
-                <p className="text-sm text-white/80 instrument-serif-regular mb-2">{p.description}</p>
+                <p className="text-base text-white instrument-serif-regular mb-2">{p.description}</p>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
                   {p.tech?.slice(0, 3).map((t) => (
@@ -86,7 +86,7 @@ export default function ProjectsPreview() {
                       <a 
                         href={p.website} 
                         onClick={(e) => e.stopPropagation()} 
-                        className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                        className="block w-full border-2 border-white bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 text-center transition-all duration-200 hover:border-white hover:shadow-lg" 
                         target="_blank" 
                         rel="noreferrer"
                       >
@@ -97,7 +97,7 @@ export default function ProjectsPreview() {
                       <a 
                         href={p.download} 
                         onClick={(e) => e.stopPropagation()} 
-                        className="block w-full border border-white/20 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-white/40 hover:shadow-lg" 
+                        className="block w-full border-2 border-white bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 text-center transition-all duration-200 hover:border-white hover:shadow-lg" 
                         download
                       >
                         📥 Download Project
@@ -107,7 +107,7 @@ export default function ProjectsPreview() {
                       <a 
                         href={p.video} 
                         onClick={(e) => e.stopPropagation()} 
-                        className="block w-full border border-red-500/50 bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-2 px-4 rounded-2xl text-center transition-all duration-200 hover:border-red-400/70 hover:shadow-lg hover:shadow-red-500/20" 
+                        className="block w-full border-2 border-white bg-red-900/30 hover:bg-red-800/40 text-red-200 font-semibold py-2 px-4 text-center transition-all duration-200 hover:border-white hover:shadow-lg hover:shadow-red-500/20" 
                         target="_blank" 
                         rel="noreferrer"
                       >
@@ -117,7 +117,7 @@ export default function ProjectsPreview() {
                   </div>
                 ) : null}
                 
-                <div className="flex items-center justify-between text-white/70 text-xs">
+                <div className="flex items-center justify-between text-white text-sm">
                   <span>Read more</span>
                   <div className="flex gap-3">
                     {p.website && p.id !== "macroboard" && p.id !== "realtor-website" && (

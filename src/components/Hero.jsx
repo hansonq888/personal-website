@@ -3,39 +3,40 @@ import { Link } from "react-router-dom";
 
 const GLOW_BTN_MAX = 120;
 const GLOW_BTN_MIN = 40;
-const GLOW_NAME_MAX = 180;
-const GLOW_NAME_MIN = 60;
-const NAME_TEXT = "Hanson Qin";
-const BREATH_CYCLE_MS = 16000; // one full inhale+exhale (much slower)
-const ROTATE_LETTER_INDICES = [1, 4, 8]; // a few letters get subtle rotation (a, o, i)
+const CUTOUT_BASE = "/cutout%20letters";
+// "Hanson Qin" — each entry is either { src, alt } or { space: true }
+const NAME_LETTERS = [
+  { src: `${CUTOUT_BASE}/h.webp`, alt: "H" },
+  { src: `${CUTOUT_BASE}/A.webp`, alt: "a" },
+  { src: `${CUTOUT_BASE}/N.webp`, alt: "n" },
+  { src: `${CUTOUT_BASE}/S.png`, alt: "s" },
+  { src: `${CUTOUT_BASE}/O.webp`, alt: "o" },
+  { src: `${CUTOUT_BASE}/N2.png`, alt: "n" },
+  { space: true, nameBreak: true },
+  { src: `${CUTOUT_BASE}/Q1.webp`, alt: "Q" },
+  { src: `${CUTOUT_BASE}/I.webp`, alt: "i" },
+  { src: `${CUTOUT_BASE}/N3.png`, alt: "n" },
+];
+const LETTER_PHASE_SCALE = 0.72;
+const LETTER_PHASE_FLOAT_X = 0.48;
+const LETTER_PHASE_FLOAT_Y = 0.61;
+// Per-letter variation (deterministic from index): tilt in degrees, size scale
+function letterTilt(i) {
+  return ((i * 37) % 17) - 8;
+}
+function letterSizeScale(i) {
+  return 0.82 + ((i * 23) % 19) / 95;
+}
 
-export default function Hero() {
+export default function Hero({ compact = false }) {
   const nameRef = useRef(null);
   const sectionRef = useRef(null);
   const newHavenRef = useRef(null);
-  const cursorRef = useRef({ x: 0, y: 0 });
   const [glowButtons, setGlowButtons] = useState(() => Array(5).fill(0));
-  const [glowLetters, setGlowLetters] = useState(() => Array(NAME_TEXT.length).fill(0));
+  const [letterTime, setLetterTime] = useState(0);
   const [lineCoords, setLineCoords] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 });
-  const [breath, setBreath] = useState(0);
-  const [breathTime, setBreathTime] = useState(0);
 
   const handleMouseMove = useCallback((e) => {
-    const pos = { x: e.clientX, y: e.clientY };
-    cursorRef.current = pos;
-    if (nameRef.current) {
-      const letters = nameRef.current.querySelectorAll(".letter");
-      if (letters.length > 0) {
-        const newGlow = Array.from(letters).map((el) => {
-          const rect = el.getBoundingClientRect();
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          const d = Math.hypot(e.clientX - cx, e.clientY - cy);
-          return d < GLOW_NAME_MIN ? 1 : d > GLOW_NAME_MAX ? 0 : 1 - (d - GLOW_NAME_MIN) / (GLOW_NAME_MAX - GLOW_NAME_MIN);
-        });
-        setGlowLetters(newGlow);
-      }
-    }
     if (sectionRef.current) {
       const btns = sectionRef.current.querySelectorAll("[data-glow-btn]");
       if (btns.length > 0) {
@@ -52,18 +53,25 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    let lastMove = 0;
+    const throttleMs = 80;
+    const onMove = (e) => {
+      const now = performance.now();
+      if (now - lastMove >= throttleMs) {
+        lastMove = now;
+        handleMouseMove(e);
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
   }, [handleMouseMove]);
 
   useEffect(() => {
     const start = performance.now();
     let rafId;
     const tick = () => {
-      const t = (performance.now() - start) / BREATH_CYCLE_MS;
-      setBreathTime(t);
-      const b = (1 + Math.sin(t * 2 * Math.PI)) / 2;
-      setBreath(b);
+      const elapsed = (performance.now() - start) / 1000;
+      setLetterTime(elapsed);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -91,153 +99,140 @@ export default function Hero() {
     };
   }, []);
 
-  const getGlowStyle = (intensity, breathAmount = 0.5) => {
-    const combined = Math.min(1, intensity * 0.6 + 0.05 + 0.9 * breathAmount);
+  const getGlowStyle = (intensity) => {
+    if (intensity <= 0) {
+      return { textShadow: "none", transition: "text-shadow 0.25s ease-out" };
+    }
+    const combined = Math.min(1, intensity * 0.6 + 0.05);
     return {
-      textShadow: combined > 0
-        ? `0 0 ${14 + combined * 28}px rgba(255,255,255,${0.08 + combined * 0.35}), 0 0 ${32 + combined * 50}px rgba(255,255,255,${0.04 + combined * 0.12})`
-        : "none",
+      textShadow: `0 0 ${14 + combined * 28}px rgba(255,255,255,${0.08 + combined * 0.35}), 0 0 ${32 + combined * 50}px rgba(255,255,255,${0.04 + combined * 0.12})`,
       transition: "text-shadow 0.25s ease-out",
     };
   };
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen overflow-hidden">
-      {/* Thin line from New Haven to name */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
-        aria-hidden
-      >
-        <line
-          x1={lineCoords.x1}
-          y1={lineCoords.y1}
-          x2={lineCoords.x2}
-          y2={lineCoords.y2}
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth="2"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-      {/* White star — right under the SVG line */}
-      <div
-        className="absolute z-10 pointer-events-none -translate-x-1/2"
-        style={{
-          left: lineCoords.x1,
-          top: lineCoords.y2 + 12,
-        }}
-        aria-hidden
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          className="text-white/75 drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]"
-        >
-          <path
-            d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6L12 2z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
-
-      {/* Top left — labels */}
-      <div ref={newHavenRef} className="absolute top-4 md:top-8 left-4 md:left-12 z-10">
-        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block">
-          Student developer & builder
-        </span>
-        <span className="geist-light text-white/75 text-[10px] md:text-xs tracking-[0.2em] block mt-1">
-          New Haven, CT
-        </span>
-      </div>
-
-      {/* Top right — about me */}
-      <div className="absolute top-4 md:top-8 right-4 md:right-12 z-10 text-right max-w-[75%] md:max-w-md md:max-w-lg px-2 md:px-0">
-        <p className="geist-light text-white/75 text-sm md:text-base leading-relaxed">
-          <span className="geist-light-italic text-white/75">
-            Yale sophomore studying CS & Mathematics.
-          </span>{" "}
-          I build software, dabble in ML and design, and like to mix code and creativity. When I'm not coding, I'm on the ultimate field or messing with music.
-        </p>
-        <Link
-          to="/about"
-          data-glow-btn
-          className="geist-light text-white/75 text-xs tracking-widest mt-4 inline-block transition-opacity hover:opacity-90"
-          style={getGlowStyle(glowButtons[0] ?? 0)}
-        >
-          More about me →
-        </Link>
-      </div>
-
-      {/* Center — name (each letter breathes at a different time via phase offset) */}
-      <div className="absolute inset-0 z-10 flex justify-center items-center pointer-events-none">
-        <h1
-          ref={nameRef}
-          className="hero-name-font text-[clamp(2.5rem,10vw,6rem)] md:text-[clamp(3.5rem,12vw,8rem)] leading-[0.92] text-white/75 font-bold flex justify-center items-center flex-wrap pointer-events-auto"
-        >
-          {NAME_TEXT.split("").map((char, i) => {
-            const phase = (breathTime + i * 0.18) * 2 * Math.PI;
-            const letterBreath = (1 + Math.sin(phase)) / 2;
-            const scale = 0.96 + 0.08 * letterBreath;
-            const rotateDeg = ROTATE_LETTER_INDICES.includes(i)
-              ? (letterBreath - 0.5) * 6
-              : 0;
-            const transform =
-              rotateDeg !== 0
-                ? `scale(${scale}) rotate(${rotateDeg}deg)`
-                : `scale(${scale})`;
-            return (
-              <span
-                key={i}
-                className="letter inline-block origin-center"
-                style={{
-                  ...getGlowStyle(glowLetters[i] ?? 0, letterBreath),
-                  transform,
-                }}
+    <section
+      ref={sectionRef}
+      className={`relative overflow-hidden bg-black ${compact ? "flex-1 flex flex-col justify-center min-h-0" : "min-h-screen"}`}
+    >
+      {!compact && (
+        <>
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none z-[1] hidden md:block"
+            aria-hidden
+          >
+            <line
+              x1={lineCoords.x1}
+              y1={lineCoords.y1}
+              x2={lineCoords.x2}
+              y2={lineCoords.y2}
+              stroke="rgba(255,255,255,0.2)"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          <div
+            className="absolute z-10 pointer-events-none -translate-x-1/2 hidden md:block"
+            style={{ left: lineCoords.x1, top: lineCoords.y2 + 12 }}
+            aria-hidden
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.25)]">
+              <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6L12 2z" fill="currentColor" />
+            </svg>
+          </div>
+          <div ref={newHavenRef} className="absolute top-4 md:top-8 left-4 md:left-12 z-10">
+            <span className="geist-light text-white text-xs md:text-sm tracking-[0.2em] block">Student developer & builder</span>
+            <span className="geist-light text-white text-xs md:text-sm tracking-[0.2em] block mt-1">New Haven, CT</span>
+          </div>
+        </>
+      )}
+      <div className={`absolute inset-0 z-10 flex justify-center items-center pointer-events-none overflow-hidden px-2 ${compact ? "py-2" : "pt-[8vh] pb-[28vh] md:pt-0 md:pb-0"}`}>
+        <div className="flex flex-col items-center gap-2 md:gap-3 pointer-events-auto w-full max-w-full min-w-0">
+          <h1
+            ref={nameRef}
+            className="flex justify-center items-end flex-wrap max-w-full min-w-0"
+            style={{ gap: 0 }}
+          >
+            {NAME_LETTERS.map((item, i) => {
+              const isSpace = !!item.space;
+              const phaseScale = i * LETTER_PHASE_SCALE;
+              const phaseX = i * LETTER_PHASE_FLOAT_X;
+              const phaseY = i * LETTER_PHASE_FLOAT_Y;
+              const breathScale = 1 + 0.07 * Math.sin(letterTime * 1.3 + phaseScale);
+              const sizeScale = letterSizeScale(i);
+              const tilt = letterTilt(i);
+              const floatX = 2.2 * Math.sin(letterTime * 0.35 + phaseX);
+              const floatY = 1.6 * Math.cos(letterTime * 0.4 + phaseY);
+              const transform = isSpace
+                ? undefined
+                : `translate(${floatX}px, ${floatY}px) rotate(${tilt}deg) scale(${breathScale * sizeScale})`;
+              const baseHeight = compact
+                ? "clamp(3.25rem, 10vw, 5.5rem)"
+                : "clamp(5.5rem, 20vw, 11rem)";
+              return (
+                <span
+                  key={i}
+                  className="inline-block origin-bottom will-change-transform"
+                  style={{
+                    transform,
+                    marginRight: isSpace ? undefined : "-0.8em",
+                    ...(isSpace ? { width: item.nameBreak ? "2.8em" : "0.2em", minWidth: item.nameBreak ? "1.5em" : "0.2em", flexShrink: 0 } : {}),
+                  }}
+                >
+                  {isSpace ? (
+                    <span aria-hidden className="inline-block w-full" />
+                  ) : (
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      className="w-auto object-contain block align-bottom"
+                      style={{ height: baseHeight }}
+                      draggable={false}
+                    />
+                  )}
+                </span>
+              );
+            })}
+          </h1>
+          {compact ? (
+            <Link
+              to="/about"
+              className="geist-light flex items-center justify-center gap-1.5 text-white/90 hover:text-white text-xs md:text-sm tracking-wide mt-2 max-w-md text-center transition-colors"
+            >
+              <span>Yale sophomore originally from Vancouver, Canada. I build software, work in ML and design…</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0" aria-hidden>
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          ) : (
+            <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
+              <Link
+                to="/about"
+                data-glow-btn
+                className="octosale bg-transparent text-white text-sm md:text-base border-2 border-white px-3 py-1.5 md:px-4 md:py-2 hover:bg-white hover:text-black transition-colors tracking-wider"
+                style={getGlowStyle(glowButtons[1] ?? 0)}
               >
-                {char}
-              </span>
-            );
-          })}
-        </h1>
-      </div>
-
-      {/* Bottom right — nav */}
-      <div className="absolute bottom-4 md:bottom-8 right-4 md:right-12 z-10 flex flex-col items-end gap-4">
-        <div className="flex flex-wrap justify-end gap-2">
-          <Link
-            to="/about"
-            data-glow-btn
-            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
-            style={getGlowStyle(glowButtons[1] ?? 0)}
-          >
-            About
-          </Link>
-          <Link
-            to="/projects"
-            data-glow-btn
-            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
-            style={getGlowStyle(glowButtons[2] ?? 0)}
-          >
-            Projects
-          </Link>
-          <Link
-            to="/contact"
-            data-glow-btn
-            className="geist-light text-white/75 text-[10px] md:text-xs border border-white/30 rounded-full px-4 py-2 hover:bg-white/10 transition-colors tracking-wider"
-            style={getGlowStyle(glowButtons[3] ?? 0)}
-          >
-            Contact
-          </Link>
+                About
+              </Link>
+              <Link
+                to="/projects"
+                data-glow-btn
+                className="octosale bg-transparent text-white text-sm md:text-base border-2 border-white px-3 py-1.5 md:px-4 md:py-2 hover:bg-white hover:text-black transition-colors tracking-wider"
+                style={getGlowStyle(glowButtons[2] ?? 0)}
+              >
+                Projects
+              </Link>
+              <Link
+                to="/contact"
+                data-glow-btn
+                className="octosale bg-transparent text-white text-sm md:text-base border-2 border-white px-3 py-1.5 md:px-4 md:py-2 hover:bg-white hover:text-black transition-colors tracking-wider"
+                style={getGlowStyle(glowButtons[3] ?? 0)}
+              >
+                Contact
+              </Link>
+            </div>
+          )}
         </div>
-        <Link
-          to="/projects"
-          data-glow-btn
-          className="geist-light text-white/75 text-xs tracking-widest transition-opacity hover:opacity-90"
-          style={getGlowStyle(glowButtons[4] ?? 0)}
-        >
-          Explore work
-        </Link>
       </div>
     </section>
   );
