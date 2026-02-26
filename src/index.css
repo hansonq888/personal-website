@@ -85,7 +85,16 @@ html, body {
   font-style: normal;
 }
 
-/* Shooting Star — local font from public/fonts */
+/* Cuppy Funny — local font from public/fonts */
+@font-face {
+  font-family: "Cuppy Funny";
+  src: url("/fonts/cuppy-funny/CuppyFunny-Regular%20Demo.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Shooting Star — local font from public/fonts (legacy) */
 @font-face {
   font-family: "Shooting Star";
   src: url("/fonts/shooting-star-personal-use/Shooting%20Star.ttf") format("truetype");
@@ -192,7 +201,7 @@ html, body {
 }
 
 .hero-name-font {
-  font-family: "Shooting Star", cursive;
+  font-family: "Cuppy Funny", cursive;
 }
 
 /* Cutout letters: transparent fill, white outline — black shows through */

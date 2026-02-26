@@ -3,37 +3,12 @@ import { Link } from "react-router-dom";
 
 const GLOW_BTN_MAX = 120;
 const GLOW_BTN_MIN = 40;
-const CUTOUT_BASE = "/cutout%20letters";
-// "Hanson Qin" — each entry is either { src, alt } or { space: true }
-const NAME_LETTERS = [
-  { src: `${CUTOUT_BASE}/h.webp`, alt: "H" },
-  { src: `${CUTOUT_BASE}/A.webp`, alt: "a" },
-  { src: `${CUTOUT_BASE}/N.webp`, alt: "n" },
-  { src: `${CUTOUT_BASE}/S.png`, alt: "s" },
-  { src: `${CUTOUT_BASE}/O.webp`, alt: "o" },
-  { src: `${CUTOUT_BASE}/N2.png`, alt: "n" },
-  { space: true, nameBreak: true },
-  { src: `${CUTOUT_BASE}/Q1.webp`, alt: "Q" },
-  { src: `${CUTOUT_BASE}/I.webp`, alt: "i" },
-  { src: `${CUTOUT_BASE}/N3.png`, alt: "n" },
-];
-const LETTER_PHASE_SCALE = 0.72;
-const LETTER_PHASE_FLOAT_X = 0.48;
-const LETTER_PHASE_FLOAT_Y = 0.61;
-// Per-letter variation (deterministic from index): tilt in degrees, size scale
-function letterTilt(i) {
-  return ((i * 37) % 17) - 8;
-}
-function letterSizeScale(i) {
-  return 0.82 + ((i * 23) % 19) / 95;
-}
 
 export default function Hero({ compact = false }) {
   const nameRef = useRef(null);
   const sectionRef = useRef(null);
   const newHavenRef = useRef(null);
   const [glowButtons, setGlowButtons] = useState(() => Array(5).fill(0));
-  const [letterTime, setLetterTime] = useState(0);
   const [lineCoords, setLineCoords] = useState({ x1: 0, y1: 0, x2: 0, y2: 0 });
 
   const handleMouseMove = useCallback((e) => {
@@ -65,18 +40,6 @@ export default function Hero({ compact = false }) {
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, [handleMouseMove]);
-
-  useEffect(() => {
-    const start = performance.now();
-    let rafId;
-    const tick = () => {
-      const elapsed = (performance.now() - start) / 1000;
-      setLetterTime(elapsed);
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, []);
 
   useEffect(() => {
     const updateLine = () => {
@@ -150,49 +113,13 @@ export default function Hero({ compact = false }) {
         <div className="flex flex-col items-center gap-2 md:gap-3 pointer-events-auto w-full max-w-full min-w-0">
           <h1
             ref={nameRef}
-            className="flex justify-center items-end flex-wrap max-w-full min-w-0"
-            style={{ gap: 0 }}
+            className={`hero-name-font flex justify-center items-end flex-wrap max-w-full min-w-0 text-white font-bold leading-[0.92] uppercase tracking-[0.06em] ${
+              compact
+                ? "text-[clamp(4.8rem,18vw,11rem)] md:text-[clamp(6rem,10vw,12rem)]"
+                : "text-[clamp(6rem,14vw,14rem)] md:text-[clamp(8rem,18vw,16rem)]"
+            }`}
           >
-            {NAME_LETTERS.map((item, i) => {
-              const isSpace = !!item.space;
-              const phaseScale = i * LETTER_PHASE_SCALE;
-              const phaseX = i * LETTER_PHASE_FLOAT_X;
-              const phaseY = i * LETTER_PHASE_FLOAT_Y;
-              const breathScale = 1 + 0.07 * Math.sin(letterTime * 1.3 + phaseScale);
-              const sizeScale = letterSizeScale(i);
-              const tilt = letterTilt(i);
-              const floatX = 2.2 * Math.sin(letterTime * 0.35 + phaseX);
-              const floatY = 1.6 * Math.cos(letterTime * 0.4 + phaseY);
-              const transform = isSpace
-                ? undefined
-                : `translate(${floatX}px, ${floatY}px) rotate(${tilt}deg) scale(${breathScale * sizeScale})`;
-              const baseHeight = compact
-                ? "clamp(3.25rem, 10vw, 5.5rem)"
-                : "clamp(5.5rem, 20vw, 11rem)";
-              return (
-                <span
-                  key={i}
-                  className="inline-block origin-bottom will-change-transform"
-                  style={{
-                    transform,
-                    marginRight: isSpace ? undefined : "-0.8em",
-                    ...(isSpace ? { width: item.nameBreak ? "2.8em" : "0.2em", minWidth: item.nameBreak ? "1.5em" : "0.2em", flexShrink: 0 } : {}),
-                  }}
-                >
-                  {isSpace ? (
-                    <span aria-hidden className="inline-block w-full" />
-                  ) : (
-                    <img
-                      src={item.src}
-                      alt={item.alt}
-                      className="w-auto object-contain block align-bottom"
-                      style={{ height: baseHeight }}
-                      draggable={false}
-                    />
-                  )}
-                </span>
-              );
-            })}
+            Hanson&nbsp;Qin
           </h1>
           {compact ? (
             <Link
