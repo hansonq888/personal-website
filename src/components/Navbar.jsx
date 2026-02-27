@@ -7,7 +7,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-transparent shadow-md sticky top-0 z-50">
+    <nav className="bg-black/60 shadow-md sticky top-0 z-50">
       <div className="w-full px-8 py-6 flex justify-between items-center">
         
         {/* Desktop Nav Links - Left Side */}
@@ -41,7 +41,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-transparent px-8 pb-4 flex flex-col space-y-3 text-white instrument-serif-regular">
+        <div className="md:hidden bg-black/60 px-8 pb-4 flex flex-col space-y-3 text-white instrument-serif-regular">
           <NavLink to="/" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">Home</NavLink>
           <NavLink to="/about" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">About</NavLink>
           <NavLink to="/projects" onClick={() => setIsOpen(false)} className="hover:text-white/80 text-base">Projects</NavLink>

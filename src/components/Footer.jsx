@@ -7,7 +7,7 @@ export default function Footer() {
   const [currentYear] = useState(new Date().getFullYear());
 
   return (
-    <footer className="bg-black border-t border-white/20">
+    <footer className="bg-black/40 backdrop-blur-sm border-t border-white/20">
       <div className="max-w-7xl mx-auto px-6 py-5 text-white instrument-serif-regular">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="text-sm text-white order-3 md:order-1">© {currentYear} Hanson Qin</div>

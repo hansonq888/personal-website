@@ -16,7 +16,7 @@ function ProjectTile({ proj }) {
   return (
     <Link
       to={`/projects/${proj.id}`}
-      className="group flex flex-col w-full h-full min-h-[320px] md:min-h-[380px] overflow-hidden bg-black border-2 border-white/20 hover:border-white hover:bg-white/5 transition-all duration-200"
+      className="group flex flex-col w-full h-full min-h-[320px] md:min-h-[380px] overflow-hidden bg-black/50 backdrop-blur-sm border-2 border-white/20 hover:border-white hover:bg-white/5 transition-all duration-200"
     >
       {proj.image && (
         <div className="flex-1 min-h-[200px] md:min-h-[260px] overflow-hidden">
@@ -51,7 +51,7 @@ export default function SinglePage() {
   }, []);
 
   return (
-    <div className="overflow-x-hidden bg-black">
+    <div className="overflow-x-hidden">
       {/* Hero */}
       <section id="hero" className="min-h-screen">
         <Hero />

@@ -101,7 +101,7 @@ function App() {
         <div
           className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full transition-opacity duration-300 ${
             isLoaded ? "opacity-100" : "opacity-0"
-          } bg-black text-white`}
+          } bg-[#141a20] text-white`}
         >
           <MusicProvider>
             <RouterProvider router={router} />

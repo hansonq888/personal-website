@@ -188,6 +188,15 @@ html, body {
   font-display: swap;
 }
 
+/* Magical Neverland — hero name */
+@font-face {
+  font-family: "Magical Neverland";
+  src: url("/fonts/magical-neverland.regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .octosale {
   font-family: "Moralana", sans-serif;
   font-weight: normal;
@@ -201,8 +210,41 @@ html, body {
 }
 
 .hero-name-font {
-  font-family: "Cuppy Funny", cursive;
+  font-family: "Magical Neverland", "Cuppy Funny", cursive;
 }
+
+@keyframes hero-breath {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.hero-name-breathing {
+  transform-origin: center bottom;
+}
+
+.hero-name-breathing .hero-letter {
+  display: inline-block;
+  animation: hero-breath 4.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.hero-name-breathing .hero-letter:nth-child(1) { animation-delay: 0s; }
+.hero-name-breathing .hero-letter:nth-child(2) { animation-delay: 0.35s; }
+.hero-name-breathing .hero-letter:nth-child(3) { animation-delay: 0.7s; }
+.hero-name-breathing .hero-letter:nth-child(4) { animation-delay: 1.05s; }
+.hero-name-breathing .hero-letter:nth-child(5) { animation-delay: 1.4s; }
+.hero-name-breathing .hero-letter:nth-child(6) { animation-delay: 1.75s; }
+.hero-name-breathing .hero-letter:nth-child(7) { animation-delay: 2.1s; }
+.hero-name-breathing .hero-letter:nth-child(8) { animation-delay: 2.45s; }
+.hero-name-breathing .hero-letter:nth-child(9) { animation-delay: 2.8s; }
+.hero-name-breathing .hero-letter:nth-child(10) { animation-delay: 3.15s; }
 
 /* Cutout letters: transparent fill, white outline — black shows through */
 .hero-name-cutout {

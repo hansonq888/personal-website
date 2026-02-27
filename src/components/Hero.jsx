@@ -76,7 +76,13 @@ export default function Hero({ compact = false }) {
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden bg-black ${compact ? "flex-1 flex flex-col justify-center min-h-0" : "min-h-screen"}`}
+      className={`relative overflow-hidden bg-[#141a20] ${compact ? "flex-1 flex flex-col justify-center min-h-0" : "min-h-screen"}`}
+      style={{
+        backgroundImage: "url('/magic background.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
       {!compact && (
         <>
@@ -113,21 +119,44 @@ export default function Hero({ compact = false }) {
         <div className="flex flex-col items-center gap-2 md:gap-3 pointer-events-auto w-full max-w-full min-w-0">
           <h1
             ref={nameRef}
-            className={`hero-name-font flex justify-center items-end flex-wrap max-w-full min-w-0 text-white font-bold leading-[0.92] uppercase tracking-[0.06em] ${
+            className={`hero-name-font hero-name-breathing flex justify-center items-end flex-wrap max-w-full min-w-0 text-white font-bold leading-[0.92] uppercase tracking-[0.06em] ${
               compact
-                ? "text-[clamp(4.8rem,18vw,11rem)] md:text-[clamp(6rem,10vw,12rem)]"
-                : "text-[clamp(6rem,14vw,14rem)] md:text-[clamp(8rem,18vw,16rem)]"
+                ? "text-[clamp(3.4rem,14vw,8rem)] md:text-[clamp(4.4rem,7vw,9rem)]"
+                : "text-[clamp(4.4rem,10vw,10.5rem)] md:text-[clamp(6rem,14vw,13rem)]"
             }`}
+            style={{
+              textShadow: "0 8px 22px rgba(0, 0, 0, 0.85)",
+            }}
           >
-            Hanson&nbsp;Qin
+            <span className="hero-letter">H</span>
+            <span className="hero-letter">a</span>
+            <span className="hero-letter">n</span>
+            <span className="hero-letter">s</span>
+            <span className="hero-letter">o</span>
+            <span className="hero-letter">n</span>
+            <span>&nbsp;</span>
+            <span className="hero-letter">Q</span>
+            <span className="hero-letter">i</span>
+            <span className="hero-letter">n</span>
           </h1>
           {compact ? (
             <Link
               to="/about"
-              className="geist-light flex items-center justify-center gap-1.5 text-white/90 hover:text-white text-xs md:text-sm tracking-wide mt-1 md:mt-2 max-w-md text-center transition-colors line-clamp-2"
+              className="geist-light flex flex-col items-center justify-center gap-1 text-white/90 hover:text-white text-xs md:text-sm tracking-wide mt-1 md:mt-2 max-w-md text-center transition-colors line-clamp-2"
             >
               <span>Yale sophomore originally from Vancouver, Canada. I build software, work in ML and design…</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0" aria-hidden>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mt-0.5"
+                aria-hidden
+              >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </Link>

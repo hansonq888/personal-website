@@ -1,22 +1,25 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Outlet, useLocation, useOutlet } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-const calmEase = [0.33, 1, 0.68, 1]; // gentle ease-out
+const calmEase = [0.33, 0.0, 0.67, 1]; // very gentle ease
 const CURSOR_GLOW_LERP = 0.2;
 const pageVariants = {
-  initial: (isContact) => ({
+  initial: () => ({
     opacity: 0,
-    x: isContact ? 24 : -24,
+    x: 0,
+    scale: 0.99,
   }),
   animate: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: calmEase },
+    scale: 1,
+    transition: { duration: 0.9, ease: calmEase },
   },
-  exit: (isContact) => ({
+  exit: () => ({
     opacity: 0,
-    x: isContact ? -24 : 24,
-    transition: { duration: 0.5, ease: calmEase },
+    x: 0,
+    scale: 0.995,
+    transition: { duration: 0.8, ease: calmEase },
   }),
 };
 
@@ -83,8 +86,14 @@ export default function Layout() {
 
   return (
     <div
-      className="flex flex-col w-full h-screen min-h-[100dvh] min-h-[100vh] min-w-0 overflow-hidden overflow-x-hidden max-w-full bg-black"
-      style={{ background: "#000" }}
+      className="flex flex-col w-full h-screen min-h-[100dvh] min-h-[100vh] min-w-0 overflow-hidden overflow-x-hidden max-w-full"
+      style={{
+        backgroundColor: "#141a20",
+        backgroundImage: "url('/magic background.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
       {/* Cursor-following glow — on every page */}
       <div
@@ -97,7 +106,7 @@ export default function Layout() {
           transform: "translate(-50%, -50%)",
           background: "radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.85) 35%, rgba(255, 255, 255, 0.45) 60%, transparent 78%)",
           filter: "blur(50px)",
-          zIndex: 1,
+          zIndex: 40,
         }}
         aria-hidden
       />

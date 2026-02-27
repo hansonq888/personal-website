@@ -31,7 +31,7 @@ export default function ProjectsPreview() {
             <Link
               key={p.id}
               to={`/projects/${p.id}`}
-              className="group overflow-hidden border-2 border-white/20 bg-black hover:bg-white/5 hover:border-white/40 transition-all"
+              className="group overflow-hidden border-2 border-white/20 bg-black/50 backdrop-blur-sm hover:bg-white/5 hover:border-white/40 transition-all"
             >
               {/* Sleek header */}
               <div className="px-4 py-3 border-b border-white/10 text-white">

@@ -7,9 +7,9 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
   const { isMusicPlaying, toggleMusic } = useMusic();
 
   return (
-    <div className="h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full min-w-0 flex flex-col bg-black border-2 border-white/30">
+    <div className="h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full min-w-0 flex flex-col border-2 border-white/30">
       {/* Top navbar — fixed height so it never resizes */}
-      <div className="flex-shrink-0 h-10 min-h-10 border-b border-white/20 px-4 flex justify-between items-center">
+      <div className="flex-shrink-0 h-10 min-h-10 border-b border-white/20 px-4 flex justify-between items-center bg-black/60">
         {isHome ? (
           <span className="geist-light text-white text-[10px] md:text-xs tracking-[0.2em]">
             Student developer & builder
