@@ -31,8 +31,8 @@ export default function Home() {
             </p>
           </div>
 
-          {/* RIGHT COLUMN */}
-          <div className="flex justify-end">
+          {/* RIGHT COLUMN (hidden on mobile) */}
+          <div className="hidden md:flex justify-end">
             <img
               src="/magicbook.png"
               alt="Magic book"
@@ -61,7 +61,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="flex justify-end">
+          <div className="hidden md:flex justify-end">
             <img
               src="/magicleaf.png"
               alt="Magic leaf"
@@ -83,7 +83,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex justify-end">
+          <div className="hidden md:flex justify-end">
             <img
               src="/magiwand.png"
               alt="Magic wand"
