@@ -76,13 +76,7 @@ export default function Hero({ compact = false }) {
   return (
     <section
       ref={sectionRef}
-      className={`relative overflow-hidden bg-[#141a20] ${compact ? "flex-1 flex flex-col justify-center min-h-0" : "min-h-screen"}`}
-      style={{
-        backgroundImage: "url('/magic background.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
+      className={`relative overflow-hidden bg-transparent ${compact ? "flex-1 flex flex-col justify-center min-h-0" : "min-h-screen"}`}
     >
       {!compact && (
         <>
