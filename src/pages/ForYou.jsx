@@ -305,7 +305,7 @@ export default function ForYou() {
     return (
       <PageShell>
         <div className="min-h-screen bg-white text-black p-6 flex flex-col items-center justify-center max-w-md mx-auto">
-          <h1 className="jersey-25-heading text-2xl font-bold text-black mb-2">For you</h1>
+          <h1 className="jersey-25-heading text-2xl font-bold text-black mb-2">For someone special</h1>
           <p className="text-black/60 text-sm mb-6">Sign in to view</p>
           <form onSubmit={handleLogin} className="w-full space-y-4">
             <input
@@ -357,7 +357,7 @@ export default function ForYou() {
     <PageShell>
       <div className="min-h-screen bg-white text-black p-4 md:p-6 max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="jersey-25-heading text-2xl md:text-3xl font-bold text-black">For you</h1>
+          <h1 className="jersey-25-heading text-2xl md:text-3xl font-bold text-black">For someone special</h1>
           <button onClick={handleSignOut} className="text-sm text-black/60 hover:text-black">Sign out</button>
         </div>
 
