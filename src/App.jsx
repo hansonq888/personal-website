@@ -99,9 +99,7 @@ function App() {
         <LoadingScreen onComplete={() => setIsLoaded(true)} progress={loadingProgress} />
       ) : (
         <div
-          className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full transition-opacity duration-300 ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          } bg-[#141a20] text-white`}
+          className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full ${isLoaded ? "opacity-100" : "opacity-0"} bg-white text-black`}
         >
           <MusicProvider>
             <RouterProvider router={router} />

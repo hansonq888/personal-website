@@ -1,4 +1,5 @@
 import PageShell from "../components/PageShell";
+import HalftoneBackground from "../components/HalftoneBackground";
 
 const experiences = [
   {
@@ -32,46 +33,54 @@ const experiences = [
 export default function Experiences() {
   return (
     <PageShell>
-      <div className="p-4 md:p-6 max-w-2xl mx-auto">
-        <h1 className="project-title-font text-white text-2xl md:text-3xl font-bold mb-6 border-b border-white/20 pb-3">
-          Experience
-        </h1>
-        <div className="space-y-6">
-          {experiences.map((exp, i) => (
-            <div
-              key={i}
-              className="border border-white/20 p-4 md:p-5"
-            >
-              <h2 className="project-title-font text-white text-lg md:text-xl font-bold mb-1">
-                {exp.role}
-              </h2>
-              <p className="geist-light text-white/80 text-sm md:text-base mb-0.5">
-                {exp.url ? (
-                  <a
-                    href={exp.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/80 hover:text-white underline underline-offset-2 transition-colors"
-                  >
-                    {exp.org}
-                  </a>
-                ) : (
-                  exp.org
-                )}
-              </p>
-              <p className="geist-light text-white/60 text-xs md:text-sm tracking-wide mb-4">
-                {exp.dates}
-              </p>
-              {exp.paragraphs.map((para, j) => (
-                <p
-                  key={j}
-                  className="geist-light text-white/90 text-sm md:text-base leading-relaxed mb-3 last:mb-0"
-                >
-                  {para}
-                </p>
-              ))}
+      <div className="min-h-screen bg-white text-black p-3 sm:p-4 md:p-6 lg:p-8 min-w-0">
+        <div className="max-w-[1600px] mx-auto w-full">
+          {/* Title in colourful box */}
+          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-black/5 shadow-md mb-4 sm:mb-5 min-h-[90px] sm:min-h-[100px] p-4 sm:p-6 md:p-8">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F9A8D4] via-[#F472B6] to-[#EC4899]" />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="jersey-25-heading text-[3rem] md:text-[4rem] font-bold text-black/10 select-none">Experience</span>
             </div>
-          ))}
+            <div className="absolute inset-0 opacity-90">
+              <HalftoneBackground width={500} height={160} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#831843" dotOpacity={0.1} />
+            </div>
+            <div className="relative z-10">
+              <h1 className="jersey-25-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-2">
+                Experience
+              </h1>
+              <p className="text-sm md:text-base text-black/90" style={{ backgroundColor: "#FBCFE8", padding: "4px 6px", width: "fit-content" }}>
+                Where I've worked
+              </p>
+            </div>
+          </div>
+
+          {/* Body — plain white cards */}
+          <div className="space-y-3 sm:space-y-4 md:space-y-5">
+            {experiences.map((exp, i) => (
+              <div key={i} className="rounded-xl sm:rounded-2xl border border-black/10 bg-white p-4 sm:p-5 md:p-6 shadow-sm min-w-0">
+                <h2 className="jersey-25-heading text-black text-lg sm:text-xl md:text-2xl font-bold mb-1">
+                  {exp.role}
+                </h2>
+                <p className="text-black/80 text-sm md:text-base mb-0.5">
+                  {exp.url ? (
+                    <a href={exp.url} target="_blank" rel="noopener noreferrer" className="text-black/80 hover:text-black underline underline-offset-2 transition-colors">
+                      {exp.org}
+                    </a>
+                  ) : (
+                    exp.org
+                  )}
+                </p>
+                <p className="text-black/60 text-xs md:text-sm tracking-wide mb-4">
+                  {exp.dates}
+                </p>
+                {exp.paragraphs.map((para, j) => (
+                  <p key={j} className="text-black/90 text-sm md:text-base leading-relaxed mb-3 last:mb-0">
+                    {para}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </PageShell>

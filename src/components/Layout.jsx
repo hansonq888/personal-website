@@ -1,40 +1,8 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
-import { Outlet, useLocation, useOutlet } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-const calmEase = [0.33, 0.0, 0.67, 1]; // very gentle ease
-const CURSOR_GLOW_LERP = 0.2;
-const pageVariants = {
-  initial: () => ({
-    opacity: 0,
-    x: 0,
-    scale: 0.99,
-  }),
-  animate: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: { duration: 0.9, ease: calmEase },
-  },
-  exit: () => ({
-    opacity: 0,
-    x: 0,
-    scale: 0.995,
-    transition: { duration: 0.8, ease: calmEase },
-  }),
-};
+import React, { useRef, useEffect } from "react";
+import { Outlet, useOutlet } from "react-router-dom";
 
 export default function Layout() {
-  const location = useLocation();
   const outlet = useOutlet();
-  const isHomePage = location.pathname === "/";
-  const isContactPage = location.pathname === "/contact";
-  const isProjectsPage = location.pathname === "/projects";
-  const isAboutPage = location.pathname === "/about";
-  const isMinimalLayout = isHomePage || isContactPage || isProjectsPage || isAboutPage;
-
-  const cursorRef = useRef({ x: 0, y: 0 });
-  const [glowPos, setGlowPos] = useState({ x: 0, y: 0 });
-
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
@@ -61,71 +29,10 @@ export default function Layout() {
     return () => document.removeEventListener("click", playClickSound, true);
   }, []);
 
-  const handleMouseMove = useCallback((e) => {
-    cursorRef.current = { x: e.clientX, y: e.clientY };
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [handleMouseMove]);
-
-  useEffect(() => {
-    let rafId;
-    const tick = () => {
-      const target = cursorRef.current;
-      setGlowPos((prev) => ({
-        x: prev.x + (target.x - prev.x) * CURSOR_GLOW_LERP,
-        y: prev.y + (target.y - prev.y) * CURSOR_GLOW_LERP,
-      }));
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, []);
-
   return (
-    <div
-      className="flex flex-col w-full h-screen min-h-[100dvh] min-h-[100vh] min-w-0 overflow-hidden overflow-x-hidden max-w-full"
-      style={{
-        backgroundColor: "#141a20",
-        backgroundImage: "url('/magic background.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* Cursor-following glow — on every page */}
-      <div
-        className="pointer-events-none fixed rounded-full mix-blend-soft-light"
-        style={{
-          left: glowPos.x,
-          top: glowPos.y,
-          width: 260,
-          height: 260,
-          transform: "translate(-50%, -50%)",
-          background: "radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.85) 35%, rgba(255, 255, 255, 0.45) 60%, transparent 78%)",
-          filter: "blur(50px)",
-          zIndex: 40,
-        }}
-        aria-hidden
-      />
-      <main className="flex-1 min-h-0 min-w-0 relative flex flex-col z-[2] overflow-x-hidden max-w-full">
-        <AnimatePresence mode="wait" initial={false}>
-          {outlet && (
-            <motion.div
-              key={location.pathname}
-              custom={isContactPage || isProjectsPage || isAboutPage}
-              variants={pageVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="min-h-full w-full min-w-0 max-w-full overflow-x-hidden"
-            >
-              {outlet}
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div className="flex flex-col w-full h-screen min-h-[100dvh] min-h-[100vh] min-w-0 overflow-hidden overflow-x-hidden max-w-full bg-white">
+      <main className="flex-1 min-h-0 min-w-0 relative flex flex-col z-[2] overflow-x-hidden overflow-y-auto max-w-full">
+        {outlet}
       </main>
     </div>
   );

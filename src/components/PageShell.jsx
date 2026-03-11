@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaLinkedin, FaGithub } from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { useMusic } from "../context/MusicContext";
 
@@ -7,28 +7,28 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
   const { isMusicPlaying, toggleMusic } = useMusic();
 
   return (
-    <div className="h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full min-w-0 flex flex-col border-2 border-white/30">
-      {/* Top navbar — fixed height so it never resizes */}
-      <div className="flex-shrink-0 h-10 min-h-10 border-b border-white/20 px-4 flex justify-between items-center bg-black/60">
+    <div className="min-h-screen w-full overflow-x-hidden min-w-0 flex flex-col bg-white">
+      {/* Top navbar — responsive */}
+      <div className="flex-shrink-0 h-11 sm:h-12 min-h-[44px] border-b border-black/10 px-3 sm:px-4 md:px-6 flex justify-between items-center gap-2 bg-white">
         {isHome ? (
-          <span className="geist-light text-white text-[10px] md:text-xs tracking-[0.2em]">
+          <span className="text-black/70 text-[10px] md:text-xs tracking-[0.2em] uppercase font-medium">
             Student developer & builder
           </span>
         ) : (
           <Link
             to="/"
-            className="geist-light text-white/80 hover:text-white text-[10px] md:text-xs tracking-wide transition-colors"
+            className="text-black/80 hover:text-black text-xs sm:text-sm font-medium tracking-wide transition-colors min-w-0 truncate"
           >
-            Back
+            ← Back
           </Link>
         )}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
           <a
             href="https://www.linkedin.com/in/hanson-q/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-black/70 hover:text-black transition-colors"
           >
             <FaLinkedin className="w-4 h-4 md:w-5 md:h-5" />
           </a>
@@ -37,14 +37,23 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-black/70 hover:text-black transition-colors"
           >
             <FaGithub className="w-4 h-4 md:w-5 md:h-5" />
           </a>
           <a
+            href="https://www.instagram.com/hanson.q888/?hl=en"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="text-black/70 hover:text-black transition-colors"
+          >
+            <FaInstagram className="w-4 h-4 md:w-5 md:h-5" />
+          </a>
+          <a
             href="mailto:hansonq888@gmail.com"
             aria-label="Email"
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-black/70 hover:text-black transition-colors"
           >
             <MdEmail className="w-4 h-4 md:w-5 md:h-5" />
           </a>
@@ -52,7 +61,7 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
             <button
               type="button"
               onClick={toggleMusic}
-              className="flex items-center justify-center w-6 h-6 bg-transparent text-white border border-white/20 hover:bg-white/10 hover:border-white/40 transition-colors"
+              className="flex items-center justify-center w-6 h-6 bg-transparent text-black/70 border border-black/20 hover:bg-black/5 hover:border-black/30 transition-colors"
               aria-label={isMusicPlaying ? "Pause music" : "Play music"}
             >
               {isMusicPlaying ? (
@@ -70,8 +79,8 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
         </div>
       </div>
 
-      {/* Main content — scrollable on inner pages, fixed on home */}
-      <main className={`flex-1 min-h-0 border-b border-white/20 min-w-0 max-w-full overflow-x-hidden ${scrollContent ? "overflow-y-auto" : "overflow-hidden flex flex-col"}`}>
+      {/* Main content — scrollable, light bg */}
+      <main className={`flex-1 min-h-0 min-w-0 max-w-full overflow-x-hidden bg-white text-black ${scrollContent ? "overflow-y-auto" : "overflow-hidden flex flex-col"}`}>
         {children}
       </main>
     </div>

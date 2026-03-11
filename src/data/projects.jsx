@@ -15,6 +15,15 @@ export const projects = [
     website: "https://macroboard.org",
   },
   {
+    id: "sample8",
+    title: "SAMPLE 8",
+    description: "A music production inspiration platform for exploring modern production techniques",
+    journalFile: "sample8",
+    image: "/sample8home.png",
+    tech: ["Next.js", "React", "TypeScript", "Supabase", "Postgres", "Tailwind", "Vercel"],
+    website: "https://sample8.space/",
+  },
+  {
     id: "realtor-website",
     title: "Realtor Website",
     description: "A personal realtor website made with React",

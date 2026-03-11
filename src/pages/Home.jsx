@@ -1,98 +1,131 @@
 import { Link } from "react-router-dom";
-import Hero from "../components/Hero";
-import PageShell from "../components/PageShell";
-import { projects } from "../data/projects";
-
-const PREVIEW_IDS = ["macroboard", "realtor-website", "live-chord-detector"];
-const previewProjects = projects.filter((p) => PREVIEW_IDS.includes(p.id));
+import { FaLinkedin, FaGithub, FaInstagram, FaArrowRight, FaEnvelope } from "react-icons/fa";
+import HalftoneBackground from "../components/HalftoneBackground";
 
 export default function Home() {
   return (
-    <PageShell isHome>
-      <div className="h-full min-h-full flex flex-col min-h-0 min-w-0 overflow-hidden w-full max-w-full">
-      {/* Center — name + about preview (compact Hero); on mobile cap height so bottom previews stay visible */}
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden max-h-[65vh] md:max-h-none">
-        <Hero compact />
+    <div className="min-h-screen w-full min-w-0 text-black overflow-y-auto overflow-x-hidden bg-white">
+      {/* Masthead: small + medium = centered name row + highlights; lg+ = spread (Hanson, highlights, Qin right) */}
+      <div className="w-full flex justify-center pt-3 md:pt-5 pb-1">
+        <div className="max-w-2xl w-full px-3 md:px-5">
+          {/* Small and medium: Hanson Qin in one row, then highlights, all centered */}
+          <div className="flex flex-col items-center lg:hidden">
+            <div className="flex flex-row items-baseline gap-2 md:gap-4">
+              <h1 className="text-5xl md:text-7xl tracking-tight leading-none flex items-baseline text-black">
+                <span className="text-[2.4em] leading-none" style={{ fontFamily: '"Luxurious Script", cursive' }}>H</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800 }}>anson</span>
+              </h1>
+              <h1 className="text-5xl md:text-7xl tracking-tight leading-none flex items-baseline text-black">
+                <span className="text-[2.4em] leading-none" style={{ fontFamily: '"Luxurious Script", cursive' }}>Q</span>
+                <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800 }}>in</span>
+              </h1>
+            </div>
+            <p className="text-sm mt-0.5 text-black/90" style={{ backgroundColor: "#fef08a", padding: "4px 6px", width: "fit-content" }}>Student developer & builder</p>
+            <p className="text-sm mt-0.5 text-black/90" style={{ backgroundColor: "#fef08a", padding: "4px 6px", width: "fit-content" }}>Vancouver, Canada · Yale University</p>
+          </div>
+          {/* lg and up: spread layout — Hanson, highlights, then Qin bottom right */}
+          <div className="hidden lg:block">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl tracking-tight leading-none flex flex-wrap items-baseline text-black">
+              <span className="text-[2.4em] leading-none" style={{ fontFamily: '"Luxurious Script", cursive' }}>H</span>
+              <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800 }}>anson</span>
+            </h1>
+            <p className="text-sm md:text-base mt-0.5 text-black/90" style={{ backgroundColor: "#fef08a", padding: "4px 6px", width: "fit-content" }}>Student developer & builder</p>
+            <p className="text-sm md:text-base mt-0.5 text-black/90" style={{ backgroundColor: "#fef08a", padding: "4px 6px", width: "fit-content" }}>Vancouver, Canada · Yale University</p>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl tracking-tight leading-none flex flex-wrap items-baseline justify-end -mt-50 mr-10 text-black">
+              <span className="text-[2.4em] leading-none" style={{ fontFamily: '"Luxurious Script", cursive' }}>Q</span>
+              <span style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800 }}>in</span>
+            </h1>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom — 3 previews; sits at bottom but can grow without clipping */}
-      <div className="mt-auto flex-shrink-0 grid grid-cols-3 divide-x divide-white/20 border-t border-white/20 min-h-[100px]">
-        <Link
-          to="/experiences"
-          className="group grid grid-cols-2 p-4 border border-white/20 bg-black/60 hover:bg-black/80 hover:border-white/40 transition-colors items-start"
-        >
-          {/* LEFT COLUMN */}
-          <div className="min-w-0 pr-4">
-            <div className="project-title-font text-white text-sm font-bold uppercase tracking-wider mb-2 text-left">
-              Experiences
-            </div>
-            <p className="geist-light text-white/80 text-sm leading-snug text-left">
-              Work, research, and other experiences.
-            </p>
+      {/* 4 sections — responsive grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-5 pt-6 sm:pt-8 md:pt-10 px-3 sm:px-4 md:px-4 lg:px-6 w-full max-w-[1600px] mx-auto min-w-0">
+        <Link to="/about" className="group relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[110px] sm:min-h-[130px] md:min-h-[160px] border border-black/5 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FFE066] via-[#FCD34D] to-[#FBBF24]" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="jersey-25-heading text-[4rem] md:text-[5.5rem] font-bold text-black/10 select-none">About</span>
           </div>
-
-          {/* RIGHT COLUMN (hidden on mobile) */}
-          <div className="hidden md:flex justify-end">
-            <img
-              src="/magicbook.png"
-              alt="Magic book"
-              className="h-20 md:h-24 object-contain drop-shadow-[0_0_14px_rgba(0,0,0,0.7)]"
-            />
+          <div className="absolute inset-0 opacity-90">
+            <HalftoneBackground width={400} height={220} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#1c1917" dotOpacity={0.12} />
+          </div>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest text-black/70 uppercase [writing-mode:vertical] [text-orientation:mixed] z-10">• Read more</span>
+          <div className="relative z-10 flex items-end justify-between w-full p-4 md:p-5">
+            <span className="jersey-25-heading font-bold text-lg sm:text-xl md:text-2xl text-black">About</span>
+            <span className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border-2 border-black/10 flex items-center justify-center text-black transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white shadow-sm">
+              <FaArrowRight className="w-4 h-4" />
+            </span>
           </div>
         </Link>
 
-        <Link
-          to="/projects"
-          className="group grid grid-cols-2 p-4 border border-white/20 bg-black/60 hover:bg-black/80 hover:border-white/40 transition-colors items-start"
-        >
-          <div className="min-w-0 pr-4">
-            <div className="project-title-font text-white text-sm font-bold uppercase tracking-wider mb-2 text-left">
-              Projects
-            </div>
-            <ul className="space-y-1">
-              {previewProjects.map((p) => (
-                <li
-                  key={p.id}
-                  className="geist-light text-white/80 text-sm truncate text-left"
-                >
-                  {p.title}
-                </li>
-              ))}
-            </ul>
+        <Link to="/projects" className="group relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[110px] sm:min-h-[130px] md:min-h-[160px] border border-black/5 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#0EA5E9]" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="jersey-25-heading text-[4rem] md:text-[5.5rem] font-bold text-black/10 select-none">Projects</span>
           </div>
-
-          <div className="hidden md:flex justify-end">
-            <img
-              src="/magicleaf.png"
-              alt="Magic leaf"
-              className="h-16 md:h-20 object-contain drop-shadow-[0_0_12px_rgba(0,0,0,0.7)]"
-            />
+          <div className="absolute inset-0 opacity-90">
+            <HalftoneBackground width={400} height={220} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#0c4a6e" dotOpacity={0.15} />
+          </div>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest text-black/70 uppercase [writing-mode:vertical] [text-orientation:mixed] z-10">• Read more</span>
+          <div className="relative z-10 flex items-end justify-between w-full p-4 md:p-5">
+            <span className="jersey-25-heading font-bold text-lg sm:text-xl md:text-2xl text-black">Projects</span>
+            <span className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border-2 border-black/10 flex items-center justify-center text-black transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white shadow-sm">
+              <FaArrowRight className="w-4 h-4" />
+            </span>
           </div>
         </Link>
 
-        <Link
-          to="/skills"
-          className="group grid grid-cols-2 p-4 border border-white/20 bg-black/60 hover:bg-black/80 hover:border-white/40 transition-colors items-start"
-        >
-          <div className="min-w-0 pr-4">
-            <div className="project-title-font text-white text-sm font-bold uppercase tracking-wider mb-2 text-left">
-              Skills
-            </div>
-            <p className="geist-light text-white/80 text-sm text-left">
-              Technologies and tools I work with.
-            </p>
+        <Link to="/experiences" className="group relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[110px] sm:min-h-[130px] md:min-h-[160px] border border-black/5 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#F9A8D4] via-[#F472B6] to-[#EC4899]" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="jersey-25-heading text-[4rem] md:text-[5.5rem] font-bold text-black/10 select-none">Experience</span>
           </div>
+          <div className="absolute inset-0 opacity-90">
+            <HalftoneBackground width={400} height={220} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#831843" dotOpacity={0.12} />
+          </div>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest text-black/70 uppercase [writing-mode:vertical] [text-orientation:mixed] z-10">• Read more</span>
+          <div className="relative z-10 flex items-end justify-between w-full p-4 md:p-5">
+            <span className="jersey-25-heading font-bold text-lg sm:text-xl md:text-2xl text-black">Experience</span>
+            <span className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border-2 border-black/10 flex items-center justify-center text-black transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white shadow-sm">
+              <FaArrowRight className="w-4 h-4" />
+            </span>
+          </div>
+        </Link>
 
-          <div className="hidden md:flex justify-end">
-            <img
-              src="/magiwand.png"
-              alt="Magic wand"
-              className="h-16 md:h-20 object-contain drop-shadow-[0_0_12px_rgba(0,0,0,0.7)]"
-            />
+        <Link to="/skills" className="group relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[110px] sm:min-h-[130px] md:min-h-[160px] border border-black/5 shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#A7F3D0] via-[#34D399] to-[#10B981]" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="jersey-25-heading text-[4rem] md:text-[5.5rem] font-bold text-black/10 select-none">Skills</span>
+          </div>
+          <div className="absolute inset-0 opacity-90">
+            <HalftoneBackground width={400} height={220} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#064e3b" dotOpacity={0.12} />
+          </div>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold tracking-widest text-black/70 uppercase [writing-mode:vertical] [text-orientation:mixed] z-10">• Read more</span>
+          <div className="relative z-10 flex items-end justify-between w-full p-4 md:p-5">
+            <span className="jersey-25-heading font-bold text-lg sm:text-xl md:text-2xl text-black">Skills</span>
+            <span className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border-2 border-black/10 flex items-center justify-center text-black transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-white shadow-sm">
+              <FaArrowRight className="w-4 h-4" />
+            </span>
           </div>
         </Link>
       </div>
+
+      {/* Social — responsive footer */}
+      <div className="px-3 sm:px-4 md:px-5 lg:px-6 mt-6 sm:mt-8 pt-4 sm:pt-6 pb-4 sm:pb-5 flex flex-wrap justify-center gap-4 sm:gap-6 border-t border-black/10">
+        <a href="https://www.linkedin.com/in/hanson-q/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-black hover:underline underline-offset-2 flex items-center gap-2" aria-label="LinkedIn">
+          <FaLinkedin className="w-4 h-4 text-black/80" /> LinkedIn
+        </a>
+        <a href="https://www.instagram.com/hanson.q888/?hl=en" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-black hover:underline underline-offset-2 flex items-center gap-2" aria-label="Instagram">
+          <FaInstagram className="w-4 h-4 text-black/80" /> Instagram
+        </a>
+        <a href="https://github.com/hansonq888" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-black hover:underline underline-offset-2 flex items-center gap-2" aria-label="GitHub">
+          <FaGithub className="w-4 h-4 text-black/80" /> GitHub
+        </a>
+        <a href="mailto:hansonq888@gmail.com" className="text-sm font-medium text-black hover:underline underline-offset-2 flex items-center gap-2" aria-label="Email">
+          <FaEnvelope className="w-4 h-4 text-black/80" /> Email
+        </a>
       </div>
-    </PageShell>
+      <div className="pb-8" />
+    </div>
   );
 }
