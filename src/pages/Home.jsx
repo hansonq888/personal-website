@@ -15,7 +15,7 @@ export default function Home() {
             SAMPLE 8
           </Link>
           <span className="px-1.5 text-black/40">·</span>
-          <Link to="/projects/realtor-website" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+          <Link to="/experiences" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
             Shown Space
           </Link>
           <span className="px-1.5 text-black/40">·</span>
@@ -30,7 +30,7 @@ export default function Home() {
             SAMPLE 8
           </Link>
           <span className="px-1.5 text-black/40">·</span>
-          <Link to="/projects/realtor-website" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+          <Link to="/experiences" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
             Shown Space
           </Link>
           <span className="px-1.5 text-black/40">·</span>
