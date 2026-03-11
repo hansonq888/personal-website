@@ -68,10 +68,16 @@ export default function ForYou() {
       setError("Could not load memories.");
       return;
     }
-    const withUrls = (data || []).map((m) => {
-      const { data: urlData } = supabase.storage.from(FOR_YOU_STORAGE_BUCKET).getPublicUrl(m.storage_path);
-      return { ...m, public_url: urlData?.publicUrl ?? "" };
-    });
+    // Use signed URLs so this works even if the bucket isn't public.
+    const withUrls = await Promise.all(
+      (data || []).map(async (m) => {
+        const { data: signed, error: signedErr } = await supabase
+          .storage
+          .from(FOR_YOU_STORAGE_BUCKET)
+          .createSignedUrl(m.storage_path, 60 * 60); // 1 hour
+        return { ...m, public_url: signedErr ? "" : (signed?.signedUrl ?? "") };
+      })
+    );
     setMemories(withUrls);
   }
 
@@ -100,10 +106,21 @@ export default function ForYou() {
     e.preventDefault();
     if (!uploadFile || !uploadCaption.trim() || !supabase || role !== ROLE_ADMIN) return;
     setError("");
+    // iPhone photos are often HEIC which most browsers won't display in <img>.
+    const nameLower = (uploadFile.name || "").toLowerCase();
+    const isVideo = (uploadFile.type || "").startsWith("video/");
+    const isHeic = nameLower.endsWith(".heic") || uploadFile.type === "image/heic" || uploadFile.type === "image/heif";
+    if (!isVideo && isHeic) {
+      setError("HEIC photos aren't supported in most browsers. Please upload a JPG/PNG/WebP instead.");
+      return;
+    }
     setUploading(true);
     const ext = uploadFile.name.split(".").pop()?.toLowerCase() || "jpg";
     const path = `${user.id}/${Date.now()}.${ext}`;
-    const { error: uploadErr } = await supabase.storage.from(FOR_YOU_STORAGE_BUCKET).upload(path, uploadFile, { upsert: false });
+    const { error: uploadErr } = await supabase.storage.from(FOR_YOU_STORAGE_BUCKET).upload(path, uploadFile, {
+      upsert: false,
+      contentType: uploadFile.type || undefined,
+    });
     if (uploadErr) {
       setError(uploadErr.message || "Upload failed.");
       setUploading(false);
@@ -216,7 +233,7 @@ export default function ForYou() {
             <p className="text-sm font-medium text-black/70">Add a memory</p>
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime,video/x-m4v"
               onChange={(e) => setUploadFile(e.target.files?.[0] ?? null)}
               className="block w-full text-sm text-black/80 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-black/10 file:text-black"
             />
@@ -244,7 +261,30 @@ export default function ForYou() {
               <div key={m.id} className="break-inside-avoid mb-4">
                 <div className="rounded-2xl border border-black/10 overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                   <div className="bg-black/5">
-                    <img src={m.public_url} alt="" className="w-full h-auto block object-cover object-center" />
+                    {m.public_url ? (() => {
+                      const lower = (m.storage_path || "").toLowerCase();
+                      const isVid = lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".mov") || lower.endsWith(".m4v");
+                      return isVid ? (
+                        <video
+                          src={m.public_url}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-auto block bg-black"
+                        />
+                      ) : (
+                        <img
+                          src={m.public_url}
+                          alt=""
+                          loading="lazy"
+                          className="w-full h-auto block object-cover object-center"
+                        />
+                      );
+                    })() : (
+                      <div className="w-full aspect-[4/3] flex items-center justify-center text-xs text-black/40">
+                        Media unavailable
+                      </div>
+                    )}
                   </div>
                   <div className="p-3 flex items-start justify-between gap-2">
                     <p className="text-black/90 text-sm leading-snug">{m.caption}</p>

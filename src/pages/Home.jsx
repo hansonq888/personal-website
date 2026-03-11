@@ -1,8 +1,30 @@
-import { Link } from "react-router-dom";
+import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaLinkedin, FaGithub, FaInstagram, FaArrowRight, FaEnvelope, FaHeart } from "react-icons/fa";
 import HalftoneBackground from "../components/HalftoneBackground";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const holdTimerRef = useRef(null);
+  const [isHoldingHeart, setIsHoldingHeart] = useState(false);
+
+  const startHeartHold = () => {
+    setIsHoldingHeart(true);
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = setTimeout(() => {
+      setIsHoldingHeart(false);
+      navigate("/for-you");
+    }, 2000);
+  };
+
+  const cancelHeartHold = () => {
+    setIsHoldingHeart(false);
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+
   return (
     <div className="min-h-screen w-full min-w-0 text-black overflow-y-auto overflow-x-hidden bg-white">
       {/* Editorial marquee — top of page, thin */}
@@ -160,9 +182,19 @@ export default function Home() {
         <a href="mailto:hansonq888@gmail.com" className="text-sm font-medium text-black hover:underline underline-offset-2 flex items-center gap-2" aria-label="Email">
           <FaEnvelope className="w-4 h-4 text-black/80" /> Email
         </a>
-        <Link to="/for-you" className="text-sm font-medium text-black hover:underline underline-offset-2 inline-flex items-center" aria-label="For you">
-          <FaHeart className="w-4 h-4 text-black/80" />
-        </Link>
+        <button
+          type="button"
+          className="text-sm font-medium text-black hover:underline underline-offset-2 inline-flex items-center select-none"
+          aria-label="For you (press and hold)"
+          title="Press and hold"
+          onPointerDown={startHeartHold}
+          onPointerUp={cancelHeartHold}
+          onPointerCancel={cancelHeartHold}
+          onPointerLeave={cancelHeartHold}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <FaHeart className={`w-4 h-4 transition-opacity ${isHoldingHeart ? "opacity-100" : "opacity-80"}`} />
+        </button>
       </div>
       <div className="pb-8" />
     </div>
