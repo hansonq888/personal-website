@@ -1,11 +1,8 @@
 import { Link } from "react-router-dom";
 import { FaLinkedin, FaGithub, FaInstagram } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
-import { useMusic } from "../context/MusicContext";
 
 export default function PageShell({ children, isHome = false, scrollContent = true }) {
-  const { isMusicPlaying, toggleMusic } = useMusic();
-
   return (
     <div className="min-h-screen w-full overflow-x-hidden min-w-0 flex flex-col bg-white">
       {/* Top navbar — responsive */}
@@ -57,25 +54,6 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
           >
             <MdEmail className="w-4 h-4 md:w-5 md:h-5" />
           </a>
-          {isHome && (
-            <button
-              type="button"
-              onClick={toggleMusic}
-              className="flex items-center justify-center w-6 h-6 bg-transparent text-black/70 border border-black/20 hover:bg-black/5 hover:border-black/30 transition-colors"
-              aria-label={isMusicPlaying ? "Pause music" : "Play music"}
-            >
-              {isMusicPlaying ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <rect x="6" y="4" width="4" height="16" rx="1" />
-                  <rect x="14" y="4" width="4" height="16" rx="1" />
-                </svg>
-              ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </button>
-          )}
         </div>
       </div>
 

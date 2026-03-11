@@ -4,7 +4,6 @@ import "./App.css";
 import { LoadingScreen } from "./components/LoadingScreen";
 import "./index.css";
 
-import { MusicProvider } from "./context/MusicContext";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -103,9 +102,7 @@ function App() {
         <div
           className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full ${isLoaded ? "opacity-100" : "opacity-0"} bg-white text-black`}
         >
-          <MusicProvider>
-            <RouterProvider router={router} />
-          </MusicProvider>
+          <RouterProvider router={router} />
         </div>
       )}
     </>
