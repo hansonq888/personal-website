@@ -5,6 +5,42 @@ import HalftoneBackground from "../components/HalftoneBackground";
 export default function Home() {
   return (
     <div className="min-h-screen w-full min-w-0 text-black overflow-y-auto overflow-x-hidden bg-white">
+      {/* Editorial marquee — top of page, thin */}
+      <div className="w-full overflow-hidden border-b border-black/10 py-1.5">
+        <div className="flex animate-marquee whitespace-nowrap text-[11px] md:text-xs text-black/70 tracking-wide font-medium uppercase" style={{ width: "max-content" }}>
+          <span className="inline-flex items-center gap-1 px-4 md:px-6">
+            Hi! I'm Hanson, welcome to my site — currently building:
+          </span>
+          <Link to="/projects/sample8" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            SAMPLE 8
+          </Link>
+          <span className="px-1.5 text-black/40">·</span>
+          <Link to="/projects/realtor-website" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            Shown Space
+          </Link>
+          <span className="px-1.5 text-black/40">·</span>
+          <Link to="/projects/macroboard" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            MacroBoard
+          </Link>
+          <span className="px-4 md:px-6 text-black/30">—</span>
+          <span className="inline-flex items-center gap-1 px-4 md:px-6">
+            Hi! I'm Hanson, welcome to my site — currently building:
+          </span>
+          <Link to="/projects/sample8" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            SAMPLE 8
+          </Link>
+          <span className="px-1.5 text-black/40">·</span>
+          <Link to="/projects/realtor-website" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            Shown Space
+          </Link>
+          <span className="px-1.5 text-black/40">·</span>
+          <Link to="/projects/macroboard" className="inline-flex items-center px-4 md:px-6 hover:text-black transition-colors">
+            MacroBoard
+          </Link>
+          <span className="px-4 md:px-6 text-black/30">—</span>
+        </div>
+      </div>
+
       {/* Masthead: small + medium = centered name row + highlights; lg+ = spread (Hanson, highlights, Qin right) */}
       <div className="w-full flex justify-center pt-3 md:pt-5 pb-1">
         <div className="max-w-2xl w-full px-3 md:px-5">
