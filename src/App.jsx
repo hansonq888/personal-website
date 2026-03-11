@@ -100,7 +100,7 @@ function App() {
         <LoadingScreen onComplete={() => setIsLoaded(true)} progress={loadingProgress} />
       ) : (
         <div
-          className={`h-screen min-h-[100dvh] min-h-[100vh] overflow-hidden overflow-x-hidden w-full max-w-full ${isLoaded ? "opacity-100" : "opacity-0"} bg-white text-black`}
+          className={`min-h-screen min-h-[100dvh] w-full max-w-full ${isLoaded ? "opacity-100" : "opacity-0"} bg-white text-black`}
         >
           <RouterProvider router={router} />
         </div>

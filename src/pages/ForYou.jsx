@@ -19,6 +19,9 @@ export default function ForYou() {
   const [uploadCaption, setUploadCaption] = useState("");
   const [uploadFile, setUploadFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingCaption, setEditingCaption] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -145,6 +148,27 @@ export default function ForYou() {
     await supabase.storage.from(FOR_YOU_STORAGE_BUCKET).remove([m.storage_path]);
     await supabase.from(FOR_YOU_VIDEOS_TABLE).delete().eq("id", id);
     await fetchMemories();
+  }
+
+  async function handleSaveCaption() {
+    if (!supabase || role !== ROLE_ADMIN || !editingId) return;
+    const nextCaption = editingCaption.trim();
+    if (!nextCaption) return;
+    setSavingEdit(true);
+    setError("");
+    const { error: e } = await supabase
+      .from(FOR_YOU_VIDEOS_TABLE)
+      .update({ caption: nextCaption })
+      .eq("id", editingId);
+    if (e) {
+      setError(e.message || "Failed to update caption.");
+      setSavingEdit(false);
+      return;
+    }
+    setMemories((prev) => prev.map((m) => (m.id === editingId ? { ...m, caption: nextCaption } : m)));
+    setEditingId(null);
+    setEditingCaption("");
+    setSavingEdit(false);
   }
 
   if (!supabase) {
@@ -287,9 +311,62 @@ export default function ForYou() {
                     )}
                   </div>
                   <div className="p-3 flex items-start justify-between gap-2">
-                    <p className="text-black/90 text-sm leading-snug">{m.caption}</p>
+                    <div className="min-w-0 flex-1">
+                      {isAdmin && editingId === m.id ? (
+                        <div className="space-y-2">
+                          <input
+                            value={editingCaption}
+                            onChange={(e) => setEditingCaption(e.target.value)}
+                            className="w-full px-3 py-2 border border-black/15 rounded-xl bg-white text-black text-sm placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/10"
+                            placeholder="Caption"
+                            autoFocus
+                          />
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handleSaveCaption}
+                              disabled={savingEdit || !editingCaption.trim()}
+                              className="px-3 py-1.5 rounded-lg bg-black text-white text-xs font-medium hover:bg-black/90 disabled:opacity-50"
+                            >
+                              {savingEdit ? "Saving..." : "Save"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingId(null);
+                                setEditingCaption("");
+                              }}
+                              className="px-2 py-1.5 text-xs text-black/60 hover:text-black"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-black/90 text-sm leading-snug break-words">{m.caption}</p>
+                      )}
+                    </div>
                     {isAdmin && (
-                      <button type="button" onClick={() => handleDelete(m.id)} className="text-red-600 hover:text-red-700 text-xs shrink-0">Delete</button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError("");
+                            setEditingId(m.id);
+                            setEditingCaption(m.caption || "");
+                          }}
+                          className="text-black/60 hover:text-black text-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(m.id)}
+                          className="text-red-600 hover:text-red-700 text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>

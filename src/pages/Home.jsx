@@ -26,7 +26,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-0 text-black overflow-y-auto overflow-x-hidden bg-white">
+    <div className="min-h-screen w-full min-w-0 text-black overflow-x-hidden bg-white">
       {/* Editorial marquee — top of page, thin */}
       <div className="w-full overflow-hidden border-b border-black/10 py-1.5">
         <div className="flex animate-marquee whitespace-nowrap text-[11px] md:text-xs text-black/70 tracking-wide font-medium uppercase" style={{ width: "max-content" }}>
