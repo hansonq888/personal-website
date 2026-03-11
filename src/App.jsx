@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import Experiences from "./pages/Experiences";
 import Skills from "./pages/Skills";
 import ProjectDetail from "./pages/ProjectDetail";
+import ForYou from "./pages/ForYou";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { path: "/experiences", element: <Experiences /> },
       { path: "/skills", element: <Skills /> },
       { path: "/projects/:id", element: <ProjectDetail /> },
+      { path: "/for-you", element: <ForYou /> },
     ],
   },
 ]);

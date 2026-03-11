@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { Outlet, useOutlet } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import CursorTrail from "./CursorTrail";
 
 export default function Layout() {
   const outlet = useOutlet();
@@ -32,6 +33,7 @@ export default function Layout() {
 
   return (
     <div className="flex flex-col w-full h-screen min-h-[100dvh] min-h-[100vh] min-w-0 overflow-hidden overflow-x-hidden max-w-full bg-white">
+      <CursorTrail />
       <main className="flex-1 min-h-0 min-w-0 relative flex flex-col z-[2] overflow-x-hidden overflow-y-auto max-w-full">
         {outlet}
       </main>

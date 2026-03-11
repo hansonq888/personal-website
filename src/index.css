@@ -51,6 +51,16 @@
   .animate-marquee {
     animation: marquee 25s linear infinite;
   }
+  @keyframes cursor-trail-fade {
+    to {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+  }
+  .cursor-trail-dot {
+    animation: cursor-trail-fade 0.48s ease-out forwards;
+    will-change: opacity, transform;
+  }
   .scrollbar-none {
     scrollbar-width: none;
     -ms-overflow-style: none;
