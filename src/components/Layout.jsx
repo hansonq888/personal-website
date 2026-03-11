@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { Outlet, useOutlet } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function Layout() {
   const outlet = useOutlet();
@@ -34,6 +35,7 @@ export default function Layout() {
       <main className="flex-1 min-h-0 min-w-0 relative flex flex-col z-[2] overflow-x-hidden overflow-y-auto max-w-full">
         {outlet}
       </main>
+      <Analytics />
     </div>
   );
 }
