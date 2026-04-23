@@ -24,6 +24,15 @@ export const projects = [
     website: "https://sample8.space/",
   },
   {
+    id: "dealsignal-ai",
+    title: "DealSignal AI",
+    description: "An AI-assisted diligence copilot for first-pass CIM review and investment memo triage.",
+    journalFile: "dealsignal-ai",
+    image: "/DealAI.png",
+    tech: ["React", "TypeScript", "FastAPI", "Anthropic", "Tavily", "pdfplumber", "Vercel", "Railway"],
+    website: "https://cim-analyzer-theta.vercel.app/",
+  },
+  {
     id: "realtor-website",
     title: "Realtor Website",
     description: "A personal realtor website made with React",

@@ -31,7 +31,7 @@ export default function ProjectDetail() {
 
   const hasVideo = (project.id === "priority-email-labeler" || project.id === "live-chord-detector") && project.video;
   const hasLinks =
-    (project.website && (project.id === "macroboard" || project.id === "realtor-website" || project.id === "sample8")) ||
+    (project.website && (project.id === "macroboard" || project.id === "realtor-website" || project.id === "sample8" || project.id === "dealsignal-ai")) ||
     (project.id === "live-chord-detector" && (project.download || project.video));
 
   return (
@@ -126,7 +126,7 @@ export default function ProjectDetail() {
         {/* Actions */}
         {hasLinks && (
           <div className="flex flex-wrap gap-2">
-            {project.website && (project.id === "macroboard" || project.id === "realtor-website" || project.id === "sample8") && (
+            {project.website && (project.id === "macroboard" || project.id === "realtor-website" || project.id === "sample8" || project.id === "dealsignal-ai") && (
               <a href={project.website} target="_blank" rel="noreferrer" className="text-sm font-medium border border-black/15 px-4 py-2.5 text-black rounded-xl hover:bg-black hover:text-white transition-colors">
                 Visit live site
               </a>
