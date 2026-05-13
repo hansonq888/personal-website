@@ -1,7 +1,7 @@
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { projects } from "../data/projects";
 import PageShell from "../components/PageShell";
-import HalftoneBackground from "../components/HalftoneBackground";
 
 const SHOW_IDS = [
   "sample8",
@@ -14,144 +14,302 @@ const SHOW_IDS = [
   "mini-compiler",
 ];
 const displayedProjects = SHOW_IDS.map((id) => projects.find((p) => p.id === id)).filter(Boolean);
-const featuredProject = displayedProjects[0];
-const otherProjects = displayedProjects.slice(1);
+const N = displayedProjects.length;
+const NAVBAR_H = 0;
+const STEP   = 150;
+const TILT   = 25;
+const EXPAND = 55;
 
-function firstSentence(text) {
-  if (!text || typeof text !== "string") return "";
-  const match = text.match(/^[^.]*\.?/);
-  return match ? match[0].trim() : text;
-}
+const lerp  = (a, b, t) => a + (b - a) * t;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 export default function Projects() {
+  const navigate   = useNavigate();
+  const cardRefs   = useRef([]);
+  const rafRef     = useRef(null);
+  const animVals   = useRef(
+    displayedProjects.map((_, i) => ({ y: i * STEP, opacity: 1, expandScale: 1, rotX: -TILT }))
+  );
+
+  const hoverRef       = useRef(false);
+  const expandRef      = useRef(0);
+  const selectedRef    = useRef(null);
+  const closingRef     = useRef(false);
+  const closingCardRef = useRef(null);
+  const timerRef       = useRef(null);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeRef = useRef(0);
+  const [labelKey, setLabelKey] = useState(0);
+
+  const [selectedId,  setSelectedId]  = useState(null);
+  const [detailReady, setDetailReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  const selectedProj = displayedProjects.find(p => p.id === selectedId);
+
+  const openDetail = (id) => {
+    if (selectedRef.current) return;
+    hoverRef.current    = false;
+    selectedRef.current = id;
+    setSelectedId(id);
+    setDetailReady(false);
+    timerRef.current = setTimeout(() => setDetailReady(true), 520);
+  };
+
+  const closeDetail = () => {
+    setDetailReady(false);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      closingCardRef.current = selectedRef.current;
+      closingRef.current     = true;
+      selectedRef.current    = null;
+      timerRef.current = setTimeout(() => {
+        closingRef.current     = false;
+        closingCardRef.current = null;
+        timerRef.current = setTimeout(() => {
+          setSelectedId(null);
+        }, 700);
+      }, 600);
+    }, 60);
+  };
+
+  useEffect(() => {
+    const vh = () => window.innerHeight - NAVBAR_H;
+
+    const tick = () => {
+      const scrollProgress = clamp(window.scrollY / vh(), 0, N - 1);
+      const floored        = Math.floor(scrollProgress);
+
+      if (floored !== activeRef.current) {
+        activeRef.current = floored;
+        setActiveIndex(floored);
+        setLabelKey(k => k + 1);
+      }
+
+      const isAnySelected = selectedRef.current !== null;
+      const isClosing     = closingRef.current;
+      if (isAnySelected) hoverRef.current = false;
+
+      expandRef.current = lerp(expandRef.current, hoverRef.current ? 1 : 0, 0.08);
+      const expand = expandRef.current;
+
+      cardRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const card        = displayedProjects[i];
+        const isSelected  = card.id === selectedRef.current;
+        const isReturning = card.id === closingCardRef.current;
+        const rel = i - scrollProgress;
+        const cur = animVals.current[i];
+
+        if (isSelected) {
+          cur.y           = lerp(cur.y,           0,    0.08);
+          cur.opacity     = 1;
+          cur.expandScale = lerp(cur.expandScale, 1.35, 0.07);
+          cur.rotX        = lerp(cur.rotX,        0,    0.08);
+          el.style.transform = `translateY(${cur.y.toFixed(2)}px) perspective(600px) rotateX(${cur.rotX.toFixed(2)}deg) scale(${cur.expandScale.toFixed(4)})`;
+          el.style.opacity   = "1";
+          el.style.zIndex    = String(N + 5);
+        } else if (isReturning) {
+          const T = 0.11;
+          cur.y           = lerp(cur.y,           rel * STEP, T);
+          cur.expandScale = lerp(cur.expandScale, 1,          T);
+          cur.rotX        = lerp(cur.rotX,        -TILT,      T);
+          cur.opacity     = 1;
+          el.style.transform = `translateY(${cur.y.toFixed(2)}px) perspective(600px) rotateX(${cur.rotX.toFixed(2)}deg) scale(${cur.expandScale.toFixed(4)})`;
+          el.style.opacity   = "1";
+          el.style.zIndex    = String(i + 1);
+        } else {
+          const expandAmt = rel > 0 ? EXPAND * 5 : EXPAND;
+          cur.y           = lerp(cur.y, rel * (STEP + expand * expandAmt), 0.10);
+          cur.opacity     = lerp(cur.opacity, (isAnySelected || isClosing) ? 0 : 1, 0.07);
+          cur.expandScale = lerp(cur.expandScale, 1, 0.10);
+          const flatness  = Math.max(0, 1 - Math.abs(rel)) * expand;
+          cur.rotX        = lerp(cur.rotX, -TILT * (1 - flatness), 0.10);
+          el.style.transform = `translateY(${cur.y.toFixed(2)}px) perspective(600px) rotateX(${cur.rotX.toFixed(2)}deg)`;
+          el.style.opacity   = cur.opacity.toFixed(3);
+          el.style.zIndex    = String(i + 1);
+        }
+      });
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const proj = displayedProjects[activeIndex];
+
   return (
     <PageShell>
-      <div className="min-h-screen bg-white text-black p-3 sm:p-4 md:p-6 lg:p-8 min-w-0">
-        <div className="max-w-[1600px] mx-auto w-full">
-          {/* Title only — colourful box */}
-          <div className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-black/5 shadow-md mb-6 sm:mb-8 p-4 sm:p-6 md:p-8 min-h-[100px] sm:min-h-[120px] flex items-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#0EA5E9]" />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className="jersey-25-heading text-[4rem] md:text-[6rem] font-bold text-black/10 select-none">Projects</span>
+      <div aria-hidden style={{ height: `calc(${N} * 100dvh)` }} />
+
+      <div
+        style={{
+          position: "fixed", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          overflow: "hidden", background: "#ffffff", zIndex: 10, cursor: "default",
+        }}
+      >
+        {/* Card stack */}
+        <div style={{ position: "relative", width: isMobile ? "min(92vw, 440px)" : "min(480px, 64vw)", aspectRatio: "16 / 10" }}>
+          {displayedProjects.map((p, i) => (
+            <div
+              key={p.id}
+              ref={el => { cardRefs.current[i] = el; }}
+              onClick={() => openDetail(p.id)}
+              onMouseEnter={() => { if (!selectedRef.current) hoverRef.current = true; }}
+              onMouseLeave={() => { hoverRef.current = false; }}
+              onTouchStart={() => { if (!selectedRef.current) hoverRef.current = true; }}
+              onTouchEnd={() => { hoverRef.current = false; }}
+              onTouchCancel={() => { hoverRef.current = false; }}
+              style={{
+                position: "absolute", inset: 0,
+                overflow: "hidden", cursor: "pointer",
+                background: "#d8d4cc", willChange: "transform, opacity",
+                transformOrigin: "center center",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.12)",
+              }}
+            >
+              {p.image && (
+                <img src={p.image} alt="" draggable={false} style={{
+                  width: "100%", height: "100%",
+                  objectFit: "cover", objectPosition: "top",
+                  display: "block", userSelect: "none", pointerEvents: "none",
+                }} />
+              )}
             </div>
-            <div className="absolute inset-0 opacity-90">
-              <HalftoneBackground width={600} height={200} dotSpacing={8} baseRadius={0.2} maxRadius={2.5} bgColor="transparent" dotColor="#0c4a6e" dotOpacity={0.12} />
+          ))}
+        </div>
+
+        {/* Stack chrome */}
+        <div style={{
+          position: "absolute", inset: 0,
+          opacity: selectedId ? 0 : 1, transition: "opacity 0.3s ease",
+          pointerEvents: "none",
+        }}>
+          <div style={{
+            position: "absolute", top: isMobile ? 88 : "50%", left: isMobile ? 16 : 36,
+            transform: isMobile ? "none" : "translateY(-50%)",
+            display: "flex", flexDirection: "column", gap: 8,
+          }}>
+            <div style={{ overflow: "hidden", height: "2rem" }}>
+              <p key={labelKey} style={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: "clamp(1.15rem, 2.4vw, 1.7rem)", fontWeight: 700, letterSpacing: "-0.01em",
+                color: "rgba(0,0,0,0.88)", lineHeight: 1, whiteSpace: "nowrap",
+                animation: "vpLabelIn 0.42s cubic-bezier(0.25,0.46,0.45,0.94) both",
+              }}>{proj?.title}</p>
             </div>
-            <div className="relative z-10">
-              <h1 className="jersey-25-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-2">
-                Projects
-              </h1>
-              <p className="text-sm md:text-base text-black/90" style={{ backgroundColor: "#BAE6FD", padding: "4px 6px", width: "fit-content" }}>
-                Things I've built
-              </p>
+            <div key={`t${labelKey}`} style={{ display: "flex", gap: 10, animation: "vpLabelIn 0.42s 0.06s cubic-bezier(0.25,0.46,0.45,0.94) both" }}>
+              {proj?.tech?.slice(0, 3).map(t => (
+                <span key={t} style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", color: "rgba(0,0,0,0.50)", textTransform: "uppercase" }}>{t}</span>
+              ))}
             </div>
           </div>
 
-          {/* BIG / bold / playful featured block */}
-          {featuredProject && (
-            <Link
-              to={`/projects/${featuredProject.id}`}
-              className="block mb-8 rounded-2xl overflow-hidden border border-black/10 shadow-xl group relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#f472b6] via-[#e879f9] to-[#fb923c]" />
-              <div className="absolute inset-0 opacity-80">
-                <HalftoneBackground width={1800} height={600} dotSpacing={12} baseRadius={0.14} maxRadius={1.65} bgColor="transparent" dotColor="#111827" dotOpacity={0.11} />
-              </div>
-              <div className="relative p-4 sm:p-6 md:p-8 lg:p-10">
-                <div className="flex flex-col lg:flex-row gap-5 lg:gap-8 items-stretch">
-                  <div className="lg:w-[58%] flex flex-col justify-between min-w-0">
-                    <div>
-                      <p className="text-[10px] sm:text-xs font-bold tracking-[0.22em] text-black/70 uppercase mb-2">Featured project</p>
-                      <h2 className="jersey-25-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.88] text-black drop-shadow-sm flex items-end gap-2 flex-wrap">
-                        {featuredProject.title}
-                      </h2>
-                      {featuredProject.description && (
-                        <p className="mt-3 text-black/80 text-sm sm:text-base md:text-lg max-w-2xl leading-snug">
-                          {firstSentence(featuredProject.description)}
-                        </p>
-                      )}
-                    </div>
-                    <p className="mt-5 inline-flex w-fit text-[11px] sm:text-xs font-bold tracking-wide uppercase px-2.5 py-1 bg-white/80 border border-black/10 rounded-full text-black/75">
-                      Tap to view more
-                    </p>
-                  </div>
+          <div style={{ position: "absolute", top: isMobile ? 56 : 72, right: isMobile ? 16 : 36 }}>
+            <p style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500, fontSize: 10, letterSpacing: "0.26em", color: "rgba(0,0,0,0.32)", textTransform: "uppercase" }}>
+              {String(activeIndex + 1).padStart(2, "0")} / {String(N).padStart(2, "0")}
+            </p>
+          </div>
 
-                  <div className="lg:w-[42%] min-w-0">
-                    <div className="relative rounded-2xl overflow-hidden border-2 border-black/15 bg-white/60 backdrop-blur-sm shadow-2xl rotate-[-1deg] group-hover:rotate-0 transition-transform duration-500">
-                      {featuredProject.image ? (
-                        <div className="bg-black/5 overflow-hidden max-h-[460px] flex items-center justify-center">
-                          <img
-                            src={featuredProject.image}
-                            alt=""
-                            className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.03]"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-[4/3] bg-black/10" />
-                      )}
-                      <span className="absolute top-2 right-2 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-black text-white tracking-wide uppercase">
-                        spotlight
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          )}
-
-          {/* Playful collage grid */}
-          {otherProjects.length > 0 && (
-            <>
-              <h2 className="jersey-25-heading text-xl sm:text-2xl text-black/80 mb-3">More projects</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {otherProjects.map((proj, i) => {
-                  const palettes = [
-                    "from-[#fef3c7] via-[#fde68a] to-[#fcd34d]",
-                    "from-[#e0f2fe] via-[#7dd3fc] to-[#38bdf8]",
-                    "from-[#fce7f3] via-[#f9a8d4] to-[#f472b6]",
-                    "from-[#dcfce7] via-[#86efac] to-[#34d399]",
-                    "from-[#ede9fe] via-[#c4b5fd] to-[#a78bfa]",
-                    "from-[#ffe4e6] via-[#fda4af] to-[#fb7185]",
-                  ];
-                  const rotate = ["rotate-[-1deg]", "rotate-[0.8deg]", "rotate-[-0.6deg]"][i % 3];
-                  return (
-                    <Link
-                      key={proj.id}
-                      to={`/projects/${proj.id}`}
-                      className={`group relative rounded-2xl overflow-hidden border border-black/10 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.015] ${rotate} hover:rotate-0`}
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${palettes[i % palettes.length]}`} />
-                      <div className="absolute inset-0 opacity-65">
-                        <HalftoneBackground width={700} height={350} dotSpacing={10} baseRadius={0.12} maxRadius={1.45} bgColor="transparent" dotColor="#111827" dotOpacity={0.11} />
-                      </div>
-
-                      <div className="relative z-10 p-3 sm:p-4">
-                        <div className="rounded-xl overflow-hidden border border-black/10 bg-white/70 mb-3">
-                          {proj.image ? (
-                            <div className="aspect-video bg-black/5">
-                              <img src={proj.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />
-                            </div>
-                          ) : (
-                            <div className="aspect-video bg-black/10" />
-                          )}
-                        </div>
-                        <span className="jersey-25-heading text-xl sm:text-2xl text-black block leading-none">
-                          {proj.title}
-                        </span>
-                        {proj.description && (
-                          <p className="text-black/70 text-xs sm:text-sm mt-1 line-clamp-2">
-                            {firstSentence(proj.description)}
-                          </p>
-                        )}
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </>
-          )}
+          <div style={{
+            position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+            opacity: activeIndex === 0 ? 1 : 0, transition: "opacity 0.7s ease",
+          }}>
+            <p style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500, fontSize: 8, letterSpacing: "0.32em", color: "rgba(0,0,0,0.28)", textTransform: "uppercase" }}>scroll</p>
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" aria-hidden>
+              <line x1="5" y1="0" x2="5" y2="14" stroke="rgba(0,0,0,0.28)" strokeWidth="1.2" strokeLinecap="round"/>
+              <polyline points="2,10 5,14 8,10" stroke="rgba(0,0,0,0.28)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
         </div>
+
+        {/* Detail panel */}
+        {selectedId && (
+          <div
+            style={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: isMobile ? "flex-end" : "center", justifyContent: isMobile ? "center" : "flex-end",
+              padding: isMobile ? "0 16px 20px 16px" : "0 60px",
+              opacity: detailReady ? 1 : 0,
+              transform: detailReady ? "translateY(0)" : "translateY(10px)",
+              transition: "opacity 0.45s ease, transform 0.45s ease",
+              pointerEvents: detailReady ? "auto" : "none",
+              zIndex: N + 15,
+            }}
+          >
+            <div style={{ width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 520 : 280, display: "flex", flexDirection: "column", gap: 18, background: isMobile ? "rgba(255,255,255,0.94)" : "transparent", padding: isMobile ? "14px 14px 10px 14px" : 0 }}>
+              <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "clamp(1.2rem, 2.4vw, 1.7rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.88)", lineHeight: 1.1 }}>
+                {selectedProj?.title}
+              </p>
+              <p style={{ fontFamily: '"Inter", sans-serif', fontWeight: 300, fontSize: 13, color: "rgba(0,0,0,0.60)", lineHeight: 1.7 }}>
+                {selectedProj?.description}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {selectedProj?.tech?.map(t => (
+                  <span key={t} style={{
+                    fontFamily: '"Inter", sans-serif', fontWeight: 500,
+                    fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase",
+                    color: "rgba(0,0,0,0.45)", border: "1px solid rgba(0,0,0,0.15)", padding: "3px 8px",
+                  }}>{t}</span>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                {selectedProj?.website && (
+                  <a href={selectedProj.website} target="_blank" rel="noopener noreferrer" style={{
+                    fontFamily: '"Inter", sans-serif', fontWeight: 500,
+                    fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: "rgba(0,0,0,0.7)", textDecoration: "none",
+                    borderBottom: "1px solid rgba(0,0,0,0.25)", paddingBottom: 2,
+                  }}>Live site →</a>
+                )}
+                {selectedProj?.github && (
+                  <a href={selectedProj.github} target="_blank" rel="noopener noreferrer" style={{
+                    fontFamily: '"Inter", sans-serif', fontWeight: 500,
+                    fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: "rgba(0,0,0,0.7)", textDecoration: "none",
+                    borderBottom: "1px solid rgba(0,0,0,0.25)", paddingBottom: 2,
+                  }}>GitHub →</a>
+                )}
+                {selectedProj?.video && (
+                  <a href={selectedProj.video} target="_blank" rel="noopener noreferrer" style={{
+                    fontFamily: '"Inter", sans-serif', fontWeight: 500,
+                    fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: "rgba(0,0,0,0.7)", textDecoration: "none",
+                    borderBottom: "1px solid rgba(0,0,0,0.25)", paddingBottom: 2,
+                  }}>Demo →</a>
+                )}
+              </div>
+              <button onClick={closeDetail} style={{
+                alignSelf: "flex-start", background: "transparent", border: "none",
+                fontFamily: '"Inter", sans-serif', fontWeight: 500,
+                padding: 0, cursor: "pointer", fontSize: 9, letterSpacing: "0.26em",
+                textTransform: "uppercase", color: "rgba(0,0,0,0.35)", marginTop: 4,
+              }}>← back</button>
+            </div>
+          </div>
+        )}
       </div>
+
+      <style>{`
+        @keyframes vpLabelIn {
+          from { transform: translateY(105%); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+      `}</style>
     </PageShell>
   );
 }

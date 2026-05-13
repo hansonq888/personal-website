@@ -4,9 +4,9 @@ import { MdEmail } from "react-icons/md";
 
 export default function PageShell({ children, isHome = false, scrollContent = true }) {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden min-w-0 flex flex-col bg-white">
-      {/* Top navbar — responsive */}
-      <div className="flex-shrink-0 h-11 sm:h-12 min-h-[44px] border-b border-black/10 px-3 sm:px-4 md:px-6 flex justify-between items-center gap-2 bg-white">
+    <div className="min-h-screen w-full overflow-x-clip min-w-0 flex flex-col">
+      {/* Top navbar — sticky, transparent */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-11 sm:h-12 min-h-[44px] px-3 sm:px-4 md:px-6 flex justify-between items-center gap-2 bg-transparent">
         {isHome ? (
           <span className="text-black/70 text-[10px] md:text-xs tracking-[0.2em] uppercase font-medium">
             Student developer & builder
@@ -58,7 +58,7 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
       </div>
 
       {/* Main content — light bg */}
-      <main className="flex-1 min-h-0 min-w-0 max-w-full overflow-x-hidden bg-white text-black">
+      <main className="flex-1 min-h-0 min-w-0 max-w-full overflow-x-hidden bg-white text-black pt-11 sm:pt-12">
         {children}
       </main>
     </div>

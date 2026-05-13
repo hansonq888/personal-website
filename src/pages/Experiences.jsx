@@ -1,5 +1,4 @@
 import PageShell from "../components/PageShell";
-import HalftoneBackground from "../components/HalftoneBackground";
 
 const experiences = [
   {
@@ -34,81 +33,81 @@ const experiences = [
 export default function Experiences() {
   return (
     <PageShell>
-      <div className="min-h-screen bg-white text-black p-3 sm:p-4 md:p-6 lg:p-8 min-w-0">
-        <div className="max-w-[1600px] mx-auto w-full">
-          {/* Big expressive header */}
-          <div className="relative rounded-2xl overflow-hidden border border-black/10 shadow-xl mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#f9a8d4] via-[#f472b6] to-[#7dd3fc]" />
-            <div className="absolute inset-0 opacity-75">
-              <HalftoneBackground width={1400} height={420} dotSpacing={11} baseRadius={0.12} maxRadius={1.6} bgColor="transparent" dotColor="#111827" dotOpacity={0.12} />
-            </div>
-            <div className="relative z-10 p-4 sm:p-6 md:p-8 lg:p-10">
-              <p className="text-[10px] sm:text-xs font-bold tracking-[0.22em] uppercase text-black/65 mb-2">
-                Career path
-              </p>
-              <h1 className="jersey-25-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.85] text-black">
-                Experience
-              </h1>
-              <p className="mt-2 inline-flex text-xs sm:text-sm text-black/85 px-2.5 py-1 bg-white/75 border border-black/10 rounded-full">
-                Where I've worked
-              </p>
-            </div>
-          </div>
+      <div className="min-h-screen bg-white text-black px-4 sm:px-8 md:px-12 pt-12 md:pt-16 pb-20 md:pb-28 min-w-0 overflow-x-hidden">
+        <div className="relative w-full max-w-6xl mx-auto">
+          <h1
+            className="leading-[1] tracking-tight"
+            style={{ fontFamily: '"Inter", sans-serif', fontWeight: 700, fontSize: "clamp(4rem, 11vw, 10rem)" }}
+          >
+            Experience
+          </h1>
+          <p
+            className="mt-4 sm:mt-5 uppercase tracking-[0.22em] text-[11px] sm:text-xs text-black/55"
+            style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
+          >
+            Where I have worked
+          </p>
 
-          {/* Masonry-like layout with same card dimensions */}
-          <div className="columns-1 lg:columns-2 gap-4 sm:gap-5 [column-fill:_balance]">
-            {experiences.map((exp, i) => {
-              const palettes = [
-                "from-[#fde68a] via-[#fbbf24] to-[#f59e0b]",
-                "from-[#bae6fd] via-[#7dd3fc] to-[#38bdf8]",
-                "from-[#fbcfe8] via-[#f9a8d4] to-[#f472b6]",
-              ];
-              const rotate = i % 2 === 0 ? "rotate-[-0.6deg]" : "rotate-[0.6deg]";
-              return (
-                <div
-                  key={i}
-                  className={`relative mb-4 break-inside-avoid rounded-2xl overflow-hidden border border-black/10 shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.01] ${rotate} hover:rotate-0`}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${palettes[i % palettes.length]}`} />
-                  <div className="absolute inset-0 opacity-60">
-                    <HalftoneBackground width={900} height={420} dotSpacing={10} baseRadius={0.11} maxRadius={1.45} bgColor="transparent" dotColor="#111827" dotOpacity={0.1} />
-                  </div>
-                  <div className="relative z-10 p-4 sm:p-5 md:p-6">
-                    <div className="inline-flex items-center gap-2 text-[10px] sm:text-xs tracking-[0.16em] uppercase text-black/65 bg-white/70 border border-black/10 rounded-full px-2.5 py-1 mb-3">
-                      <span>{exp.dates}</span>
-                    </div>
-                    <h2 className="jersey-25-heading text-black text-2xl sm:text-3xl md:text-4xl leading-[0.9] mb-1">
-                      {exp.role}
-                    </h2>
-                    <p className="text-black/85 text-xs sm:text-sm mb-3 break-words">
-                      {exp.url ? (
-                        <a href={exp.url} target="_blank" rel="noopener noreferrer" className="text-black/85 hover:text-black underline underline-offset-2 transition-colors break-words">
-                          {exp.org}
-                        </a>
-                      ) : (
-                        exp.org
-                      )}
-                    </p>
-                    {exp.image && (
-                      <div className="mb-3 rounded-xl overflow-hidden border border-black/15 bg-white/70">
-                        <img src={exp.image} alt={`${exp.org} preview`} className="w-full h-auto object-cover block" />
-                      </div>
+          <div className="mt-16 md:mt-20 flex flex-col gap-14 md:gap-20">
+            {experiences.map((exp, i) => (
+              <div
+                key={i}
+                className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start ${
+                  i % 2 === 1 ? "md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1" : ""
+                }`}
+              >
+                <div className={i % 2 === 0 ? "md:pr-6" : "md:pl-6 md:translate-y-6"}>
+                  <p
+                    className="uppercase tracking-[0.24em] text-[10px] sm:text-xs text-black/45 mb-3"
+                    style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
+                  >
+                    {exp.dates}
+                  </p>
+                  <h2
+                    className="leading-[0.95]"
+                    style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800, fontSize: "clamp(1.8rem, 4.8vw, 3.6rem)" }}
+                  >
+                    {exp.role}
+                  </h2>
+                  <p className="mt-2 text-base text-black/70" style={{ fontFamily: '"Inter", sans-serif', fontWeight: 400 }}>
+                    {exp.url ? (
+                      <a href={exp.url} target="_blank" rel="noopener noreferrer" className="hover:text-black underline underline-offset-2 transition-colors">
+                        {exp.org}
+                      </a>
+                    ) : (
+                      exp.org
                     )}
+                  </p>
+
+                  <div className="mt-8 md:mt-10 space-y-4">
                     {exp.paragraphs.length > 0 ? (
                       exp.paragraphs.map((para, j) => (
-                        <p key={j} className="text-black/90 text-sm md:text-base leading-relaxed mb-3 last:mb-0">
+                        <p key={j} className="text-sm sm:text-base text-black/70 leading-relaxed max-w-[60ch]" style={{ fontFamily: '"Inter", sans-serif', fontWeight: 300 }}>
                           {para}
                         </p>
                       ))
                     ) : (
-                      <p className="text-black/75 text-sm md:text-base leading-relaxed italic">
+                      <p className="text-sm sm:text-base text-black/45 leading-relaxed italic" style={{ fontFamily: '"Inter", sans-serif', fontWeight: 300 }}>
                         Building across product and engineering; more details coming soon.
                       </p>
                     )}
                   </div>
                 </div>
-              );
-            })}
+
+                <div className={i % 2 === 0 ? "md:pl-8 md:-translate-y-4" : "md:pr-8"}>
+                  {exp.image ? (
+                    <img src={exp.image} alt={`${exp.org} preview`} className="w-full max-w-[460px] h-auto object-cover block" />
+                  ) : (
+                    <p
+                      className="uppercase tracking-[0.22em] text-[10px] sm:text-xs text-black/35 pt-2"
+                      style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
+                    >
+                      Visual coming soon
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
