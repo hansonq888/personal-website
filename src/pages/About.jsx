@@ -1,85 +1,49 @@
 import PageShell from "../components/PageShell";
 
+const INTER = { fontFamily: '"Inter", sans-serif', fontWeight: 300 };
+
 export default function About() {
   return (
     <PageShell>
-      <div className="min-h-screen bg-white text-black px-4 sm:px-8 md:px-12 pt-12 md:pt-16 pb-20 md:pb-28 min-w-0 overflow-x-hidden">
-        <div className="relative w-full max-w-6xl mx-auto">
-          <h1
-            className="leading-[0.9] tracking-tight"
-            style={{ fontFamily: '"Inter", sans-serif', fontWeight: 700, fontSize: "clamp(4rem, 11vw, 10rem)" }}
-          >
-            About
-          </h1>
+      <div className="min-h-[calc(100vh-2.75rem)] sm:min-h-[calc(100vh-3rem)] w-full min-w-0 bg-white text-black overflow-x-hidden flex flex-col">
+        {/* Body */}
+        <div className="flex-1 px-3 sm:px-5 pt-6 md:pt-8 pb-6 flex flex-col">
+          <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col">
+            <img
+              src="/ultimate_frisbee_dotted.gif"
+              alt=""
+              style={{ transform: "scaleY(-1)" }}
+              className="mb-1 w-[240px] sm:w-[320px] md:w-[400px] h-auto block select-none pointer-events-none"
+            />
 
-          <p
-            className="mt-1 sm:mt-2 uppercase tracking-[0.22em] text-[11px] sm:text-xs text-black/55"
-            style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
-          >
-            Random notes about me
-          </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
+              <div>
+                <h1
+                  className="leading-[0.9]"
+                  style={{ fontFamily: '"Inter", sans-serif', fontWeight: 700, fontSize: "clamp(2.75rem, 12vw, 10rem)", letterSpacing: "-0.02em" }}
+                >
+                  About
+                </h1>
 
-          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
-            <div className="space-y-5 md:space-y-6">
-              <p
-                className="leading-tight"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 700, fontSize: "clamp(1.5rem, 4vw, 2.8rem)" }}
-              >
-                Yale sophomore from Vancouver.
-              </p>
+                <div className="mt-4 md:mt-5 space-y-1" style={INTER}>
+                  <p className="text-sm tracking-wide">--YALE JUNIOR</p>
+                  <p className="text-sm tracking-wide">:CS + MATH</p>
+                  <p className="text-sm tracking-wide">--VANCOUVER, BC x NEW HAVEN, CT</p>
+                </div>
+              </div>
 
-              <p
-                className="max-w-[32ch] leading-[1.35] text-black/75"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 300, fontSize: "clamp(1rem, 2.2vw, 1.5rem)" }}
-              >
-                I build software, work with ML, and enjoy finding that sweet spot where code, design, and story all click.
-              </p>
-
-              <p
-                className="uppercase tracking-[0.25em] text-black/45 text-xs"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
-              >
-                New Haven, CT x Vancouver, BC
-              </p>
+              <div className="w-full flex md:justify-end">
+                <img
+                  src="/sideeye.JPG"
+                  alt="Hanson Qin"
+                  className="w-full max-w-[380px] h-auto block"
+                />
+              </div>
             </div>
 
-            <div className="w-full md:pl-8 lg:pl-14 md:-mt-6">
-              <img src="/AIheadshot.jpg" alt="" className="w-full max-w-[170px] ml-auto h-auto object-cover block" />
-            </div>
-          </div>
-
-          <div className="mt-14 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
-            <div>
-              <p
-                className="uppercase tracking-[0.22em] text-[10px] sm:text-xs text-black/50 mb-2"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
-              >
-                Focus
-              </p>
-              <p
-                className="leading-none"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800, fontSize: "clamp(2rem, 6vw, 4.5rem)" }}
-              >
-                Code x Design
-              </p>
-            </div>
-
-            <div className="md:translate-y-8">
-              <p
-                className="uppercase tracking-[0.22em] text-[10px] sm:text-xs text-black/50 mb-2"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500 }}
-              >
-                Interests
-              </p>
-              <p
-                className="leading-[1.05]"
-                style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800, fontSize: "clamp(2rem, 6vw, 4.5rem)" }}
-              >
-                AI · Music · Systems
-              </p>
-            </div>
           </div>
         </div>
+
       </div>
     </PageShell>
   );

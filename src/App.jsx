@@ -8,11 +8,9 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Projects from "./pages/Projects";
-import Contact from "./pages/Contact";
 import Experiences from "./pages/Experiences";
 import Skills from "./pages/Skills";
 import ProjectDetail from "./pages/ProjectDetail";
-import ForYou from "./pages/ForYou";
 
 const router = createBrowserRouter([
   {
@@ -22,11 +20,9 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
       { path: "/about", element: <About /> },
       { path: "/projects", element: <Projects /> },
-      { path: "/contact", element: <Contact /> },
       { path: "/experiences", element: <Experiences /> },
       { path: "/skills", element: <Skills /> },
       { path: "/projects/:id", element: <ProjectDetail /> },
-      { path: "/for-you", element: <ForYou /> },
     ],
   },
 ]);

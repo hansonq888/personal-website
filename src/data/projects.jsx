@@ -26,7 +26,7 @@ export const projects = [
   {
     id: "dealsignal-ai",
     title: "DealSignal AI",
-    description: "An AI-assisted diligence copilot for first-pass CIM review and investment memo triage.",
+    description: "An AI copilot that reads deal documents and drafts first-pass investment memos.",
     journalFile: "dealsignal-ai",
     image: "/DealAI.png",
     tech: ["React", "TypeScript", "FastAPI", "Anthropic", "Tavily", "pdfplumber", "Vercel", "Railway"],

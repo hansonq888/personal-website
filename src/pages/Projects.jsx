@@ -16,9 +16,13 @@ const SHOW_IDS = [
 const displayedProjects = SHOW_IDS.map((id) => projects.find((p) => p.id === id)).filter(Boolean);
 const N = displayedProjects.length;
 const NAVBAR_H = 0;
-const STEP   = 150;
 const TILT   = 25;
-const EXPAND = 55;
+
+// Stack metrics differ by breakpoint: at 150px/card an 8-card stack needs
+// ~1050px of height, so the lower cards fall below the fold on a phone.
+const DESKTOP_METRICS = { step: 150, expand: 55, selScale: 1.35 };
+const MOBILE_METRICS  = { step: 60,  expand: 22, selScale: 1.15 };
+const metricsFor = (w) => (w < 768 ? MOBILE_METRICS : DESKTOP_METRICS);
 
 const lerp  = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -28,7 +32,7 @@ export default function Projects() {
   const cardRefs   = useRef([]);
   const rafRef     = useRef(null);
   const animVals   = useRef(
-    displayedProjects.map((_, i) => ({ y: i * STEP, opacity: 1, expandScale: 1, rotX: -TILT }))
+    displayedProjects.map((_, i) => ({ y: i * metricsFor(window.innerWidth).step, opacity: 1, expandScale: 1, rotX: -TILT }))
   );
 
   const hoverRef       = useRef(false);
@@ -45,6 +49,7 @@ export default function Projects() {
   const [selectedId,  setSelectedId]  = useState(null);
   const [detailReady, setDetailReady] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const metricsRef = useRef(metricsFor(window.innerWidth));
 
   const selectedProj = displayedProjects.find(p => p.id === selectedId);
 
@@ -78,6 +83,7 @@ export default function Projects() {
     const vh = () => window.innerHeight - NAVBAR_H;
 
     const tick = () => {
+      const { step: STEP, expand: EXPAND, selScale: SEL_SCALE } = metricsRef.current;
       const scrollProgress = clamp(window.scrollY / vh(), 0, N - 1);
       const floored        = Math.floor(scrollProgress);
 
@@ -105,7 +111,7 @@ export default function Projects() {
         if (isSelected) {
           cur.y           = lerp(cur.y,           0,    0.08);
           cur.opacity     = 1;
-          cur.expandScale = lerp(cur.expandScale, 1.35, 0.07);
+          cur.expandScale = lerp(cur.expandScale, SEL_SCALE, 0.07);
           cur.rotX        = lerp(cur.rotX,        0,    0.08);
           el.style.transform = `translateY(${cur.y.toFixed(2)}px) perspective(600px) rotateX(${cur.rotX.toFixed(2)}deg) scale(${cur.expandScale.toFixed(4)})`;
           el.style.opacity   = "1";
@@ -143,7 +149,10 @@ export default function Projects() {
   }, []);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => {
+      metricsRef.current = metricsFor(window.innerWidth);
+      setIsMobile(window.innerWidth < 768);
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -162,7 +171,7 @@ export default function Projects() {
         }}
       >
         {/* Card stack */}
-        <div style={{ position: "relative", width: isMobile ? "min(92vw, 440px)" : "min(480px, 64vw)", aspectRatio: "16 / 10" }}>
+        <div style={{ position: "relative", width: isMobile ? "min(78vw, 340px)" : "min(480px, 64vw)", aspectRatio: "16 / 10" }}>
           {displayedProjects.map((p, i) => (
             <div
               key={p.id}
@@ -192,11 +201,24 @@ export default function Projects() {
           ))}
         </div>
 
+        {/* Masks the top of the stack on phones: cards scrolling upward slide
+            under a white fade instead of passing behind the title text. */}
+        {isMobile && (
+          <div aria-hidden style={{
+            position: "absolute", top: 0, left: 0, right: 0, height: 200,
+            background: "linear-gradient(to bottom, #ffffff 0%, #ffffff 66%, rgba(255,255,255,0) 100%)",
+            zIndex: N + 8, pointerEvents: "none",
+          }} />
+        )}
+
         {/* Stack chrome */}
         <div style={{
           position: "absolute", inset: 0,
           opacity: selectedId ? 0 : 1, transition: "opacity 0.3s ease",
           pointerEvents: "none",
+          // above the cards (z 1..N) so the title is never covered mid-scroll,
+          // below the detail panel (N + 15)
+          zIndex: N + 9,
         }}>
           <div style={{
             position: "absolute", top: isMobile ? 88 : "50%", left: isMobile ? 16 : 36,
@@ -216,6 +238,15 @@ export default function Projects() {
                 <span key={t} style={{ fontFamily: '"Inter", sans-serif', fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", color: "rgba(0,0,0,0.50)", textTransform: "uppercase" }}>{t}</span>
               ))}
             </div>
+          </div>
+
+          <div style={{ position: "absolute", top: "50%", right: 48, transform: "translateY(-50%)", display: isMobile ? "none" : "block" }}>
+            <img
+              src="/camera_shutter_dotted.gif"
+              alt=""
+              draggable={false}
+              style={{ width: 280, height: "auto", display: "block", userSelect: "none", pointerEvents: "none" }}
+            />
           </div>
 
           <div style={{ position: "absolute", top: isMobile ? 56 : 72, right: isMobile ? 16 : 36 }}>
@@ -243,7 +274,7 @@ export default function Projects() {
             style={{
               position: "absolute", inset: 0,
               display: "flex", alignItems: isMobile ? "flex-end" : "center", justifyContent: isMobile ? "center" : "flex-end",
-              padding: isMobile ? "0 16px 20px 16px" : "0 60px",
+              padding: isMobile ? "0 18px 28px 18px" : "0 60px",
               opacity: detailReady ? 1 : 0,
               transform: detailReady ? "translateY(0)" : "translateY(10px)",
               transition: "opacity 0.45s ease, transform 0.45s ease",
@@ -251,7 +282,18 @@ export default function Projects() {
               zIndex: N + 15,
             }}
           >
-            <div style={{ width: isMobile ? "100%" : "auto", maxWidth: isMobile ? 520 : 280, display: "flex", flexDirection: "column", gap: 18, background: isMobile ? "rgba(255,255,255,0.94)" : "transparent", padding: isMobile ? "14px 14px 10px 14px" : 0 }}>
+            <div style={{
+              width: isMobile ? "100%" : "auto",
+              maxWidth: isMobile ? 520 : 280,
+              display: "flex", flexDirection: "column", gap: 18,
+              // On phones this floats as an opaque card inset from the screen
+              // edges, so the text never sits on the card art or its shadow.
+              background: isMobile ? "#ffffff" : "transparent",
+              padding: isMobile ? "18px 18px 16px 18px" : 0,
+              borderRadius: isMobile ? 14 : 0,
+              border: isMobile ? "1px solid rgba(0,0,0,0.08)" : "none",
+              boxShadow: isMobile ? "0 12px 40px rgba(0,0,0,0.16)" : "none",
+            }}>
               <p style={{ fontFamily: '"Inter", sans-serif', fontSize: "clamp(1.2rem, 2.4vw, 1.7rem)", fontWeight: 700, letterSpacing: "-0.01em", color: "rgba(0,0,0,0.88)", lineHeight: 1.1 }}>
                 {selectedProj?.title}
               </p>
