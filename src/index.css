@@ -692,3 +692,18 @@ h1, h2, h3 {
   border: 1px solid #e5e7eb;
   margin: 0.5rem 0;
 }
+
+/* About page — slowly rotating halftone star */
+@keyframes star-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.star-spin {
+  animation: star-spin 24s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-spin { animation: none; }
+}
