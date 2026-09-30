@@ -48,7 +48,7 @@ export default function Projects() {
       <div className="min-h-screen bg-white text-black px-4 sm:px-8 md:px-12 pt-12 md:pt-16 pb-28 md:pb-40 min-w-0 overflow-x-clip">
         <div className="w-full max-w-5xl mx-auto">
           {/* Wordmark with item count */}
-          <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="flex items-start gap-6 flex-wrap">
             <h1
               className="leading-[0.85] tracking-tight flex items-start"
               style={{ fontFamily: INTER, fontWeight: 700, fontSize: "clamp(2.25rem, 7vw, 5rem)", letterSpacing: "-0.03em" }}
@@ -58,11 +58,6 @@ export default function Projects() {
                 {String(displayedProjects.length).padStart(2, "0")}
               </sup>
             </h1>
-            <img
-              src="/camera_shutter_dotted.gif"
-              alt=""
-              className="w-[78px] sm:w-[92px] md:w-[110px] h-auto block select-none pointer-events-none mt-1"
-            />
           </div>
 
           {/* Grid */}
