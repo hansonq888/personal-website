@@ -21,7 +21,7 @@ const experiences = [
     org: "Yale Cancer Center — Blenman Innovation Group",
     url: "https://blenmaninnovationgroup.org/",
     image: "/blenman.png",
-    dates: "January 2026 – Present · New Haven, CT",
+    dates: "January 2026 – August 2026 · New Haven, CT",
   },
   {
     role: "Head of Sponsorships",
