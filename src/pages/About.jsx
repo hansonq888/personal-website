@@ -10,10 +10,9 @@ export default function About() {
         <div className="flex-1 px-3 sm:px-5 pt-6 md:pt-8 pb-6 flex flex-col">
           <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col">
             <img
-              src="/ultimate_frisbee_dotted.gif"
+              src="/camera_shutter_dotted.gif"
               alt=""
-              style={{ transform: "scaleY(-1)" }}
-              className="mb-1 w-[240px] sm:w-[320px] md:w-[400px] h-auto block select-none pointer-events-none"
+              className="mb-1 w-[150px] sm:w-[190px] md:w-[240px] h-auto block select-none pointer-events-none"
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start">
@@ -26,8 +25,7 @@ export default function About() {
                 </h1>
 
                 <div className="mt-4 md:mt-5 space-y-1" style={INTER}>
-                  <p className="text-sm tracking-wide">--YALE JUNIOR</p>
-                  <p className="text-sm tracking-wide">:CS + MATH</p>
+                  <p className="text-sm tracking-wide">--CS + MATH @ YALE</p>
                   <p className="text-sm tracking-wide">--VANCOUVER, BC x NEW HAVEN, CT</p>
                 </div>
               </div>

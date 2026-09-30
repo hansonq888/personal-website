@@ -27,13 +27,18 @@ const skillSections = [
     description: "Building AI-powered product features, retrieval workflows, and practical ML-assisted tools.",
   },
   {
+    title: "Systems",
+    skills: ["WebAssembly", "Audio DSP", "Lock-free concurrency", "Unix systems"],
+    description: "Writing performance-critical code and compiling native work to run in the browser.",
+  },
+  {
     title: "Infrastructure",
     skills: ["Docker", "AWS (S3, ECS, SQS)", "CI/CD (GitHub Actions, EAS)", "Supabase", "Vercel"],
     description: "Containerized services, cloud storage and queues, and automated build and deploy pipelines.",
   },
   {
     title: "Engineering",
-    skills: ["Git", "Linux", "Sentry", "PostHog"],
+    skills: ["Git", "Linux", "Vitest", "Sentry", "PostHog"],
     description: "Reviewing pull requests, collaborating in multi-developer codebases, and monitoring production.",
   },
 ];
