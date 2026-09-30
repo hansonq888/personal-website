@@ -50,13 +50,10 @@ export default function Projects() {
           {/* Wordmark with item count */}
           <div className="flex items-start gap-6 flex-wrap">
             <h1
-              className="leading-[0.85] tracking-tight flex items-start"
+              className="leading-[0.85] tracking-tight"
               style={{ fontFamily: INTER, fontWeight: 700, fontSize: "clamp(2.25rem, 7vw, 5rem)", letterSpacing: "-0.03em" }}
             >
               Projects
-              <sup className="mono-meta ml-2 text-[0.16em] tracking-[0.1em] text-black/45">
-                {String(displayedProjects.length).padStart(2, "0")}
-              </sup>
             </h1>
           </div>
 
