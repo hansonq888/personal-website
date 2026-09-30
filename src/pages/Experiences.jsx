@@ -1,10 +1,9 @@
 import PageShell from "../components/PageShell";
 
-export const experiences = [
+const experiences = [
   {
     role: "Software Engineer Intern",
     org: "Kira Learning",
-    short: "KIRA-LEARNING",
     url: "https://www.kiralearning.com",
     image: "/kira.avif",
     dates: "June 2026 – August 2026 · New York",
@@ -12,26 +11,25 @@ export const experiences = [
   {
     role: "Founding Software Engineer",
     org: "Shown Space",
-    short: "SHOWN-SPACE",
     url: "https://shownspace.com",
-    image: "/shownspace.png",
+    image: "/shownspace-logo.png",
     dates: "November 2025 – Present",
     blurb: "Building the web app, mobile app, and data pipelines for a sports analytics platform.",
   },
   {
     role: "Software Engineer",
     org: "Yale Cancer Center — Blenman Innovation Group",
-    short: "YALE-CANCER-CENTER",
     url: "https://blenmaninnovationgroup.org/",
+    image: "/blenman.png",
     dates: "January 2026 – Present · New Haven, CT",
   },
   {
-    role: "Treasurer",
+    role: "Head of Sponsorships",
     org: "Yale AI Association",
-    short: "YALE-AI",
     url: "https://www.yale-ai.org/",
+    image: "/yale-ai.png",
     dates: "September 2025 – Present · New Haven, CT",
-    blurb: "Managing finances for Yale's AI student organization.",
+    blurb: "Leading sponsorship outreach for Yale's AI student organization.",
   },
 ];
 
