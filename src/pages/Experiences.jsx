@@ -4,7 +4,7 @@ const experiences = [
   {
     role: "Software Engineer Intern",
     org: "Kira Learning",
-    url: "https://www.kiralearning.com",
+    url: "https://www.kira-learning.com/",
     image: "/kira.avif",
     dates: "June 2026 – August 2026 · New York",
   },
