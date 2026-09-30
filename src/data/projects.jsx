@@ -57,7 +57,6 @@ export const projects = [
     longDescription:
       "A full-stack dashboard that pulls U.S. economic indicators from the Federal Reserve's FRED API and layers AI-generated analysis on top. A FastAPI backend handles caching and insight generation; a React frontend makes the series interactive. I built it to have one place to track macro data, and to put my interest in economics next to full-stack work.",
     tech: ["FastAPI", "React", "Python", "OpenAI", "Vercel", "Render"],
-    github: "https://github.com/hansonq888/econ-dashboard",
     website: "https://macroboard.org",
   },
   {
@@ -100,7 +99,6 @@ export const projects = [
     longDescription:
       "A professional realtor site built with React, Tailwind, and Firebase. Admin authentication and Firestore let the owner add and manage property listings without touching code, and the layout holds up for buyers browsing on their phones.",
     tech: ["React", "Tailwind", "Firebase"],
-    github: "https://github.com/hansonq888/carol-wang-realtor",
     website: "https://carolwangprec.com",
   },
   {
@@ -132,7 +130,6 @@ export const projects = [
     longDescription:
       "An AI system that labels important Gmail messages automatically. It connects through Google's API and analyzes sender, subject, and content as mail arrives, applying a Priority label in real time. It grew out of an earlier spam detector: that project taught me email classification and the Gmail API, and this one goes past filtering spam to organizing what actually matters.",
     tech: ["Machine Learning", "Python", "FastAPI", "Gmail API", "Google Cloud"],
-    github: "https://github.com/hansonq888/priority-email-detector",
     relatedProject: "spam-email-detector",
   },
   {
