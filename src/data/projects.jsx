@@ -5,6 +5,33 @@ import ProjectJournal from "../components/ProjectJournal";
 
 export const projects = [
   {
+    id: "webrack",
+    year: "2026",
+    category: "Systems",
+    type: "Browser app",
+    title: "WebRack",
+    description: "A browser beat machine and slowed + reverb tool running on a from-scratch C++/WebAssembly audio engine",
+    image: "/webrack.png",
+    longDescription:
+      "A beat machine and slowed + reverb tool that runs in the browser \u2014 16 pads, voice recording onto any pad, a step sequencer, and a song deck with reverb, a DJ filter, drive and EQ. I wrote the audio engine from scratch in C++20 and compiled it to standalone WebAssembly with no Emscripten glue; the UI is TypeScript with no framework. The two sides talk through a lock-free ring buffer in shared memory, so nothing allocates or blocks while audio is running, and the engine splits each block at the exact sample a step lands on so timing never drifts to block boundaries. Export runs the same engine offline, so the WAV sounds like what you heard.",
+    tech: ["C++20", "WebAssembly", "AudioWorklet", "TypeScript", "DSP", "Vercel"],
+    website: "https://webrack.hansonqin.com",
+    github: "https://github.com/hansonq888/webrack",
+  },
+  {
+    id: "kudex",
+    year: "2026",
+    category: "Full-stack",
+    type: "Web app",
+    title: "Kudex",
+    description: "Endurance player cards \u2014 connect Strava and get your training rated out of 99",
+    image: "/kudex.png",
+    longDescription:
+      "Connect Strava and get an endurance player card rated out of 99, built from a year of real runs, rides and swims. Each card comes with a scout report, sport mix, races, trophies and a training calendar, plus shareable card and story images generated server-side. Privacy mirrors your Strava settings \u2014 a profile stays owner-only unless you hand out its secret share link.",
+    tech: ["Next.js", "TypeScript", "Strava API", "OAuth", "Vitest", "Vercel"],
+    website: "https://endurance-cards.vercel.app",
+  },
+  {
     id: "shown-space",
     year: "2025",
     category: "Full-stack",
@@ -172,6 +199,8 @@ export const projects = [
 // each page can link through to its neighbours.
 export const featuredIds = [
   "shown-space",
+  "webrack",
+  "kudex",
   "sample8",
   "dealsignal-ai",
   "macroboard",
