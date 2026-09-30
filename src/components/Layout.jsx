@@ -32,9 +32,9 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full min-h-screen min-h-[100dvh] min-w-0 overflow-x-hidden max-w-full bg-white">
+    <div className="flex flex-col w-full min-h-screen min-h-[100dvh] min-w-0 overflow-x-clip max-w-full bg-white">
       <CursorTrail />
-      <main className="flex-1 min-w-0 relative flex flex-col z-[2] overflow-x-hidden max-w-full">
+      <main className="flex-1 min-w-0 relative flex flex-col z-[2] overflow-x-clip max-w-full">
         {outlet}
       </main>
       <Analytics />
