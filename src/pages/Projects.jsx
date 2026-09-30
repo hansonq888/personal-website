@@ -27,8 +27,8 @@ function Card({ project }) {
 
       <div className="mt-3 flex items-baseline justify-between gap-4">
         <h2
-          className="mono-meta leading-none"
-          style={{ fontWeight: 700, letterSpacing: "0.01em", fontSize: "clamp(0.85rem, 1.2vw, 1rem)" }}
+          className="uppercase leading-none"
+          style={{ fontFamily: INTER, fontWeight: 700, letterSpacing: "-0.01em", fontSize: "clamp(0.95rem, 1.4vw, 1.2rem)" }}
         >
           {project.title}
         </h2>
