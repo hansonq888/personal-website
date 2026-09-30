@@ -58,7 +58,7 @@ export default function PageShell({ children, isHome = false, scrollContent = tr
       </div>
 
       {/* Main content — light bg */}
-      <main className="flex-1 min-h-0 min-w-0 max-w-full overflow-x-hidden bg-white text-black pt-11 sm:pt-12">
+      <main className="flex-1 min-h-0 min-w-0 max-w-full overflow-x-clip bg-white text-black pt-11 sm:pt-12">
         {children}
       </main>
     </div>
