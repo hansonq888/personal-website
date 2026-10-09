@@ -31,7 +31,8 @@ const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 /* The hero is split per word, then per letter: each word stays in one
    unbreakable box, or the per-letter spans let it wrap mid-word. The letters
-   arrive stretched and out of focus, then condense onto the baseline. */
+   rise from behind their own baseline on one firm curve. No spring, no blur,
+   no rotation: a single decisive reveal rather than a cascade of effects. */
 function Giant({ text, delay = 0 }) {
   const still = useReducedMotion();
   const words = text.split(" ");
@@ -43,25 +44,20 @@ function Giant({ text, delay = 0 }) {
           {[...word].map((ch, ci) => {
             const i = n++;
             return (
-              <motion.span
-                className="g"
-                key={ci}
-                initial={
-                  still
-                    ? false
-                    : { opacity: 0, scaleY: 2.1, scaleX: 0.68, y: "0.22em", filter: "blur(16px)" }
-                }
-                animate={{ opacity: 1, scaleY: 1, scaleX: 1, y: 0, filter: "blur(0px)" }}
-                transition={{
-                  delay: (delay + i * 52) / 1000,
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 14,
-                  mass: 1,
-                }}
-              >
-                {ch}
-              </motion.span>
+              <span className="clip" key={ci}>
+                <motion.span
+                  className="g"
+                  initial={still ? false : { y: "112%" }}
+                  animate={{ y: 0 }}
+                  transition={{
+                    delay: (delay + i * 20) / 1000,
+                    duration: 0.78,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  {ch}
+                </motion.span>
+              </span>
             );
           })}
           {wi < words.length - 1 ? " " : null}

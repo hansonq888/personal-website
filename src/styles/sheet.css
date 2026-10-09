@@ -231,9 +231,9 @@
   margin: 0;
   font-size: clamp(2.8rem, 17vw, 15rem);
 }
-/* each letter turns on its own baseline, so the line needs depth */
-.sheet .giant { perspective: 900px; }
-.sheet .giant .g { display: inline-block; transform-origin: 50% 100%; will-change: transform, filter; }
+/* each letter rises out of its own box, so the box has to crop it */
+.sheet .giant .clip { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.sheet .giant .g { display: inline-block; will-change: transform; }
 .sheet .giant .w { display: inline-block; white-space: nowrap; }
 
 /* a section title, set against the hero but well under it */
