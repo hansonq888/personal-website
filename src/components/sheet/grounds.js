@@ -27,7 +27,7 @@ const WEATHER = {
 const SYSTEM = {
   Home: ["dither", 0.05],      // spans Home + About
   Experience: ["phi", -0.15],  // spans Experience + Projects
-  Projects: ["orbits", 0.1],   // a binary field with dials over it
+  Projects: ["orbits", 0.1],   // rings and dials, no field behind them
   Skills: ["contour", 0.13],
 };
 
@@ -137,7 +137,6 @@ export function initGrounds(root) {
         { x0: .68, y0: .52, x1: .97, y1: .68, a: .52, b: .72, w: 1.5 },
       ].map((st) => ({ ...st, x0: st.x0 * w, y0: st.y0 * h, x1: st.x1 * w, y1: st.y1 * h }));
     }
-    S.bin = null;
     S.last = -1e9;
   }
 
@@ -236,46 +235,6 @@ export function initGrounds(root) {
     }
   }
 
-  /* --- IV: a field of ones and zeroes, with dials turning over it --- */
-  // Redrawn into its own buffer a few times a second and blitted every frame:
-  // tens of thousands of glyphs cannot be laid out at 25fps, but they do not
-  // need to be — the field drifts far more slowly than the rings turn.
-  function drawBinary(S, t) {
-    const W = S.w, H = S.h;
-    if (!S.bin || S.binW !== W || S.binH !== H) {
-      S.bin = document.createElement("canvas");
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      S.bin.width = W * dpr; S.bin.height = H * dpr;
-      S.binCtx = S.bin.getContext("2d");
-      S.binCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      S.binW = W; S.binH = H;
-    }
-    const c = S.binCtx;
-    c.clearRect(0, 0, W, H);
-    c.font = '600 12px ui-monospace, SFMono-Regular, Menlo, monospace';
-    c.textBaseline = "top";
-    const cell = 16;
-    const cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
-    const TAU = Math.PI * 2;
-    const rgb = S.light ? "11,11,12" : "250,250,247";
-    const flip = Math.floor(t / 820);
-    for (let y = 0; y < rows; y++) {
-      const v = y / rows;
-      for (let x = 0; x < cols; x++) {
-        const u = x / cols;
-        let n = Math.sin((u * 3.1 + v * 1.7 + t * 0.00004) * TAU)
-              + 0.7 * Math.sin((u * -2.2 + v * 4.3 - t * 0.000027) * TAU);
-        n = n * 0.5 + 0.5;
-        if (n < 0.54) continue;              // most of the page stays bare
-        const a = (n - 0.54) / 0.46;
-        c.fillStyle = "rgba(" + rgb + "," + (0.14 + a * 0.46).toFixed(3) + ")";
-        // a stable per-cell bit that turns over now and then
-        const bit = (((x * 73856093) ^ (y * 19349663)) + flip + ((x * 3 + y) >> 2)) & 1;
-        c.fillText(bit ? "1" : "0", x * cell, y * cell);
-      }
-    }
-  }
-
   /* --- IV: orbits. rings that butterfly open and planets that ride them --- */
   // Concentric at the middle of the section, splaying into mirrored pairs of
   // flattened dials at either end, in step with the cards unzipping.
@@ -283,8 +242,6 @@ export function initGrounds(root) {
     const c = S.ctx;
     const W = S.w, H = S.h;
     c.clearRect(0, 0, W, H);
-    if (t - (S.binLast || -1e9) > 160) { S.binLast = t; drawBinary(S, t); }
-    if (S.bin) c.drawImage(S.bin, 0, 0, W, H);
     c.lineWidth = 1;
     const cx = W / 2, cy = H / 2;
     const maxR = Math.min(W, H) * 0.46;

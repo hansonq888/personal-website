@@ -382,6 +382,29 @@
 .sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
 
+/* the band the scene plays in, with the word standing in front of it */
+.sheet .xp-band {
+  position: relative;
+  margin-bottom: 44px;
+}
+.sheet .xp-scene {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  width: min(1180px, 100%);
+  height: clamp(220px, 34vh, 380px);
+  z-index: 0;
+  pointer-events: auto;
+}
+.sheet .xp-band .sec-title {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+@media (max-width: 860px) { .sheet .xp-scene { display: none; } }
+
 /* ---- experience: a timeline ---------------------------------------------- */
 .sheet .roles {
   position: relative;
