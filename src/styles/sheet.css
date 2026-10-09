@@ -562,7 +562,7 @@
 
 .sheet .tv-content {
   position: absolute;
-  inset: 7% 6%;
+  inset: 5% 4.5%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -627,16 +627,17 @@
 /* the stack is on screen now, so it sets its own scale and never the page's */
 .sheet .tv-content .skills { max-width: none; }
 .sheet .tv-content .skill {
-  grid-template-columns: 42px 150px 1fr;
-  gap: 18px;
-  padding: clamp(5px, 1.1cqh, 13px) 0;
+  grid-template-columns: clamp(26px, 3.4%, 54px) clamp(90px, 22%, 210px) 1fr;
+  gap: clamp(10px, 1.6%, 24px);
+  padding: clamp(4px, 0.9%, 12px) 0;
   border-top-color: rgba(250, 250, 247, 0.16);
 }
 .sheet .tv-content .skill:last-child { border-bottom-color: rgba(250, 250, 247, 0.16); }
 .sheet .tv-content .skill b,
-.sheet .tv-content .skill .items,
-.sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 12px); }
-.sheet .tv-content .skill .items { line-height: 1.7; color: rgba(250, 250, 247, 0.6); }
+.sheet .tv-content .skill .items { font-size: clamp(11px, 1.62vw, 22px); }
+.sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 14px); }
+.sheet .tv-content .skill .items { line-height: 1.45; color: rgba(250, 250, 247, 0.62); }
+.sheet .tv-content .skill b { letter-spacing: 0.01em; }
 .sheet .tv-content .skill b { color: rgba(250, 250, 247, 0.92); }
 .sheet .tv-content .skill .num { color: rgba(250, 250, 247, 0.34); }
 .sheet .tv-content .skill.lit .num { color: #fafaf7; }

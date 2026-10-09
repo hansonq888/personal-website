@@ -46,10 +46,12 @@ export function initGrounds(root) {
     const page = panel.dataset.ground;
     const [kind, par] = SYSTEM[page] || [null, 0];
     const sparkle = panel.classList.contains("sparkle");
+    const streaks = panel.classList.contains("streaks");
     const S = {
       panel, page, kind, par, light: true, visible: false, last: -1e9, prog: 0,
       w: 0, h: 0, cols: 0, rows: 0,
       canvas: null, ctx: null, off: null, octx: null, sparks: null, sctx: null, pts: [],
+      streak: null, strCtx: null, stars: [],
     };
     if (kind) {
       S.canvas = document.createElement("canvas");
@@ -65,6 +67,13 @@ export function initGrounds(root) {
       if (S.canvas) S.canvas.after(S.sparks);
       else panel.prepend(S.sparks);
       S.sctx = S.sparks.getContext("2d");
+    }
+    if (streaks) {
+      S.streak = document.createElement("canvas");
+      S.streak.className = "layer"; S.streak.setAttribute("aria-hidden", "true");
+      const after = S.sparks || S.canvas;
+      if (after) after.after(S.streak); else panel.prepend(S.streak);
+      S.strCtx = S.streak.getContext("2d");
     }
     return S;
   });
@@ -113,6 +122,20 @@ export function initGrounds(root) {
         ph: Math.random() * 6.283, sp: 0.25 + Math.random() * 0.8,
         r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
       }));
+    }
+    if (S.streak) {
+      const dpr2 = Math.min(2, window.devicePixelRatio || 1);
+      S.streak.width = w * dpr2; S.streak.height = h * dpr2;
+      S.streak.style.width = w + "px"; S.streak.style.height = h + "px";
+      S.strCtx.setTransform(dpr2, 0, 0, dpr2, 0, 0);
+      // the first is the long throw: it leaves the title page and lands well
+      // inside About, which the two can only share because they are one run
+      S.stars = [
+        { x0: .14, y0: .07, x1: .95, y1: .74, a: .02, b: .60, w: 2.0 },
+        { x0: .60, y0: .03, x1: .89, y1: .19, a: .10, b: .28, w: 1.3 },
+        { x0: .05, y0: .26, x1: .29, y1: .39, a: .26, b: .44, w: 1.1 },
+        { x0: .68, y0: .52, x1: .97, y1: .68, a: .52, b: .72, w: 1.5 },
+      ].map((st) => ({ ...st, x0: st.x0 * w, y0: st.y0 * h, x1: st.x1 * w, y1: st.y1 * h }));
     }
     S.bin = null;
     S.last = -1e9;
@@ -325,6 +348,42 @@ export function initGrounds(root) {
     }
   }
 
+  // Shooting stars carried by the scroll rather than a timer, so one of them
+  // can begin on the title page and finish inside About.
+  function drawStreaks(S) {
+    const c = S.strCtx;
+    if (!c) return;
+    c.clearRect(0, 0, S.w, S.h);
+    for (const st of S.stars) {
+      const p = (S.prog - st.a) / (st.b - st.a);
+      if (p <= 0 || p >= 1) continue;
+      const x = st.x0 + (st.x1 - st.x0) * p;
+      const y = st.y0 + (st.y1 - st.y0) * p;
+      const dx = st.x1 - st.x0, dy = st.y1 - st.y0;
+      const L = Math.hypot(dx, dy) || 1;
+      const ux = dx / L, uy = dy / L;
+      // they only show while the page is actually moving
+      const fade = Math.min(1, p * 5) * Math.min(1, (1 - p) * 5) * activity;
+      if (fade < 0.02) continue;
+      const tail = L * 0.22 * fade;
+      if (tail < 1) continue;
+      const g = c.createLinearGradient(x, y, x - ux * tail, y - uy * tail);
+      g.addColorStop(0, "rgba(255,253,245," + (0.95 * fade).toFixed(3) + ")");
+      g.addColorStop(1, "rgba(255,253,245,0)");
+      c.strokeStyle = g;
+      c.lineWidth = st.w;
+      c.lineCap = "round";
+      c.beginPath();
+      c.moveTo(x, y);
+      c.lineTo(x - ux * tail, y - uy * tail);
+      c.stroke();
+      c.fillStyle = "rgba(255,253,245," + (0.98 * fade).toFixed(3) + ")";
+      c.beginPath();
+      c.arc(x, y, st.w * 0.95, 0, 6.283);
+      c.fill();
+    }
+  }
+
   function drawSparks(S, t) {
     const c = S.sctx;
     c.clearRect(0, 0, S.w, S.h);
@@ -396,7 +455,7 @@ export function initGrounds(root) {
     ctx: el.getContext("2d"),
     w: 0, h: 0, cols: 0, rows: 0, last: -1,
   }));
-  const DCELL = 13;
+  const DCELL = 11;
 
   function drawDissolve(q, p) {
     const host = q.host;
@@ -423,13 +482,17 @@ export function initGrounds(root) {
         let hsh = ((x * 73856093) ^ (y * 19349663)) >>> 0;
         hsh = ((hsh ^ (hsh >>> 13)) * 1274126177) >>> 0;
         const thr = (hsh >>> 8) / 16777216;
-        const covered = thr > p * (1 + bias) - bias * 0.5;
+        // three depths: the near plane clears last, the far plane first
+        const plane = (hsh >>> 20) % 3;
+        const lead = [0.0, 0.16, 0.3][plane];
+        const covered = thr > (p - lead) * 1.5 * (1 + bias) - bias * 0.5;
         if (!covered) { o[i*4+3] = 0; continue; }
         // busiest through the middle of the break-up
         const hot = ((hsh >>> 3) & 255) / 255 < 0.07 + Math.sin(Math.PI * p) * 0.1;
         const v = hot ? 250 : 11;
         o[i*4] = v; o[i*4+1] = v; o[i*4+2] = hot ? 247 : 12;
-        o[i*4+3] = 255;
+        // the far plane sits back behind the near one
+        o[i*4+3] = hot ? 255 : [255, 200, 140][plane];
       }
     }
     c.putImageData(img, 0, 0);
@@ -456,6 +519,16 @@ export function initGrounds(root) {
   // never expose an edge.
   // A first-order filter on every scroll-driven value. Tracking the raw
   // position frame for frame is what makes these effects feel brittle.
+  // how hard the page is being scrolled right now: snaps up, decays slowly
+  let lastY = window.scrollY, activity = 0;
+  function readActivity() {
+    const y = window.scrollY;
+    const vel = Math.abs(y - lastY);
+    lastY = y;
+    const target = Math.min(1, vel / 9);
+    activity = target > activity ? target : activity + (target - activity) * 0.06;
+  }
+
   const EASE = 0.16;
   function damp(store, key, target) {
     const cur = store[key];
@@ -466,6 +539,7 @@ export function initGrounds(root) {
   }
 
   function parallax() {
+    readActivity();
     const vh = window.innerHeight;
     for (const S of sections) {
       if (!S.visible) continue;
@@ -557,6 +631,7 @@ export function initGrounds(root) {
         if (t - S.last > every) { S.last = t; paint(S, t); }
       }
       if (S.sparks) drawSparks(S, t);
+      if (S.streak) drawStreaks(S);
     }
     raf = requestAnimationFrame(tick);
   }
@@ -569,6 +644,7 @@ export function initGrounds(root) {
       S.prog = 0.5;
       paint(S, 0);
       if (S.sparks) drawSparks(S, 0);
+      if (S.streak) drawStreaks(S);
     });
     parallax();
   }
@@ -590,7 +666,7 @@ export function initGrounds(root) {
     window.removeEventListener("resize", onResize);
     if (scheme.removeEventListener) scheme.removeEventListener("change", onScheme);
     else scheme.removeListener(onScheme);
-    sections.forEach((S) => { S.canvas?.remove(); S.sparks?.remove(); });
+    sections.forEach((S) => { S.canvas?.remove(); S.sparks?.remove(); S.streak?.remove(); });
   };
 }
 

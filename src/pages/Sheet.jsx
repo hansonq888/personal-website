@@ -466,7 +466,7 @@ export default function Sheet() {
       </div>
 
       {/* ------------- I + II share one ground ------------- */}
-      <div className="panel-group deep sparkle" data-ground="Home">
+      <div className="panel-group deep sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
         <div className="body" data-par=".035">
