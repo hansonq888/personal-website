@@ -1,0 +1,295 @@
+/* ============================================================================
+   The long-scroll sheet.
+
+   Everything here is scoped under .sheet so it cannot leak into the rest of
+   the site, which is still Tailwind. One typeface at one size for every label;
+   the only type that is ever big is the hero.
+   ========================================================================== */
+
+.sheet {
+  --ground: #fff;
+  --dark-ground: #0b0b0c;
+  --ink: #0b0b0c;
+  --ink-55: rgba(11, 11, 12, 0.56);
+  --ink-30: rgba(11, 11, 12, 0.32);
+  --rule: #e4e4e0;
+  --pad: 30px;
+
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sheet:not([data-theme="light"]) {
+    /* the paper has to stay distinct from the dark sections, or the
+       light/dark cut collapses into one flat colour */
+    --ground: #17171a;
+    --dark-ground: #000;
+    --ink: #fafaf7;
+    --ink-55: rgba(250, 250, 247, 0.58);
+    --ink-30: rgba(250, 250, 247, 0.32);
+    --rule: #33333a;
+  }
+}
+
+@media (max-width: 640px) {
+  .sheet { --pad: 18px; }
+}
+
+.sheet * { box-sizing: border-box; }
+
+/* ---- the one label voice ------------------------------------------------ */
+.sheet .lab {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: var(--ink);
+}
+.sheet .lab.dim { color: var(--ink-55); }
+
+/* ---- top navigation ----------------------------------------------------- */
+/* difference blending keeps it legible over paper and over the dark sections
+   without any per-section logic */
+.sheet-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px var(--pad);
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.sheet-bar > * { pointer-events: auto; }
+.sheet-bar .sig { font-size: 12.5px; line-height: 1.35; }
+.sheet-bar nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.sheet-bar a {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.34;
+  transition: opacity 0.18s linear;
+}
+.sheet-bar a:hover,
+.sheet-bar a[aria-current="true"] { opacity: 1; }
+.sheet-bar b { font-weight: 400; font-size: 12.5px; line-height: 1.35; }
+.sheet-bar u { text-decoration: none; font-size: 10px; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .sheet-bar u { display: none; }
+  .sheet-bar nav { gap: 13px; }
+}
+@media (max-width: 520px) {
+  .sheet-bar .sig { display: none; }
+  .sheet-bar { justify-content: flex-end; }
+}
+
+.sheet-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  z-index: 61;
+  pointer-events: none;
+}
+.sheet-progress i { display: block; height: 100%; width: 0%; background: var(--ink); }
+
+/* ---- sections ----------------------------------------------------------- */
+.sheet .panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 92px var(--pad) 64px;
+  background: var(--ground);
+}
+.sheet .panel.tall { min-height: 100svh; }
+.sheet .panel.dark {
+  --ink: #fafaf7;
+  --ink-55: rgba(250, 250, 247, 0.58);
+  --ink-30: rgba(250, 250, 247, 0.32);
+  --rule: #26262a;
+  background: var(--dark-ground);
+  color: var(--ink);
+}
+
+/* the layer box overhangs its section so there is room to parallax inside it */
+.sheet .layer {
+  position: absolute;
+  left: 0; right: 0;
+  top: -14%;
+  height: 128%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.sheet canvas.layer { image-rendering: pixelated; }
+.sheet .panel > .spec,
+.sheet .panel > .body,
+.sheet .panel > .foot,
+.sheet .panel > .band,
+.sheet .panel > .sheet-foot { position: relative; z-index: 1; }
+.sheet [data-par] { will-change: transform; }
+
+/* ---- the corner pair ---------------------------------------------------- */
+.sheet .spec {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  clip-path: inset(0 100% 0 0);
+}
+.sheet .spec.in { clip-path: inset(0 0 0 0); transition: clip-path 0.55s steps(14, end); }
+.sheet .spec .r { text-align: right; }
+.sheet .spec b {
+  display: block;
+  font-weight: 400;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+.sheet .spec i {
+  font-style: normal;
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--ink-55);
+}
+@media (max-width: 520px) { .sheet .spec b, .sheet .spec i { font-size: 11px; } }
+
+.sheet .body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 40px;
+  width: 100%;
+}
+.sheet .foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ---- home --------------------------------------------------------------- */
+.sheet .giant {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.88;
+  margin: 0;
+  font-size: clamp(2.6rem, 15vw, 11rem);
+}
+.sheet .giant .clip { overflow: hidden; display: inline-block; vertical-align: bottom; }
+.sheet .giant .g { display: inline-block; }
+.sheet .giant .w { display: inline-block; white-space: nowrap; }
+
+/* ---- about -------------------------------------------------------------- */
+.sheet .about-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 46px;
+  align-items: center;
+}
+@media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
+.sheet .about-row .me { width: 100%; max-width: 280px; height: auto; display: block; }
+
+/* the dithered skyline, bleeding to both edges along the floor of the page */
+.sheet .band {
+  position: relative;
+  margin: auto calc(-1 * var(--pad)) -64px;
+  padding-top: 24px;
+}
+.sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
+
+/* ---- experience / skills lists ------------------------------------------ */
+.sheet .roles, .sheet .skills { display: grid; width: 100%; }
+.sheet .role {
+  display: grid;
+  grid-template-columns: 140px 1fr 200px;
+  gap: 24px;
+  align-items: baseline;
+  padding: 22px 0;
+  border-top: 1px solid var(--rule);
+  transition: padding-left 0.2s linear;
+  text-decoration: none;
+  color: inherit;
+}
+.sheet .role:last-child { border-bottom: 1px solid var(--rule); }
+.sheet .role:hover { padding-left: 10px; }
+@media (max-width: 760px) {
+  .sheet .role { grid-template-columns: 1fr; gap: 4px; }
+  .sheet .role .r { text-align: left; }
+}
+.sheet .role span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+.sheet .role b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .role i { font-style: normal; font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+.sheet .role .r { text-align: right; }
+
+.sheet .skill {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  padding: 18px 0;
+  border-top: 1px solid var(--rule);
+}
+.sheet .skill:last-child { border-bottom: 1px solid var(--rule); }
+@media (max-width: 760px) { .sheet .skill { grid-template-columns: 1fr; gap: 4px; } }
+.sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .skill span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+
+/* ---- projects ----------------------------------------------------------- */
+.sheet .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px 22px;
+  width: 100%;
+}
+@media (max-width: 900px) { .sheet .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .sheet .grid { grid-template-columns: 1fr; } }
+.sheet .card {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  opacity: 0;
+  transform: translateY(10px);
+  text-decoration: none;
+  color: inherit;
+}
+.sheet .card.in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.3s linear, transform 0.3s linear;
+}
+.sheet .card .frame {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+}
+.sheet .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheet .card .lbl { display: flex; justify-content: space-between; gap: 10px; }
+.sheet .card .lbl b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .card .lbl i { font-style: normal; font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+
+/* ---- the sheet's address line ------------------------------------------- */
+.sheet .sheet-foot { display: flex; gap: 58px; flex-wrap: wrap; margin-top: auto; padding-top: 40px; }
+.sheet .sheet-foot a { font-size: 12.5px; line-height: 1.35; color: var(--ink); text-decoration: none; }
+.sheet .sheet-foot a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet .card { opacity: 1; transform: none; }
+  .sheet .spec { clip-path: none; }
+  .sheet .giant .g { transform: none !important; }
+}
