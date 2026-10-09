@@ -231,8 +231,9 @@
   margin: 0;
   font-size: clamp(2.8rem, 17vw, 15rem);
 }
-.sheet .giant .clip { overflow: hidden; display: inline-block; vertical-align: bottom; }
-.sheet .giant .g { display: inline-block; }
+/* each letter turns on its own baseline, so the line needs depth */
+.sheet .giant { perspective: 900px; }
+.sheet .giant .g { display: inline-block; transform-origin: 50% 100%; will-change: transform, filter; }
 .sheet .giant .w { display: inline-block; white-space: nowrap; }
 
 /* a section title, set against the hero but well under it */
@@ -290,8 +291,8 @@
   grid-template-columns: 1fr auto;
   gap: 46px;
   align-items: center;
-  perspective: 900px;
-  perspective-origin: 72% 50%;
+  perspective: 1500px;
+  perspective-origin: 62% 50%;
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
@@ -326,7 +327,9 @@
   transform:
     rotate(calc(var(--fan, 0) * 6deg))
     translate(calc(var(--fan, 0) * -62%), calc(var(--fan, 0) * -9%))
-    scale(calc(1 - var(--fan, 0) * 0.04));
+    rotateY(calc(var(--fan, 0) * 13deg))
+    rotateX(calc(var(--fan, 0) * -3deg))
+    translateZ(calc(var(--fan, 0) * -20px));
   filter: saturate(0.94) brightness(0.96);
 }
 .sheet .polaroid.back2 {
@@ -336,19 +339,30 @@
   transform:
     rotate(calc(var(--fan, 0) * -8deg))
     translate(calc(var(--fan, 0) * -126%), calc(var(--fan, 0) * 4%))
-    scale(calc(1 - var(--fan, 0) * 0.08));
+    rotateY(calc(var(--fan, 0) * 22deg))
+    rotateX(calc(var(--fan, 0) * 5deg))
+    translateZ(calc(var(--fan, 0) * -70px));
   filter: saturate(0.9) brightness(0.93);
 }
 .sheet .polaroid.back .cap,
-.sheet .polaroid.back2 .cap { display: none; }
+.sheet .polaroid.back2 .cap { opacity: 0; }
 .sheet .polaroid.front { position: relative; z-index: 1; }
 
 .sheet .polaroid {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   position: relative;
   background: #f7f6f1;
   padding: 14px 14px 54px;
   border-radius: 2px;
-  transform: rotate(-6deg) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform:
+    rotate(-5deg)
+    rotateY(calc(var(--fan, 0) * -7deg))
+    rotateX(calc(var(--fan, 0) * 4deg))
+    translateZ(calc(var(--fan, 0) * 40px));
   transform-style: preserve-3d;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
   will-change: transform;
@@ -358,12 +372,6 @@
     0 10px 22px rgba(0, 0, 0, 0.5),
     0 34px 70px rgba(0, 0, 0, 0.55),
     0 0 calc(70px * var(--near, 0)) rgba(255, 250, 235, calc(0.2 * var(--near, 0)));
-}
-.sheet .me-wrap:hover .polaroid {
-  box-shadow:
-    0 2px 3px rgba(0, 0, 0, 0.6),
-    0 16px 34px rgba(0, 0, 0, 0.55),
-    0 50px 96px rgba(0, 0, 0, 0.6);
 }
 .sheet .polaroid img {
   display: block;

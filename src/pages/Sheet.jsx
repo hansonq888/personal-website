@@ -11,6 +11,14 @@ import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
 
+// the stack on About; whichever is clicked comes to the front
+const PRINTS = [
+  { id: "headshot", src: "/headshot.jpg", cap: "HEADSHOT.JPG" },
+  { id: "sideeye", src: "/sideeye.JPG", cap: "SIDEEYE.JPG" },
+  { id: "baby", src: "/AboutPhoto.jpg", cap: "ABOUTPHOTO.JPG" },
+];
+const LAYER = ["front", "back", "back2"];
+
 // a fixed wobble, so the timeline reads as something laid out by hand
 const LOOSE = [
   { nudge: "0px", tilt: "-2.6deg", pad: "34px" },
@@ -22,31 +30,37 @@ const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 
 /* The hero is split per word, then per letter: each word stays in one
-   unbreakable box, or the per-letter spans let it wrap mid-word. */
+   unbreakable box, or the per-letter spans let it wrap mid-word. The letters
+   swing down out of the page on a spring rather than wiping up. */
 function Giant({ text, delay = 0 }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const glyphs = ref.current?.querySelectorAll(".g") || [];
-    const anims = [...glyphs].map((g, i) =>
-      g.animate(
-        [{ transform: "translateY(102%)" }, { transform: "translateY(0)" }],
-        { duration: 520, delay: delay + i * 34, easing: "cubic-bezier(.22,1,.3,1)", fill: "both" }
-      )
-    );
-    return () => anims.forEach((a) => a.cancel());
-  }, [delay]);
-
+  const still = useReducedMotion();
+  const words = text.split(" ");
+  let n = 0;
   return (
-    <p className="giant" ref={ref}>
-      {text.split(" ").map((word, wi, all) => (
+    <p className="giant">
+      {words.map((word, wi) => (
         <span className="w" key={wi}>
-          {[...word].map((ch, ci) => (
-            <span className="clip" key={ci}>
-              <span className="g" style={{ transform: "translateY(102%)" }}>{ch}</span>
-            </span>
-          ))}
-          {wi < all.length - 1 ? " " : null}
+          {[...word].map((ch, ci) => {
+            const i = n++;
+            return (
+              <motion.span
+                className="g"
+                key={ci}
+                initial={still ? false : { opacity: 0, rotateX: -88, y: "0.34em", filter: "blur(10px)" }}
+                animate={{ opacity: 1, rotateX: 0, y: 0, filter: "blur(0px)" }}
+                transition={{
+                  delay: (delay + i * 46) / 1000,
+                  type: "spring",
+                  stiffness: 140,
+                  damping: 17,
+                  mass: 0.9,
+                }}
+              >
+                {ch}
+              </motion.span>
+            );
+          })}
+          {wi < words.length - 1 ? " " : null}
         </span>
       ))}
     </p>
@@ -123,6 +137,9 @@ export default function Sheet() {
   const bandRef = useRef(null);
   const gridRef = useRef(null);
   const meRef = useRef(null);
+  const [order, setOrder] = useState([0, 1, 2]);
+  const bringToFront = (idx) =>
+    setOrder((o) => [idx, ...o.filter((x) => x !== idx)]);
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
   const arcRef = useRef(null);
@@ -154,33 +171,7 @@ export default function Sheet() {
   useEffect(() => initGrounds(rootRef.current), []);
   useEffect(() => initDither(bandRef.current, "/vancouver-strip.jpg"), []);
 
-  // the polaroid tilts toward the cursor, with a sheen that tracks it — the
-  // parallax lives on the wrapper so the two transforms never fight
-  useEffect(() => {
-    const wrap = meRef.current;
-    if (!wrap || window.matchMedia("(pointer: coarse)").matches) return;
-    const card = wrap.querySelector(".polaroid.front");
-    if (!card) return;
-    const onMove = (e) => {
-      const r = wrap.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--ry", (x * 30).toFixed(2) + "deg");
-      card.style.setProperty("--rx", (-y * 25).toFixed(2) + "deg");
-      card.style.setProperty("--mx", (e.clientX - r.left).toFixed(0) + "px");
-      card.style.setProperty("--my", (e.clientY - r.top).toFixed(0) + "px");
-    };
-    const onLeave = () => {
-      card.style.setProperty("--ry", "0deg");
-      card.style.setProperty("--rx", "0deg");
-    };
-    wrap.addEventListener("pointermove", onMove);
-    wrap.addEventListener("pointerleave", onLeave);
-    return () => {
-      wrap.removeEventListener("pointermove", onMove);
-      wrap.removeEventListener("pointerleave", onLeave);
-    };
-  }, []);
+
 
   // one staggered run of children, used by the timeline and the skills index
   const useStagger = (ref, step, threshold) =>
@@ -550,7 +541,7 @@ export default function Sheet() {
       {/* ------------- I + II share one ground ------------- */}
       <div className="panel-group deep sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
-        <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
+        <Spec left="Hanson Qin" leftSub="Software Engineer" right="hansonqin.com" rightSub="New Haven, CT" />
         <div className="body" data-par=".035">
           <div className="hero-row">
             <div>
@@ -590,16 +581,21 @@ export default function Sheet() {
               />
             </div>
             <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>
-              <div className="polaroid back2" aria-hidden="true">
-                <img src="/AboutPhoto.jpg" alt="" />
-              </div>
-              <div className="polaroid back" aria-hidden="true">
-                <img src="/sideeye.JPG" alt="" />
-              </div>
-              <div className="polaroid front">
-                <img src="/headshot.jpg" alt="Hanson Qin" />
-                <p className="cap">HANSON QIN &middot; VANCOUVER</p>
-              </div>
+              {order.map((idx, pos) => {
+                const print = PRINTS[idx];
+                return (
+                  <button
+                    type="button"
+                    key={print.id}
+                    className={"polaroid " + LAYER[pos]}
+                    onClick={() => bringToFront(idx)}
+                    aria-label={"Bring " + print.cap + " to the front"}
+                  >
+                    <img src={print.src} alt={print.id === "headshot" ? "Hanson Qin" : ""} />
+                    <p className="cap">{print.cap}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
