@@ -273,7 +273,7 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-projects" data-page="Projects">
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
-          <h2 className="sec-title">Projects</h2>
+          <h2 className="sec-title center">Projects</h2>
           <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
               <div key={p.id}><ProjectCard project={p} /></div>
