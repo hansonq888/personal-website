@@ -407,13 +407,25 @@ export function initGrounds(root) {
 
   // Every layer parallaxes inside its own section's overhang, clamped so it can
   // never expose an edge.
+  // A first-order filter on every scroll-driven value. Tracking the raw
+  // position frame for frame is what makes these effects feel brittle.
+  const EASE = 0.16;
+  function damp(store, key, target) {
+    const cur = store[key];
+    if (cur === undefined || Math.abs(target - cur) > 2000) { store[key] = target; return target; }
+    const next = cur + (target - cur) * EASE;
+    store[key] = Math.abs(next - target) < 0.01 ? target : next;
+    return store[key];
+  }
+
   function parallax() {
     const vh = window.innerHeight;
     for (const S of sections) {
       if (!S.visible) continue;
       const r = S.panel.getBoundingClientRect();
       const rel = vh / 2 - (r.top + r.height / 2);
-      const shift = Math.max(-0.12, Math.min(0.12, (rel / vh) * S.par)) * S.h;
+      const raw = Math.max(-0.12, Math.min(0.12, (rel / vh) * S.par)) * S.h;
+      const shift = damp(S, "_shift", raw);
       const tf = "translate3d(0," + shift.toFixed(1) + "px,0)";
       if (S.canvas) S.canvas.style.transform = tf;
       if (S.sparks) S.sparks.style.transform = "translate3d(0," + (shift * 0.55).toFixed(1) + "px,0)";
@@ -422,14 +434,14 @@ export function initGrounds(root) {
     for (const q of pars) {
       const r = q.host.getBoundingClientRect();
       const rel = r.top + r.height / 2 - vh / 2;
-      q.el.style.transform = "translate3d(0," + (-rel * q.f).toFixed(1) + "px,0)";
+      q.el.style.transform = "translate3d(0," + damp(q, "_y", -rel * q.f).toFixed(1) + "px,0)";
     }
     for (const q of slides) {
       const r = q.host.getBoundingClientRect();
       // 0 as the section enters from the bottom, 0.5 centred, 1 as it leaves
       const p = (vh - r.top) / (r.height + vh);
       const away = Math.min(1, Math.abs(p - 0.5) * 2.35);   // flat through the middle
-      const e = Math.pow(away, 1.7);
+      const e = damp(q, "_e", Math.pow(away, 1.7));
       const x = e * 170;              // percent of its own width
       const z = -e * 560;             // swings back into the scene as it leaves
       const ry = -e * 58;             // and turns right onto its edge, like a door
@@ -444,7 +456,7 @@ export function initGrounds(root) {
     for (const q of drifts) {
       const r = q.host.getBoundingClientRect();
       const rel = r.top + r.height / 2 - vh / 2;
-      q.el.style.transform = "translate3d(0," + (-rel * q.f).toFixed(1) + "px,0)";
+      q.el.style.transform = "translate3d(0," + damp(q, "_y", -rel * q.f).toFixed(1) + "px,0)";
     }
 
     for (const el of meters) {
@@ -467,7 +479,7 @@ export function initGrounds(root) {
     for (const q of fliers) {
       const r = q.el.getBoundingClientRect();
       const t = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / (vh * 0.85)));
-      const a = Math.pow(Math.abs(t), 1.6);
+      const a = damp(q, "_a", Math.pow(Math.abs(t), 1.6));
       const x = q.dir * a * 190;
       const ry = -q.dir * a * 16;
       const z = -a * 260;

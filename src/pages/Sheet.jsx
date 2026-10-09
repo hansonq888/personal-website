@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import { featuredProjects } from "../data/projects";
 import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
@@ -76,6 +78,25 @@ export default function Sheet() {
   const skillsRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
+
+  // Smooth scrolling. Lenis takes over the wheel and drives its own rAF, which
+  // every rect-based effect on the page then follows for free. It is skipped
+  // entirely under reduced-motion, where the native scroll is the right answer.
+  const lenisRef = useRef(null);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const lenis = new Lenis({
+      duration: 1.15,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.5,
+    });
+    lenisRef.current = lenis;
+    let raf = 0;
+    const tick = (t) => { lenis.raf(t); raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
+    return () => { cancelAnimationFrame(raf); lenis.destroy(); lenisRef.current = null; };
+  }, []);
 
   useEffect(() => initGrounds(rootRef.current), []);
   useEffect(() => initDither(bandRef.current, "/vancouver-strip.jpg"), []);
@@ -199,7 +220,8 @@ export default function Sheet() {
     if (!el) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const y = el.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+    if (lenisRef.current) lenisRef.current.scrollTo(y, { duration: 1.3 });
+    else window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
   };
 
   return (
