@@ -199,10 +199,13 @@ export default function Sheet() {
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
         <div className="body" data-par=".035">
-          <div>
-            <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
-            <Giant text="Hanson" delay={120} />
-            <Giant text="Qin" delay={340} />
+          <div className="hero-row">
+            <div>
+              <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
+              <Giant text="Hanson" delay={120} />
+              <Giant text="Qin" delay={340} />
+            </div>
+            <img className="hero-gif" src="/ezgif.com-gif-maker.gif" alt="" />
           </div>
         </div>
         <div className="foot">
@@ -214,17 +217,9 @@ export default function Sheet() {
         </div>
       </section>
 
-      {/* ------------- interstitial: the reel ------------- */}
-      <section className="panel reel" id="sheet-reel" aria-label="Reel">
-        <div className="reel-wrap" data-zoom>
-          <img className="reel-gif" src="/ezgif.com-gif-maker.gif" alt="" />
-        </div>
-        <p className="lab dim reel-cap">REEL.GIF &middot; 800X400PX</p>
-      </section>
-
       {/* ---------------- II. ABOUT ---------------- */}
       <section className="panel" id="sheet-about" data-page="About">
-        <Spec left="About" leftSub="Bitmap Session" right="HANSON.JPG" rightSub="1616X1080PX" />
+        <Spec left="About" leftSub="Bitmap Session" right="HEADSHOT.JPG" rightSub="800X800PX" />
         <div className="body">
           <h2 className="sec-title">About me</h2>
           <div className="about-row">
@@ -238,7 +233,7 @@ export default function Sheet() {
             </div>
             <div className="me-wrap" data-slide=".055" ref={meRef}>
               <div className="polaroid">
-                <img src="/AIheadshot.jpg" alt="Hanson Qin" />
+                <img src="/headshot.jpg" alt="Hanson Qin" />
                 <p className="cap">HANSON QIN &middot; VANCOUVER</p>
               </div>
             </div>

@@ -337,13 +337,6 @@ export function initGrounds(root) {
     host: el.closest("[data-page], .panel") || el.parentElement,
   }));
 
-  // Elements that swell as their section crosses the middle of the view and
-  // shrink away at either end, opening out of a clip as they come.
-  const zooms = [...root.querySelectorAll("[data-zoom]")].map((el) => ({
-    el,
-    host: el.closest(".panel") || el.parentElement,
-  }));
-
   // The project grid unzips: cards converge as they reach the middle of the
   // view and fly apart along their column's axis as they leave it.
   const fliers = [];
@@ -389,19 +382,6 @@ export function initGrounds(root) {
         "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px," +
         z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
       q.el.style.setProperty("--near", (1 - e).toFixed(3));
-    }
-
-    for (const q of zooms) {
-      const r = q.host.getBoundingClientRect();
-      const p = (vh - r.top) / (r.height + vh);
-      const d = Math.max(-1, Math.min(1, (p - 0.5) * 2));   // -1 below, 0 centred, 1 above
-      const near = 1 - Math.abs(d);
-      q.el.style.transform =
-        "perspective(1200px) translate3d(0," + (d * 70).toFixed(1) + "px,0) " +
-        "scale(" + (0.76 + near * 0.3).toFixed(3) + ") rotateX(" + (d * 9).toFixed(2) + "deg)";
-      const inset = (Math.abs(d) * 13).toFixed(1);
-      q.el.style.clipPath = "inset(" + inset + "% " + inset + "% round 2px)";
-      q.el.style.opacity = (0.25 + near * 0.75).toFixed(3);
     }
 
     for (const q of fliers) {
