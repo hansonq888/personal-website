@@ -443,6 +443,14 @@ export function initGrounds(root) {
     host: el.closest(".role, .skill") || el.parentElement,
   }));
 
+  // Something that swims: it crosses its section sideways as you scroll, with
+  // a gentle rise and fall on the way.
+  const swims = [...root.querySelectorAll("[data-swim]")].map((el) => ({
+    el,
+    f: parseFloat(el.dataset.swim) || 0.3,
+    host: el.closest("[data-page], .panel") || el.parentElement,
+  }));
+
   // Containers that publish how far they have been scrolled through, as --p.
   const meters = [...root.querySelectorAll("[data-progress]")];
 
@@ -525,12 +533,25 @@ export function initGrounds(root) {
       q.el.style.transform = "translate3d(0," + damp(q, "_y", -rel * q.f).toFixed(1) + "px,0)";
     }
 
+    for (const q of swims) {
+      const r = q.host.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));
+      const x = damp(q, "_sx", p * q.f * r.width);
+      const y = Math.sin(p * Math.PI * 2) * 18;
+      q.el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+    }
+
     for (const el of meters) {
       const r = el.getBoundingClientRect();
       // 0 when the list's top reaches the playhead, 1 when its bottom does
       const play = vh * 0.58;
-      const p = Math.max(0, Math.min(1, (play - r.top) / Math.max(1, r.height)));
+      const raw = Math.max(0, Math.min(1, (play - r.top) / Math.max(1, r.height)));
+      // the stroke holds at its start for the first stretch, so whatever draws
+      // it can arrive and sit still before it begins
+      const HOLD = 0.2;
+      const p = Math.max(0, Math.min(1, (raw - HOLD) / (1 - HOLD)));
       el.style.setProperty("--p", p.toFixed(4));
+      el.style.setProperty("--pr", raw.toFixed(4));
     }
 
     for (const el of lits) {

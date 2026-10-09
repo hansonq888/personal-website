@@ -229,7 +229,7 @@
   letter-spacing: -0.022em;
   line-height: 0.84;
   margin: 0;
-  font-size: clamp(3rem, 21vw, 19rem);
+  font-size: clamp(2.8rem, 17vw, 15rem);
 }
 .sheet .giant .clip { overflow: hidden; display: inline-block; vertical-align: bottom; }
 .sheet .giant .g { display: inline-block; }
@@ -256,7 +256,7 @@
   font-size: clamp(2.75rem, 12vw, 11rem);
   letter-spacing: -0.035em;
   line-height: 0.82;
-  margin-bottom: clamp(32px, 4vw, 64px);
+  margin-bottom: clamp(64px, 8vw, 140px);
 }
 
 /* ---- motifs --------------------------------------------------------------
@@ -279,6 +279,10 @@
 .sheet .title-row .sec-title { margin-bottom: 0; }
 .sheet .title-row + * { margin-top: 44px; }
 .sheet .title-row ~ .skills, .sheet .title-row ~ .roles { margin-top: 44px; }
+
+/* the fish sits on the same line as the words, not above them */
+.sheet #sheet-about .title-row { align-items: center; }
+.sheet #sheet-about .motif { will-change: transform; }
 
 /* ---- about -------------------------------------------------------------- */
 .sheet .about-row {
@@ -395,11 +399,12 @@
 /* the rail: a bow drawn through the nodes, filling as you read down it */
 .sheet .arc {
   position: absolute;
-  /* the rail runs down the far left now, with the roles to its right */
+  /* the rail begins at the top of the section; how far it reaches above the
+     list is measured at runtime and written to --off */
   left: 0;
-  top: 0;
-  width: 150px;
-  height: 100%;
+  top: calc(-1 * var(--off, 200px));
+  width: 560px;
+  height: calc(100% + var(--off, 200px));
   overflow: visible;
   pointer-events: none;
 }
@@ -426,7 +431,7 @@
 .sheet .pencil {
   position: absolute;
   left: 0;
-  top: 0;
+  top: calc(-1 * var(--off, 200px));
   width: 430px;
   height: auto;
   pointer-events: none;
@@ -465,7 +470,7 @@
   .sheet .role .shot { grid-row: 1 / span 2; grid-column: 2; width: 132px; }
 }
 
-.sheet .role .when { font-size: clamp(13px, 1.1vw, 17px); line-height: 1.4; color: var(--ink-55); }
+.sheet .role .when { font-size: clamp(14px, 1.3vw, 20px); line-height: 1.4; color: var(--ink-55); }
 .sheet .role .who { display: block; }
 
 /* A feathered pool of light under each role, so the type lifts off the
@@ -499,7 +504,7 @@
 .sheet .panel.dark .role .when::before { display: none; }
 .sheet .role b {
   font-weight: 700;
-  font-size: clamp(19px, 2.3vw, 36px);
+  font-size: clamp(22px, 2.9vw, 46px);
   line-height: 1.06;
   letter-spacing: -0.025em;
   text-transform: uppercase;
@@ -507,8 +512,8 @@
 .sheet .role i {
   font-style: normal;
   display: block;
-  margin-top: 9px;
-  font-size: clamp(13px, 1.15vw, 18px);
+  margin-top: 11px;
+  font-size: clamp(14px, 1.35vw, 21px);
   line-height: 1.35;
   color: var(--ink-55);
 }
@@ -747,6 +752,9 @@
 .sheet .skill .items > span { transition: color 0.2s linear; }
 .sheet .skill .items > span:hover { color: var(--ink); }
 .sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
+
+/* room under the last row before the section ends */
+.sheet #sheet-projects { padding-bottom: clamp(120px, 15vh, 240px); }
 
 /* ---- projects ------------------------------------------------------------
    The cards are the ones from /projects, unchanged. Only the grid and the

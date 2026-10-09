@@ -27,7 +27,7 @@ export const experiences = [
     short: { when: "Jan–Aug 2026", where: "Blenman Innovation Group" },
   },
   {
-    role: "Head of Sponsorships",
+    role: "Treasurer",
     org: "Yale AI Association",
     url: "https://www.yale-ai.org/",
     image: "/yale-ai.png",

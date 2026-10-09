@@ -266,13 +266,25 @@ export default function Sheet() {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
 
-    const RAIL_W = 150;                    // matches the node column in sheet.css
+    const RAIL_W = 560;                    // matches .arc in sheet.css
     const TIP = { x: 0.346, y: 0.994 };    // where the pencil's point sits in its image
 
     const layout = () => {
       const rows = [...list.querySelectorAll(".role")];
       if (!rows.length) return;
       const lb = list.getBoundingClientRect();
+      // reach all the way to the top of the section, so the stroke starts as
+      // high as the panel allows rather than at the list
+      const panel = list.closest(".panel");
+      const pb = panel ? panel.getBoundingClientRect() : lb;
+      const OFF_Y = Math.max(0, Math.round(lb.top - pb.top));
+      list.style.setProperty("--off", OFF_Y + "px");
+      const title = panel && panel.querySelector(".sec-title");
+      const tb = title ? title.getBoundingClientRect() : null;
+      const LEAD = {
+        x: tb ? Math.min(RAIL_W - 40, tb.right - lb.left + 44) : 470,
+        y: 26,
+      };
       const bow = Math.min(66, lb.width * 0.08);
       const pts = rows.map((row) => {
         const node = row.querySelector(".node");
@@ -317,14 +329,14 @@ export default function Sheet() {
       };
       const wob0 = wobble(0);
 
+      const body = [];
       const N = 640;
-      let d = "";
       for (let i = 0; i <= N; i++) {
         const t = i / N;
         // the wobble fades out at the very ends so the stroke starts and stops clean
         const taper = Math.min(1, Math.min(t, 1 - t) * 9);
         let x = baseX(t) + (wobble(t) - wob0 * (1 - taper)) * taper;
-        let y = yTop + t * span + Math.sin(t * 6.283 * 9.3 + wob[1].ph) * 1.6 * taper;
+        let y = OFF_Y + yTop + t * span + Math.sin(t * 6.283 * 9.3 + wob[1].ph) * 1.6 * taper;
         for (const lp of loops) {
           const dt = t - lp.c;
           if (Math.abs(dt) >= lp.w) continue;
@@ -332,10 +344,30 @@ export default function Sheet() {
           x += lp.dir * lp.r * Math.sin(phi);
           y -= lp.r * (1 - Math.cos(phi)) * lp.squash;
         }
-        d += (i ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1);
+        body.push([x, y]);
       }
 
-      svg.setAttribute("viewBox", "0 0 " + RAIL_W + " " + Math.max(1, lb.height));
+      // the stroke begins beside the title and sweeps down into the rail
+      const lead = [];
+      const L0 = [LEAD.x, LEAD.y];
+      const L3 = body[0];
+      const L1 = [LEAD.x - 150, LEAD.y + 40];
+      const L2 = [L3[0] + 120, L3[1] - 150];
+      for (let i = 0; i < 90; i++) {
+        const u = i / 90, v = 1 - u;
+        const bx = v*v*v*L0[0] + 3*v*v*u*L1[0] + 3*v*u*u*L2[0] + u*u*u*L3[0];
+        const by = v*v*v*L0[1] + 3*v*v*u*L1[1] + 3*v*u*u*L2[1] + u*u*u*L3[1];
+        const wob2 = Math.sin(u * 6.283 * 3.1 + wob[2].ph) * 2.6 * Math.min(1, u * 6);
+        lead.push([bx + wob2, by + wob2 * 0.4]);
+      }
+
+      const all = lead.concat(body);
+      let d = "";
+      for (let i = 0; i < all.length; i++) {
+        d += (i ? "L" : "M") + all[i][0].toFixed(1) + "," + all[i][1].toFixed(1);
+      }
+
+      svg.setAttribute("viewBox", "0 0 " + RAIL_W + " " + Math.max(1, lb.height + OFF_Y));
       track.setAttribute("d", d);
       ghost.setAttribute("d", d);
       fill.setAttribute("d", d);
@@ -357,6 +389,9 @@ export default function Sheet() {
       const len = list._railLen || 0;
       if (!len) return;
       const p = parseFloat(list.style.getPropertyValue("--p")) || 0;
+      // presence runs on the unheld progress, so the hand is already in place
+      // and waiting before the stroke starts moving
+      const pr = parseFloat(list.style.getPropertyValue("--pr")) || 0;
       const sb = svg.getBoundingClientRect();
       const vb = svg.viewBox.baseVal;
       if (!vb || !vb.width || !vb.height) return;
@@ -375,28 +410,33 @@ export default function Sheet() {
       // the rail runs downward, so measure the lean off vertical
       const off = Math.atan2(dx, Math.max(0.001, Math.abs(dy))) * (180 / Math.PI);
       const clamp = (v, m) => Math.max(-m, Math.min(m, v));
-      smooth.lean = lerp(smooth.lean, clamp(off * 0.5, 24), 0.16);
-      smooth.ry = lerp(smooth.ry, clamp(off * 0.8, 30), 0.14);
-      smooth.rx = lerp(smooth.rx, clamp(-dy * 1.6, 16) + 6, 0.12);
+      // a lighter lean, and a slower filter on it, so the hand settles rather
+      // than reacting to every kink in the line
+      smooth.lean = lerp(smooth.lean, clamp(off * 0.24, 11), 0.065);
+      smooth.ry = lerp(smooth.ry, clamp(off * 0.36, 13), 0.055);
+      smooth.rx = lerp(smooth.rx, clamp(-dy * 0.7, 7) + 3, 0.05);
 
       const w = pencil.offsetWidth || 300;
       const h = pencil.offsetHeight || 169;
       // the hand swings in from the right as the stroke starts and lifts away
       // at the end, rather than simply fading
-      const IN = 0.07;
-      const present = Math.max(0, Math.min(1, Math.min(p / IN, (1 - p) / IN)));
+      // it arrives and then stays: there is no exit, so it rests on the end of
+      // the stroke once the line is finished
+      const IN = 0.1;
+      const present = Math.max(0, Math.min(1, pr / IN));
       const e = 1 - present;
       const ease = e * e;
       // a slow rock, as a wrist does while it writes
-      const bob = Math.sin(at / 26) * 2.4 * present;
+      const bob = Math.sin(at / 52) * 0.9 * present;
 
       pencil.style.transformOrigin = TIP.x * 100 + "% " + TIP.y * 100 + "%";
+      // it comes down from above rather than in from the corner
       pencil.style.transform =
-        "translate3d(" + (x - TIP.x * w + ease * 300).toFixed(1) + "px," +
-        (y - TIP.y * h + ease * 56).toFixed(1) + "px,0) " +
+        "translate3d(" + (x - TIP.x * w + ease * 60).toFixed(1) + "px," +
+        (y - TIP.y * h - ease * 340).toFixed(1) + "px,0) " +
         "rotateX(" + (smooth.rx * present).toFixed(2) + "deg) " +
-        "rotateY(" + (smooth.ry * present + ease * 26).toFixed(2) + "deg) " +
-        "rotateZ(" + (smooth.lean + bob + ease * 18).toFixed(2) + "deg) " +
+        "rotateY(" + (smooth.ry * present + ease * 10).toFixed(2) + "deg) " +
+        "rotateZ(" + (smooth.lean + bob - ease * 12).toFixed(2) + "deg) " +
         "scale(" + (1 - ease * 0.18).toFixed(3) + ")";
       // the shadow swings opposite the tilt, which is what reads as height
       const sh = clamp(-smooth.ry * 0.7, 22);
@@ -536,7 +576,7 @@ export default function Sheet() {
         <div className="body">
           <div className="title-row">
             <h2 className="sec-title">About me</h2>
-            <img className="motif inv" src="/swimming_fish.gif" alt=""
+            <img className="motif inv" src="/swimming_fish.gif" alt="" data-swim=".5"
                  style={{ width: "min(320px, 24vw)" }} />
           </div>
           <div className="about-row">
