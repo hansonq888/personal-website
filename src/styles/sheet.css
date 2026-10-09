@@ -388,7 +388,7 @@
   display: grid;
   width: 100%;
   /* capped, or the plates end up at the far edge of a wide screen */
-  max-width: 1280px;
+  max-width: 1440px;
   perspective: 1400px;
 }
 /* the rail: a bow drawn through the nodes, filling as you read down it */
@@ -440,7 +440,7 @@
 
 .sheet .role {
   display: grid;
-  grid-template-columns: 150px 150px 1fr clamp(300px, 26vw, 420px);
+  grid-template-columns: 300px 150px 1fr clamp(300px, 26vw, 420px);
   gap: 28px;
   align-items: center;
   padding: var(--pad, 30px) 0;
@@ -466,6 +466,36 @@
 
 .sheet .role .when { font-size: clamp(13px, 1.1vw, 17px); line-height: 1.4; color: var(--ink-55); }
 .sheet .role .who { display: block; }
+
+/* A feathered pool of light under each role, so the type lifts off the
+   construction lines drifting behind it. It opens up as you pass the row. */
+.sheet .role .who,
+.sheet .role .when { position: relative; isolation: isolate; }
+.sheet .role .who::before,
+.sheet .role .when::before {
+  content: "";
+  position: absolute;
+  inset: -46% -16%;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    58% 62% at 42% 50%,
+    rgba(255, 255, 255, 0.96),
+    rgba(255, 255, 255, 0.72) 42%,
+    rgba(255, 255, 255, 0) 74%
+  );
+  filter: blur(13px);
+  opacity: 0.8;
+  transform: scale(1);
+  transition: opacity 0.3s linear, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet .role .when::before { inset: -70% -34%; }
+.sheet .role:hover .who::before,
+.sheet .role:hover .when::before { opacity: 1; transform: scale(1.1); }
+/* on a dark run the pool would be a smear, so it only exists on paper */
+.sheet .panel.dark .role .who::before,
+.sheet .panel.dark .role .when::before { display: none; }
 .sheet .role b {
   font-weight: 700;
   font-size: clamp(19px, 2.3vw, 36px);

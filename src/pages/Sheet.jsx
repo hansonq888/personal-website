@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { featuredProjects } from "../data/projects";
@@ -49,6 +50,46 @@ function Giant({ text, delay = 0 }) {
         </span>
       ))}
     </p>
+  );
+}
+
+/* Text that settles into place a word at a time: each one rises out of a blur
+   rather than simply fading, which is what makes it read as smooth rather than
+   as a cut. Motion handles the stagger and the spring. */
+const LINE = { hidden: {}, show: { transition: { staggerChildren: 0.03, delayChildren: 0.04 } } };
+const WORD = {
+  hidden: { opacity: 0, y: "0.55em", filter: "blur(7px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { type: "spring", stiffness: 190, damping: 25, mass: 0.7 },
+  },
+};
+
+function Reveal({ as = "p", text, className, style }) {
+  const still = useReducedMotion();
+  const Tag = motion[as];
+  if (still) {
+    const Plain = as;
+    return <Plain className={className} style={style}>{text}</Plain>;
+  }
+  const words = text.split(" ");
+  return (
+    <Tag
+      className={className}
+      style={style}
+      variants={LINE}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.5 }}
+    >
+      {words.map((w, i) => (
+        <motion.span key={i} variants={WORD} style={{ display: "inline-block", whiteSpace: "pre" }}>
+          {i < words.length - 1 ? w + " " : w}
+        </motion.span>
+      ))}
+    </Tag>
   );
 }
 
@@ -496,12 +537,13 @@ export default function Sheet() {
           <h2 className="sec-title">About me</h2>
           <div className="about-row">
             <div>
-              <p className="lab">CS + Math @ Yale</p>
-              <p className="lab dim">Vancouver, BC x New Haven, CT</p>
-              <p className="lab dim" style={{ maxWidth: "38ch", marginTop: 20 }}>
-                I build things that run in the browser and have no right to — an audio engine in C++,
-                a model that rates how you train, stats for a sport nobody tracks.
-              </p>
+              <Reveal className="lab" text="CS + Math @ Yale" />
+              <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
+              <Reveal
+                className="lab dim"
+                style={{ maxWidth: "38ch", marginTop: 20 }}
+                text="I build things that run in the browser and have no right to — an audio engine in C++, a model that rates how you train, stats for a sport nobody tracks."
+              />
               <img className="motif inv" src="/swimming_fish.gif" alt="" data-drift=".05"
                    style={{ width: "min(340px, 80%)", marginTop: 26 }} />
             </div>
