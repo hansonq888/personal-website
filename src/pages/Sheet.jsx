@@ -577,7 +577,7 @@ export default function Sheet() {
               <Reveal
                 className="lab dim"
                 style={{ maxWidth: "38ch", marginTop: 20 }}
-                text="I build things that run in the browser and have no right to — an audio engine in C++, a model that rates how you train, stats for a sport nobody tracks."
+                text="I build low-level systems and ship them on the web: a C++ audio engine compiled to WebAssembly, a model that rates how you train, and live analytics for ultimate frisbee."
               />
             </div>
             <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>

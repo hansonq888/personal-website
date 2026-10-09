@@ -1,44 +1,40 @@
 // Shared by the long-scroll sheet and the standalone Skills page.
+//
+// Every entry here comes from the SKILLS block of the resume, split into finer
+// groups than the resume uses but with nothing added and nothing dropped:
+//   Languages & Frameworks -> Languages, Frontend, Runtime & Data
+//   Backend & Systems      -> Storage, Platform
+//   AI & Infrastructure    -> AI & Observability (plus Git/Linux/Vercel under Platform)
 export const skillSections = [
   {
     title: "Languages",
-    skills: ["Python", "TypeScript", "JavaScript", "SQL", "Java", "C / C++", "HTML / CSS"],
+    skills: ["Python", "TypeScript", "JavaScript", "SQL", "C / C++ (C++20)", "R"],
     description: null,
   },
   {
     title: "Frontend",
-    skills: ["React", "React Native", "Next.js", "Expo", "Tailwind CSS"],
+    skills: ["React", "React Native", "Next.js", "Expo"],
     description: "Building responsive web and mobile interfaces and reusable component systems.",
   },
   {
-    title: "Backend & APIs",
-    skills: ["Node.js", "FastAPI", "Flask", "REST APIs", "OAuth 2.0 / OIDC"],
-    description: "Designing backend services, REST APIs, authentication flows, and ingestion pipelines.",
+    title: "Runtime & Data",
+    skills: ["Node.js", "WebAssembly (WASM/SIMD)", "Pandas", "NumPy", "scikit-learn"],
+    description: "Compiling native work to run in the browser, and the analysis around it.",
   },
   {
-    title: "Data & Analytics",
-    skills: ["PostgreSQL", "Pandas", "NumPy", "NetworkX", "D3", "Recharts"],
-    description: "Working with relational data, analytics pipelines, and data visualization.",
+    title: "Storage",
+    skills: ["PostgreSQL", "SQLite", "IndexedDB", "Supabase"],
+    description: "Relational data, offline-first stores, and the sync layers between them.",
   },
   {
-    title: "AI & ML",
-    skills: ["OpenAI API", "LLM Prompt Engineering", "RAG Pipelines", "Vector Search"],
-    description: "Building AI-powered product features, retrieval workflows, and practical ML-assisted tools.",
+    title: "Platform",
+    skills: ["AWS (S3, SQS)", "Docker", "Vercel", "RESTful APIs", "OAuth 2.0 / PKCE", "Git", "Linux"],
+    description: "Containerized services, cloud storage and queues, authentication, and deploys.",
   },
   {
-    title: "Systems",
-    skills: ["WebAssembly", "Audio DSP", "Lock-free concurrency", "Unix systems"],
-    description: "Writing performance-critical code and compiling native work to run in the browser.",
-  },
-  {
-    title: "Infrastructure",
-    skills: ["Docker", "AWS (S3, ECS, SQS)", "CI/CD (GitHub Actions, EAS)", "Supabase", "Vercel"],
-    description: "Containerized services, cloud storage and queues, and automated build and deploy pipelines.",
-  },
-  {
-    title: "Engineering",
-    skills: ["Git", "Linux", "Vitest", "Sentry", "PostHog"],
-    description: "Reviewing pull requests, collaborating in multi-developer codebases, and monitoring production.",
+    title: "AI & Observability",
+    skills: ["LLMs", "Embeddings", "Retrieval Systems", "LangSmith", "SSE", "Sentry", "PostHog"],
+    description: "AI-powered product features, and the monitoring that keeps them honest.",
   },
 ];
 

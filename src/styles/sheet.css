@@ -282,7 +282,8 @@
 .sheet .title-row ~ .skills, .sheet .title-row ~ .roles { margin-top: 44px; }
 
 /* the fish sits on the same line as the words, not above them */
-.sheet #sheet-about .title-row { align-items: center; }
+/* the fish sits on the same line as the words, not above them */
+.sheet #sheet-about .title-row { align-items: center; margin-bottom: clamp(16px, 2vw, 30px); }
 .sheet #sheet-about .motif { will-change: transform; }
 
 /* ---- about -------------------------------------------------------------- */
@@ -740,7 +741,12 @@
 .sheet .tv-content .skill b,
 .sheet .tv-content .skill .items { font-size: clamp(9px, 1.2vw, 16px); }
 .sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 14px); }
-.sheet .tv-content .skill .items { line-height: 1.45; color: rgba(250, 250, 247, 0.62); }
+.sheet .tv-content .skill .items {
+  line-height: 1.45;
+  color: rgba(250, 250, 247, 0.62);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .sheet .tv-content .skill b { letter-spacing: 0.01em; }
 .sheet .tv-content .skill b { color: rgba(250, 250, 247, 0.92); }
 .sheet .tv-content .skill .num { color: rgba(250, 250, 247, 0.34); }
@@ -781,7 +787,7 @@
 .sheet .skills:hover .skill.in { opacity: 0.4; }
 .sheet .skills:hover .skill.in:hover { opacity: 1; }
 .sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
-.sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); }
+.sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); min-width: 0; }
 .sheet .skill .items > span { transition: color 0.2s linear; }
 .sheet .skill .items > span:hover { color: var(--ink); }
 .sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
