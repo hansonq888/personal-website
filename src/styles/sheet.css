@@ -187,7 +187,32 @@
   flex-wrap: wrap;
 }
 
-/* ---- home --------------------------------------------------------------- */
+/* ---- home ----------------------------------------------------------------- */
+.sheet .hero-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: center;
+  width: 100%;
+}
+@media (max-width: 1000px) { .sheet .hero-row { grid-template-columns: 1fr; gap: 26px; } }
+.sheet .hero-gif {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  display: block;
+  justify-self: end;
+  /* the gif is black-backed, so screen drops its field into the ground */
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: sheet-hero-in 0.5s linear 1.15s forwards;
+}
+@keyframes sheet-hero-in { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sheet .hero-gif { opacity: 1; animation: none; }
+}
+
+/* ---- hero type --------------------------------------------------------------- */
 .sheet .giant {
   font-weight: 700;
   letter-spacing: -0.035em;
@@ -199,14 +224,24 @@
 .sheet .giant .g { display: inline-block; }
 .sheet .giant .w { display: inline-block; white-space: nowrap; }
 
+/* a section title, set against the hero but well under it */
+.sheet .sec-title {
+  margin: 0 0 44px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  font-size: clamp(2.2rem, 7vw, 4.6rem);
+}
+@media (max-width: 760px) { .sheet .sec-title { margin-bottom: 28px; } }
+
 /* ---- about -------------------------------------------------------------- */
 .sheet .about-row {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 46px;
   align-items: center;
-  perspective: 1500px;
-  perspective-origin: 68% 50%;
+  perspective: 900px;
+  perspective-origin: 72% 50%;
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
@@ -238,7 +273,7 @@
   background: #f7f6f1;
   padding: 14px 14px 54px;
   border-radius: 2px;
-  transform: rotate(-2.4deg) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform: rotate(-6deg) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transform-style: preserve-3d;
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
   will-change: transform;
@@ -290,7 +325,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet .polaroid { transform: rotate(-2.4deg); transition: none; }
+  .sheet .polaroid { transform: rotate(-6deg); transition: none; }
 }
 
 /* the dithered skyline, bleeding to both edges along the floor of the page */
@@ -386,19 +421,38 @@
 }
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* ---- skills --------------------------------------------------------------- */
-.sheet .skills { display: grid; width: 100%; }
+/* ---- skills: a numbered index ------------------------------------------- */
+.sheet .skills { display: grid; width: 100%; max-width: 1080px; }
 .sheet .skill {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 24px;
-  padding: 18px 0;
+  grid-template-columns: 54px 190px 1fr;
+  gap: 26px;
+  align-items: baseline;
+  padding: 20px 0;
   border-top: 1px solid var(--rule);
+  opacity: 0;
+  transform: translateX(-44px);
+  transition: opacity 0.5s linear, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    padding-left 0.2s linear;
 }
+.sheet .skill.in { opacity: 1; transform: none; }
 .sheet .skill:last-child { border-bottom: 1px solid var(--rule); }
-@media (max-width: 760px) { .sheet .skill { grid-template-columns: 1fr; gap: 4px; } }
+.sheet .skill:hover { padding-left: 10px; }
+@media (max-width: 760px) {
+  .sheet .skill { grid-template-columns: 40px 1fr; gap: 4px 16px; transform: translateX(-20px); }
+  .sheet .skill .items { grid-column: 2; }
+}
+.sheet .skill .num {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-30);
+  font-variant-numeric: tabular-nums;
+}
 .sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
-.sheet .skill span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+.sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); }
+.sheet .skill .items > span { transition: color 0.2s linear; }
+.sheet .skill .items > span:hover { color: var(--ink); }
+.sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
 
 /* ---- projects ------------------------------------------------------------
    The cards are the ones from /projects, unchanged. Only the grid and the

@@ -321,13 +321,14 @@ export function initGrounds(root) {
       const p = (vh - r.top) / (r.height + vh);
       const away = Math.min(1, Math.abs(p - 0.5) * 2.35);   // flat through the middle
       const e = Math.pow(away, 1.7);
-      const x = e * 165;              // percent of its own width
-      const z = -e * 420;             // swings back into the scene as it leaves
-      const ry = -e * 34;             // and turns on its edge, like a door
+      const x = e * 170;              // percent of its own width
+      const z = -e * 560;             // swings back into the scene as it leaves
+      const ry = -e * 58;             // and turns right onto its edge, like a door
+      const rz = e * 11;              // rocking as it goes
       const rel = r.top + r.height / 2 - vh / 2;
       q.el.style.transform =
         "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px," +
-        z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg)";
+        z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
       q.el.style.setProperty("--near", (1 - e).toFixed(3));
     }
 

@@ -2,18 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { featuredProjects } from "../data/projects";
 import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
+import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
 const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
-const SKILLS = [
-  ["Languages", "Python / TypeScript / SQL / C++"],
-  ["Frontend", "React / React Native / Next.js / Expo"],
-  ["Systems", "WebAssembly / Audio DSP / Lock-free"],
-  ["Infra", "Docker / AWS / CI-CD / Vercel"],
-];
 
 /* The hero is split per word, then per letter: each word stays in one
    unbreakable box, or the per-letter spans let it wrap mid-word. */
@@ -77,6 +72,7 @@ export default function Sheet() {
   const gridRef = useRef(null);
   const meRef = useRef(null);
   const rolesRef = useRef(null);
+  const skillsRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -94,8 +90,8 @@ export default function Sheet() {
       const r = wrap.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5;
       const y = (e.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--ry", (x * 15).toFixed(2) + "deg");
-      card.style.setProperty("--rx", (-y * 13).toFixed(2) + "deg");
+      card.style.setProperty("--ry", (x * 30).toFixed(2) + "deg");
+      card.style.setProperty("--rx", (-y * 25).toFixed(2) + "deg");
       card.style.setProperty("--mx", (e.clientX - r.left).toFixed(0) + "px");
       card.style.setProperty("--my", (e.clientY - r.top).toFixed(0) + "px");
     };
@@ -111,27 +107,30 @@ export default function Sheet() {
     };
   }, []);
 
-  // the timeline swings in a row at a time
-  useEffect(() => {
-    const list = rolesRef.current;
-    if (!list) return;
-    const rows = [...list.children];
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      rows.forEach((r) => r.classList.add("in"));
-      return;
-    }
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => {
-        if (!e.isIntersecting) return;
-        const i = rows.indexOf(e.target);
-        setTimeout(() => e.target.classList.add("in"), Math.max(0, i) * 110);
-        io.unobserve(e.target);
-      }),
-      { threshold: 0.3 }
-    );
-    rows.forEach((r) => io.observe(r));
-    return () => io.disconnect();
-  }, []);
+  // one staggered run of children, used by the timeline and the skills index
+  const useStagger = (ref, step, threshold) =>
+    useEffect(() => {
+      const list = ref.current;
+      if (!list) return;
+      const rows = [...list.children];
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        rows.forEach((r) => r.classList.add("in"));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (es) => es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          setTimeout(() => e.target.classList.add("in"), Math.max(0, rows.indexOf(e.target)) * step);
+          io.unobserve(e.target);
+        }),
+        { threshold }
+      );
+      rows.forEach((r) => io.observe(r));
+      return () => io.disconnect();
+    }, [ref, step, threshold]);
+
+  useStagger(rolesRef, 110, 0.3);
+  useStagger(skillsRef, 70, 0.25);
 
   // the project grid cuts in, one card at a time
   useEffect(() => {
@@ -199,10 +198,13 @@ export default function Sheet() {
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
         <div className="body" data-par=".035">
-          <div>
-            <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
-            <Giant text="Hanson" delay={120} />
-            <Giant text="Qin" delay={340} />
+          <div className="hero-row">
+            <div>
+              <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
+              <Giant text="Hanson" delay={120} />
+              <Giant text="Qin" delay={340} />
+            </div>
+            <img className="hero-gif" src="/ezgif.com-gif-maker.gif" alt="" />
           </div>
         </div>
         <div className="foot">
@@ -218,6 +220,7 @@ export default function Sheet() {
       <section className="panel" id="sheet-about" data-page="About">
         <Spec left="About" leftSub="Bitmap Session" right="HANSON.JPG" rightSub="1616X1080PX" />
         <div className="body">
+          <h2 className="sec-title">About me</h2>
           <div className="about-row">
             <div>
               <p className="lab">CS + Math @ Yale</p>
@@ -247,6 +250,7 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-experience" data-page="Experience">
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">
+          <h2 className="sec-title">Experience</h2>
           <div className="roles" ref={rolesRef}>
             {experiences.map((x) => (
               <a className="role" key={x.org} href={x.url} target="_blank" rel="noreferrer">
@@ -269,6 +273,7 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-projects" data-page="Projects">
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
+          <h2 className="sec-title">Projects</h2>
           <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
               <div key={p.id}><ProjectCard project={p} /></div>
@@ -280,11 +285,23 @@ export default function Sheet() {
 
       {/* ---------------- V. SKILLS ---------------- */}
       <section className="panel deep" id="sheet-skills" data-page="Skills" data-ground="Skills">
-        <Spec left="Skills" leftSub="Working Stack" right="STACK.TXT" rightSub="Updated 2026" />
+        <Spec left="Skills" leftSub={`${skillSections.length} Groups`} right="STACK.TXT" rightSub="Updated 2026" />
         <div className="body">
-          <div className="skills">
-            {SKILLS.map(([k, v]) => (
-              <div className="skill" key={k}><b>{k}</b><span>{v}</span></div>
+          <h2 className="sec-title">Skills</h2>
+          <div className="skills" ref={skillsRef}>
+            {skillSections.map((g, i) => (
+              <div className="skill" key={g.title}>
+                <span className="num">{String(i + 1).padStart(2, "0")}</span>
+                <b>{g.title}</b>
+                <span className="items">
+                  {g.skills.map((it, j) => (
+                    <span key={it}>
+                      {it}
+                      {j < g.skills.length - 1 ? <em aria-hidden="true">/</em> : null}
+                    </span>
+                  ))}
+                </span>
+              </div>
             ))}
           </div>
         </div>
