@@ -27,7 +27,7 @@ const WEATHER = {
 const SYSTEM = {
   Home: ["dither", 0.05],      // spans Home + About
   Experience: ["phi", -0.15],  // spans Experience + Projects
-  Projects: ["orbits", 0.1],   // its own layer, over the shared one
+  Projects: ["orbits", 0.1],   // a binary field with dials over it
   Skills: ["contour", 0.13],
 };
 
@@ -114,6 +114,7 @@ export function initGrounds(root) {
         r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
       }));
     }
+    S.bin = null;
     S.last = -1e9;
   }
 
@@ -212,6 +213,46 @@ export function initGrounds(root) {
     }
   }
 
+  /* --- IV: a field of ones and zeroes, with dials turning over it --- */
+  // Redrawn into its own buffer a few times a second and blitted every frame:
+  // tens of thousands of glyphs cannot be laid out at 25fps, but they do not
+  // need to be — the field drifts far more slowly than the rings turn.
+  function drawBinary(S, t) {
+    const W = S.w, H = S.h;
+    if (!S.bin || S.binW !== W || S.binH !== H) {
+      S.bin = document.createElement("canvas");
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      S.bin.width = W * dpr; S.bin.height = H * dpr;
+      S.binCtx = S.bin.getContext("2d");
+      S.binCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      S.binW = W; S.binH = H;
+    }
+    const c = S.binCtx;
+    c.clearRect(0, 0, W, H);
+    c.font = '500 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+    c.textBaseline = "top";
+    const cell = 16;
+    const cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
+    const TAU = Math.PI * 2;
+    const rgb = S.light ? "11,11,12" : "250,250,247";
+    const flip = Math.floor(t / 820);
+    for (let y = 0; y < rows; y++) {
+      const v = y / rows;
+      for (let x = 0; x < cols; x++) {
+        const u = x / cols;
+        let n = Math.sin((u * 3.1 + v * 1.7 + t * 0.00004) * TAU)
+              + 0.7 * Math.sin((u * -2.2 + v * 4.3 - t * 0.000027) * TAU);
+        n = n * 0.5 + 0.5;
+        if (n < 0.6) continue;               // most of the page stays bare
+        const a = (n - 0.6) / 0.4;
+        c.fillStyle = "rgba(" + rgb + "," + (0.07 + a * 0.26).toFixed(3) + ")";
+        // a stable per-cell bit that turns over now and then
+        const bit = (((x * 73856093) ^ (y * 19349663)) + flip + ((x * 3 + y) >> 2)) & 1;
+        c.fillText(bit ? "1" : "0", x * cell, y * cell);
+      }
+    }
+  }
+
   /* --- IV: orbits. rings that butterfly open and planets that ride them --- */
   // Concentric at the middle of the section, splaying into mirrored pairs of
   // flattened dials at either end, in step with the cards unzipping.
@@ -219,6 +260,8 @@ export function initGrounds(root) {
     const c = S.ctx;
     const W = S.w, H = S.h;
     c.clearRect(0, 0, W, H);
+    if (t - (S.binLast || -1e9) > 160) { S.binLast = t; drawBinary(S, t); }
+    if (S.bin) c.drawImage(S.bin, 0, 0, W, H);
     c.lineWidth = 1;
     const cx = W / 2, cy = H / 2;
     const maxR = Math.min(W, H) * 0.46;
@@ -337,6 +380,20 @@ export function initGrounds(root) {
     host: el.closest("[data-page], .panel") || el.parentElement,
   }));
 
+  // Drift measured against the element's own row rather than the whole section,
+  // so a long list layers instead of sliding as one slab.
+  const drifts = [...root.querySelectorAll("[data-drift]")].map((el) => ({
+    el,
+    f: parseFloat(el.dataset.drift) || 0,
+    host: el.closest(".role, .skill") || el.parentElement,
+  }));
+
+  // Containers that publish how far they have been scrolled through, as --p.
+  const meters = [...root.querySelectorAll("[data-progress]")];
+
+  // Containers whose children light as they cross the playhead.
+  const lits = [...root.querySelectorAll("[data-lit]")];
+
   // The project grid unzips: cards converge as they reach the middle of the
   // view and fly apart along their column's axis as they leave it.
   const fliers = [];
@@ -382,6 +439,29 @@ export function initGrounds(root) {
         "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px," +
         z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
       q.el.style.setProperty("--near", (1 - e).toFixed(3));
+    }
+
+    for (const q of drifts) {
+      const r = q.host.getBoundingClientRect();
+      const rel = r.top + r.height / 2 - vh / 2;
+      q.el.style.transform = "translate3d(0," + (-rel * q.f).toFixed(1) + "px,0)";
+    }
+
+    for (const el of meters) {
+      const r = el.getBoundingClientRect();
+      // 0 when the list's top reaches the playhead, 1 when its bottom does
+      const play = vh * 0.58;
+      const p = Math.max(0, Math.min(1, (play - r.top) / Math.max(1, r.height)));
+      el.style.setProperty("--p", p.toFixed(4));
+    }
+
+    for (const el of lits) {
+      const play = vh * 0.58;
+      for (const child of el.children) {
+        if (child.dataset.lit === undefined && !child.matches(".role, .skill")) continue;
+        const r = child.getBoundingClientRect();
+        child.classList.toggle("lit", r.top + r.height * 0.5 <= play);
+      }
     }
 
     for (const q of fliers) {

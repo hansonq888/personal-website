@@ -257,6 +257,27 @@
   line-height: 0.85;
 }
 
+/* ---- motifs --------------------------------------------------------------
+   The dotted gifs are black on transparent, so they invert on the dark runs
+   and multiply into the paper one. */
+.sheet .motif {
+  display: block;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+.sheet .motif.inv { filter: invert(1); }
+.sheet .motif.mul { mix-blend-mode: multiply; }
+.sheet .title-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.sheet .title-row .sec-title { margin-bottom: 0; }
+.sheet .title-row + * { margin-top: 44px; }
+.sheet .title-row ~ .skills, .sheet .title-row ~ .roles { margin-top: 44px; }
+
 /* ---- about -------------------------------------------------------------- */
 .sheet .about-row {
   display: grid;
@@ -361,7 +382,14 @@
 .sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
 
 /* ---- experience: a timeline ---------------------------------------------- */
-.sheet .roles { position: relative; display: grid; width: 100%; perspective: 1400px; }
+.sheet .roles {
+  position: relative;
+  display: grid;
+  width: 100%;
+  /* capped, or the plates end up at the far edge of a wide screen */
+  max-width: 860px;
+  perspective: 1400px;
+}
 /* the spine, running between the first and last node */
 .sheet .roles::before {
   content: "";
@@ -373,6 +401,16 @@
   background: linear-gradient(to bottom, transparent, var(--rule) 8%, var(--rule) 92%, transparent);
 }
 @media (max-width: 760px) { .sheet .roles::before { display: none; } }
+.sheet .spine-fill {
+  position: absolute;
+  left: 191px;
+  top: 64px;
+  width: 1px;
+  height: calc((100% - 128px) * var(--p, 0));
+  background: var(--ink);
+  opacity: 0.5;
+}
+@media (max-width: 760px) { .sheet .spine-fill { display: none; } }
 
 .sheet .role {
   display: grid;
@@ -422,7 +460,11 @@
   box-shadow: 0 0 0 6px var(--ground);
   transition: background 0.25s linear, transform 0.25s linear;
 }
-.sheet .role:hover .node { background: var(--ink); transform: scale(1.25); }
+.sheet .role.lit .node { background: var(--ink); }
+.sheet .role:hover .node { background: var(--ink); transform: scale(1.35); }
+.sheet .roles:hover .role { opacity: 0.45; }
+.sheet .roles:hover .role:hover, .sheet .roles .role:not(.in) { opacity: inherit; }
+.sheet .roles:hover .role.in:hover { opacity: 1; }
 
 /* the plate: bigger, lifted off the page, straightening as you reach it */
 .sheet .role .shot {
@@ -432,6 +474,7 @@
   justify-self: end;
   background: var(--rule);
   opacity: 0.72;
+  transform-style: preserve-3d;
   transform: rotate(-1.2deg);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 14px 34px rgba(0, 0, 0, 0.22);
   transition: opacity 0.3s linear, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -439,7 +482,8 @@
 }
 .sheet .role:hover .shot {
   opacity: 1;
-  transform: rotate(0deg) translateY(-4px) scale(1.03);
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+    translateY(-5px) scale(1.04);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22), 0 24px 54px rgba(0, 0, 0, 0.3);
 }
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -470,7 +514,12 @@
   line-height: 1.7;
   color: var(--ink-30);
   font-variant-numeric: tabular-nums;
+  transition: color 0.3s linear, letter-spacing 0.3s linear;
 }
+.sheet .skill.lit .num { color: var(--ink); letter-spacing: 0.08em; }
+.sheet .skills:hover .skill.in { opacity: 0.4; }
+.sheet .skills:hover .skill.in:hover { opacity: 1; }
+.sheet .skill .items { transition: transform 0.1s linear; }
 .sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
 .sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); }
 .sheet .skill .items > span { transition: color 0.2s linear; }

@@ -131,6 +131,30 @@ export default function Sheet() {
     }, [ref, step, threshold]);
 
   useStagger(rolesRef, 110, 0.3);
+
+  // the plates turn a little toward the pointer, the polaroid's trick at a
+  // fraction of the angle
+  useEffect(() => {
+    const list = rolesRef.current;
+    if (!list || window.matchMedia("(pointer: coarse)").matches) return;
+    const onMove = (e) => {
+      const shot = e.target.closest?.(".shot");
+      if (!shot) return;
+      const r = shot.getBoundingClientRect();
+      shot.style.setProperty("--ry", (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2) + "deg");
+      shot.style.setProperty("--rx", (-((e.clientY - r.top) / r.height - 0.5) * 13).toFixed(2) + "deg");
+    };
+    const onOut = (e) => {
+      const shot = e.target.closest?.(".shot");
+      if (shot) { shot.style.setProperty("--ry", "0deg"); shot.style.setProperty("--rx", "0deg"); }
+    };
+    list.addEventListener("pointermove", onMove);
+    list.addEventListener("pointerout", onOut);
+    return () => {
+      list.removeEventListener("pointermove", onMove);
+      list.removeEventListener("pointerout", onOut);
+    };
+  }, []);
   useStagger(skillsRef, 70, 0.25);
 
   // the project grid cuts in, one card at a time
@@ -230,6 +254,8 @@ export default function Sheet() {
                 I build things that run in the browser and have no right to — an audio engine in C++,
                 a model that rates how you train, stats for a sport nobody tracks.
               </p>
+              <img className="motif inv" src="/swimming_fish.gif" alt="" data-drift=".05"
+                   style={{ width: "min(340px, 80%)", marginTop: 26 }} />
             </div>
             <div className="me-wrap" data-slide=".055" ref={meRef}>
               <div className="polaroid">
@@ -252,8 +278,9 @@ export default function Sheet() {
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">
           <h2 className="sec-title">Experience</h2>
-          <div className="roles" ref={rolesRef}>
-            {experiences.map((x) => (
+          <div className="roles" ref={rolesRef} data-progress data-lit>
+            <span className="spine-fill" aria-hidden="true" />
+            {experiences.map((x, i) => (
               <a className="role" key={x.org} href={x.url} target="_blank" rel="noreferrer">
                 <span className="when">{x.short.when}</span>
                 <span className="node" aria-hidden="true" />
@@ -261,7 +288,7 @@ export default function Sheet() {
                   <b>{x.role}</b>
                   <i>{x.short.where}</i>
                 </span>
-                <span className="shot">
+                <span className="shot" data-drift={i % 2 ? "-.042" : ".055"}>
                   {x.image ? <img src={x.image} alt="" loading="lazy" /> : null}
                 </span>
               </a>
@@ -288,13 +315,17 @@ export default function Sheet() {
       <section className="panel deep" id="sheet-skills" data-page="Skills" data-ground="Skills">
         <Spec left="Skills" leftSub={`${skillSections.length} Groups`} right="STACK.TXT" rightSub="Updated 2026" bar />
         <div className="body">
-          <h2 className="sec-title">Skills</h2>
-          <div className="skills" ref={skillsRef}>
+          <div className="title-row">
+            <h2 className="sec-title">Skills</h2>
+            <img className="motif inv" src="/dotted_star_shining.gif" alt=""
+                 style={{ width: "min(260px, 52vw)" }} />
+          </div>
+          <div className="skills" ref={skillsRef} data-lit>
             {skillSections.map((g, i) => (
               <div className="skill" key={g.title}>
                 <span className="num">{String(i + 1).padStart(2, "0")}</span>
                 <b>{g.title}</b>
-                <span className="items">
+                <span className="items" data-drift={i % 2 ? "-.03" : ".038"}>
                   {g.skills.map((it, j) => (
                     <span key={it}>
                       {it}
