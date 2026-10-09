@@ -563,7 +563,6 @@ export default function Sheet() {
 
       {/* ---------------- IV. PROJECTS ---------------- */}
       <section className="panel tall" id="sheet-projects" data-page="Projects" data-ground="Projects">
-        <canvas className="dissolve" data-dissolve aria-hidden="true" />
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
           <h2 className="sec-title center">Projects</h2>
@@ -594,7 +593,7 @@ export default function Sheet() {
               <div className="skill" key={g.title}>
                 <span className="num">{String(i + 1).padStart(2, "0")}</span>
                 <b>{g.title}</b>
-                <span className="items" data-drift={i % 2 ? "-.03" : ".038"}>
+                <span className="items">
                   {g.skills.map((it, j) => (
                     <span key={it}>
                       {it}

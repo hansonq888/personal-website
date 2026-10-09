@@ -705,22 +705,11 @@
 .sheet .skill.lit .num { color: var(--ink); letter-spacing: 0.08em; }
 .sheet .skills:hover .skill.in { opacity: 0.4; }
 .sheet .skills:hover .skill.in:hover { opacity: 1; }
-.sheet .skill .items { transition: transform 0.1s linear; }
 .sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
 .sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); }
 .sheet .skill .items > span { transition: color 0.2s linear; }
 .sheet .skill .items > span:hover { color: var(--ink); }
 .sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
-
-/* Projects arrives through a dither dissolve: a field of paper-coloured cells
-   that thin out as the section comes up, so it resolves rather than slides. */
-.sheet .dissolve {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  image-rendering: pixelated;
-}
 
 /* ---- projects ------------------------------------------------------------
    The cards are the ones from /projects, unchanged. Only the grid and the
