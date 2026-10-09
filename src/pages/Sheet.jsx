@@ -9,6 +9,14 @@ import { initGrounds, initDither } from "../components/sheet/grounds";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
+
+// a fixed wobble, so the timeline reads as something laid out by hand
+const LOOSE = [
+  { nudge: "0px", tilt: "-2.6deg", pad: "34px" },
+  { nudge: "46px", tilt: "1.9deg", pad: "26px" },
+  { nudge: "18px", tilt: "-1.1deg", pad: "40px" },
+  { nudge: "62px", tilt: "2.6deg", pad: "28px" },
+];
 const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 
@@ -77,6 +85,7 @@ export default function Sheet() {
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
   const arcRef = useRef(null);
+  const pencilRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -162,55 +171,142 @@ export default function Sheet() {
     const svg = arcRef.current;
     if (!list || !svg) return;
     const track = svg.querySelector(".arc-track");
+    const ghost = svg.querySelector(".arc-ghost");
     const fill = svg.querySelector(".arc-fill");
 
-    const RAIL_W = 96;                     // matches the node column in sheet.css
+    // a seeded generator, so the stroke is random-looking but identical on
+    // every layout pass — a line that redrew itself differently each resize
+    // would read as noise, not as a drawn line
+    const seeded = (a) => () => {
+      a |= 0; a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+
+    const RAIL_W = 150;                    // matches the node column in sheet.css
+    const TIP = { x: 0.346, y: 0.994 };    // where the pencil's point sits in its image
+
     const layout = () => {
       const rows = [...list.querySelectorAll(".role")];
       if (!rows.length) return;
       const lb = list.getBoundingClientRect();
-      const bow = Math.min(RAIL_W - 18, lb.width * 0.09);
+      const bow = Math.min(66, lb.width * 0.08);
       const pts = rows.map((row) => {
         const node = row.querySelector(".node");
         const nb = node.getBoundingClientRect();
-        const y = nb.top - lb.top + nb.height / 2;
-        return { row, node, y };
+        return { row, node, y: nb.top - lb.top + nb.height / 2 };
       });
-      const y0 = pts[0].y;
-      const y1 = pts[pts.length - 1].y;
-      const span = Math.max(1, y1 - y0);
-      pts.forEach((pt) => {
-        // a half sine: flush at the ends, furthest out in the middle
-        pt.x = bow * Math.sin((Math.PI * (pt.y - y0)) / span);
+      const yTop = Math.max(0, pts[0].y - 48);
+      const yEnd = Math.min(lb.height, pts[pts.length - 1].y + 48);
+      const span = Math.max(1, yEnd - yTop);
+      const baseX = (t) => bow * Math.sin(Math.PI * t);
+
+      // the nodes sit on the bare bow, so a loop may never cover one
+      const nodeT = pts.map((pt) => (pt.y - yTop) / span);
+      pts.forEach((pt, i) => {
+        pt.x = baseX(nodeT[i]);
         pt.node.style.setProperty("--ax", pt.x.toFixed(1) + "px");
       });
-      // run the curve past the first and last node so it reads as a rail
-      const head = { x: 0, y: Math.max(0, y0 - 44) };
-      const tail = { x: 0, y: Math.min(lb.height, y1 + 44) };
-      const all = [head, ...pts, tail];
-      let d = "M" + all[0].x.toFixed(1) + "," + all[0].y.toFixed(1);
-      for (let i = 1; i < all.length; i++) {
-        const a = all[i - 1], b = all[i];
-        const my = (a.y + b.y) / 2;
-        d += " C" + a.x.toFixed(1) + "," + my.toFixed(1) +
-             " " + b.x.toFixed(1) + "," + my.toFixed(1) +
-             " " + b.x.toFixed(1) + "," + b.y.toFixed(1);
+
+      // a loop in each gap, each one its own size and direction
+      const rnd = seeded(20260409);
+      const loops = [];
+      for (let i = 0; i < nodeT.length - 1; i++) {
+        const gap = nodeT[i + 1] - nodeT[i];
+        if (gap <= 0.14) continue;
+        loops.push({
+          c: (nodeT[i] + nodeT[i + 1]) / 2 + (rnd() - 0.5) * gap * 0.22,
+          w: Math.min(0.082, gap * (0.28 + rnd() * 0.12)),
+          r: 24 + rnd() * 20,
+          dir: rnd() < 0.45 ? -1 : 1,
+          squash: 0.42 + rnd() * 0.3,
+        });
       }
-      // the box is the node column, not the list: with preserveAspectRatio="none"
-      // x and y scale independently, so both must map 1:1 to CSS pixels
+
+      // the hand wobble: three slow waves plus a fine tremor
+      const wob = [0, 1, 2, 3].map(() => ({ ph: rnd() * 6.283 }));
+      const AMP = [6.5, 3.2, 1.7, 0.9];
+      const FRQ = [5.9, 13.7, 29.3, 61.1];
+      const wobble = (t) => {
+        let v = 0;
+        for (let k = 0; k < 4; k++) v += AMP[k] * Math.sin(FRQ[k] * t * 6.283 + wob[k].ph);
+        return v;
+      };
+      const wob0 = wobble(0);
+
+      const N = 640;
+      let d = "";
+      for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        // the wobble fades out at the very ends so the stroke starts and stops clean
+        const taper = Math.min(1, Math.min(t, 1 - t) * 9);
+        let x = baseX(t) + (wobble(t) - wob0 * (1 - taper)) * taper;
+        let y = yTop + t * span + Math.sin(t * 6.283 * 9.3 + wob[1].ph) * 1.6 * taper;
+        for (const lp of loops) {
+          const dt = t - lp.c;
+          if (Math.abs(dt) >= lp.w) continue;
+          const phi = Math.PI * (dt / lp.w + 1);   // a full turn across the window
+          x += lp.dir * lp.r * Math.sin(phi);
+          y -= lp.r * (1 - Math.cos(phi)) * lp.squash;
+        }
+        d += (i ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1);
+      }
+
       svg.setAttribute("viewBox", "0 0 " + RAIL_W + " " + Math.max(1, lb.height));
       track.setAttribute("d", d);
+      ghost.setAttribute("d", d);
       fill.setAttribute("d", d);
       const len = fill.getTotalLength ? fill.getTotalLength() : 1000;
       list.style.setProperty("--len", len.toFixed(1));
+      ghost.style.strokeDasharray = len.toFixed(1);
+      list._railLen = len;
     };
+
+    // the pencil's point rides the end of the drawn stroke
+    const pencil = pencilRef.current;
+    let raf = 0;
+    const ride = () => {
+      raf = requestAnimationFrame(ride);
+      if (!pencil || !fill.getPointAtLength) return;
+      const len = list._railLen || 0;
+      if (!len) return;
+      const p = parseFloat(list.style.getPropertyValue("--p")) || 0;
+      const sb = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal;
+      if (!vb || !vb.width || !vb.height) return;
+      const pt = fill.getPointAtLength(len * p);
+      // viewBox units are CSS pixels in y but scale in x, so map both
+      const x = (pt.x / vb.width) * sb.width;
+      const y = (pt.y / vb.height) * sb.height;
+      const w = pencil.offsetWidth || 190;
+      const h = pencil.offsetHeight || 107;
+      // the hand swings in from the right as the stroke starts and lifts away
+      // at the end, rather than simply fading
+      const IN = 0.07;
+      const present = Math.max(0, Math.min(1, Math.min(p / IN, (1 - p) / IN)));
+      const e = 1 - present;
+      const ease = e * e;
+      pencil.style.transform =
+        "translate3d(" + (x - TIP.x * w + ease * 260).toFixed(1) + "px," +
+        (y - TIP.y * h + ease * 46).toFixed(1) + "px,0) " +
+        "rotate(" + (ease * 17).toFixed(2) + "deg) scale(" + (1 - ease * 0.16).toFixed(3) + ")";
+      pencil.style.transformOrigin = TIP.x * 100 + "% " + TIP.y * 100 + "%";
+      pencil.style.opacity = present.toFixed(3);
+    };
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) raf = requestAnimationFrame(ride);
 
     layout();
     const ro = new ResizeObserver(layout);
     ro.observe(list);
     window.addEventListener("resize", layout);
     const t = setTimeout(layout, 600);   // once the stagger has settled
-    return () => { ro.disconnect(); window.removeEventListener("resize", layout); clearTimeout(t); };
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("resize", layout);
+      clearTimeout(t);
+    };
   }, []);
 
   // the plates turn a little toward the pointer, the polaroid's trick at a
@@ -363,10 +459,23 @@ export default function Sheet() {
           <div className="roles" ref={rolesRef} data-progress data-lit>
             <svg className="arc" ref={arcRef} aria-hidden="true" preserveAspectRatio="none">
               <path className="arc-track" />
+              <path className="arc-ghost" />
               <path className="arc-fill" />
             </svg>
+            <img className="pencil" ref={pencilRef} src="/pencl.png" alt="" aria-hidden="true" />
             {experiences.map((x, i) => (
-              <a className="role" key={x.org} href={x.url} target="_blank" rel="noreferrer">
+              <a
+                className="role"
+                key={x.org}
+                href={x.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  "--nudge": LOOSE[i % LOOSE.length].nudge,
+                  "--tilt": LOOSE[i % LOOSE.length].tilt,
+                  "--pad": LOOSE[i % LOOSE.length].pad,
+                }}
+              >
                 <span className="when">{x.short.when}</span>
                 <span className="node" aria-hidden="true" />
                 <span className="who">

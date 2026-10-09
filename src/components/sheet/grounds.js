@@ -229,7 +229,7 @@ export function initGrounds(root) {
     }
     const c = S.binCtx;
     c.clearRect(0, 0, W, H);
-    c.font = '500 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+    c.font = '600 12px ui-monospace, SFMono-Regular, Menlo, monospace';
     c.textBaseline = "top";
     const cell = 16;
     const cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
@@ -243,9 +243,9 @@ export function initGrounds(root) {
         let n = Math.sin((u * 3.1 + v * 1.7 + t * 0.00004) * TAU)
               + 0.7 * Math.sin((u * -2.2 + v * 4.3 - t * 0.000027) * TAU);
         n = n * 0.5 + 0.5;
-        if (n < 0.6) continue;               // most of the page stays bare
-        const a = (n - 0.6) / 0.4;
-        c.fillStyle = "rgba(" + rgb + "," + (0.07 + a * 0.26).toFixed(3) + ")";
+        if (n < 0.54) continue;              // most of the page stays bare
+        const a = (n - 0.54) / 0.46;
+        c.fillStyle = "rgba(" + rgb + "," + (0.14 + a * 0.46).toFixed(3) + ")";
         // a stable per-cell bit that turns over now and then
         const bit = (((x * 73856093) ^ (y * 19349663)) + flip + ((x * 3 + y) >> 2)) & 1;
         c.fillText(bit ? "1" : "0", x * cell, y * cell);
