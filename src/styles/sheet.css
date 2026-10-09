@@ -226,8 +226,8 @@
 /* ---- hero type --------------------------------------------------------------- */
 .sheet .giant {
   font-weight: 700;
-  letter-spacing: -0.045em;
-  line-height: 0.82;
+  letter-spacing: -0.022em;
+  line-height: 0.84;
   margin: 0;
   font-size: clamp(3rem, 21vw, 19rem);
 }
