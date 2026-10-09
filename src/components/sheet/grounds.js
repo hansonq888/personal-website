@@ -147,16 +147,29 @@ export function initGrounds(root) {
     if (!P || !S.octx) return;
     const L = P.L;
     const TAU = Math.PI * 2;
+    // the cursor's place in this layer, in cells
+    const lb = S.canvas.getBoundingClientRect();
+    const px = ((ptr.x - lb.left) / Math.max(1, lb.width)) * cols;
+    const py = ((ptr.y - lb.top) / Math.max(1, lb.height)) * rows;
+    const R = Math.max(14, cols * 0.2);
+    const R2 = R * R;
+    const near = ptr.on;
     const buf = new Float32Array(cols * rows);
     for (let y = 0; y < rows; y++) {
       const v = y / rows;
       for (let x = 0; x < cols; x++) {
         const u = x / cols;
-        buf[y * cols + x] =
+        let val =
           P.base + P.gx * (u - 0.5) + P.gy * (v - 0.5) +
           L[0][2] * Math.sin((u * L[0][0] + v * L[0][1] + t * L[0][3]) * TAU) +
           L[1][2] * Math.sin((u * L[1][0] + v * L[1][1] + t * L[1][3]) * TAU) +
           L[2][2] * Math.sin((u * L[2][0] + v * L[2][1] + t * L[2][3]) * TAU);
+        if (near) {
+          // the field gathers under the pointer, so you carry a pool of it
+          const dx = x - px, dy = y - py, d2 = dx * dx + dy * dy;
+          if (d2 < R2) { const f = 1 - Math.sqrt(d2) / R; val -= f * f * 0.62; }
+        }
+        buf[y * cols + x] = val;
       }
     }
     const img = S.octx.createImageData(cols, rows);
@@ -328,7 +341,13 @@ export function initGrounds(root) {
     const W = S.w, H = S.h;
     c.clearRect(0, 0, W, H);
     c.lineWidth = 1;
-    const cx = W * 0.78, cy = H * 0.5, N = 16;
+    // the rings pull toward the pointer, so the whole field leans with it
+    const lb = S.canvas.getBoundingClientRect();
+    const mx = ptr.on ? (ptr.x - lb.left) / Math.max(1, lb.width) - 0.5 : 0;
+    const my = ptr.on ? (ptr.y - lb.top) / Math.max(1, lb.height) - 0.5 : 0;
+    S._cx = damp(S, "_cxv", W * 0.78 + mx * W * 0.5);
+    S._cy = damp(S, "_cyv", H * 0.5 + my * H * 0.34);
+    const cx = S._cx, cy = S._cy, N = 16;
     const maxR = Math.hypot(W, H) * 0.78;
     const drift = (t * 0.000035) % (1 / N);
     for (let i = 0; i < N; i++) {
@@ -489,6 +508,13 @@ export function initGrounds(root) {
     activity = target > activity ? target : activity + (target - activity) * 0.06;
   }
 
+  // where the pointer is on the page, so a ground can answer to it
+  const ptr = { x: -1e5, y: -1e5, on: 0 };
+  const onPtr = (e) => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = 1; };
+  const offPtr = () => { ptr.on = 0; };
+  window.addEventListener("pointermove", onPtr, { passive: true });
+  window.addEventListener("pointerleave", offPtr);
+
   const EASE = 0.16;
   function damp(store, key, target) {
     const cur = store[key];
@@ -633,6 +659,8 @@ export function initGrounds(root) {
 
   return () => {
     cancelAnimationFrame(raf);
+    window.removeEventListener("pointermove", onPtr);
+    window.removeEventListener("pointerleave", offPtr);
     vio.disconnect();
     window.removeEventListener("resize", onResize);
     if (scheme.removeEventListener) scheme.removeEventListener("change", onScheme);

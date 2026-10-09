@@ -31,7 +31,7 @@ const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 /* The hero is split per word, then per letter: each word stays in one
    unbreakable box, or the per-letter spans let it wrap mid-word. The letters
-   swing down out of the page on a spring rather than wiping up. */
+   arrive stretched and out of focus, then condense onto the baseline. */
 function Giant({ text, delay = 0 }) {
   const still = useReducedMotion();
   const words = text.split(" ");
@@ -46,14 +46,18 @@ function Giant({ text, delay = 0 }) {
               <motion.span
                 className="g"
                 key={ci}
-                initial={still ? false : { opacity: 0, rotateX: -88, y: "0.34em", filter: "blur(10px)" }}
-                animate={{ opacity: 1, rotateX: 0, y: 0, filter: "blur(0px)" }}
+                initial={
+                  still
+                    ? false
+                    : { opacity: 0, scaleY: 2.1, scaleX: 0.68, y: "0.22em", filter: "blur(16px)" }
+                }
+                animate={{ opacity: 1, scaleY: 1, scaleX: 1, y: 0, filter: "blur(0px)" }}
                 transition={{
-                  delay: (delay + i * 46) / 1000,
+                  delay: (delay + i * 52) / 1000,
                   type: "spring",
-                  stiffness: 140,
-                  damping: 17,
-                  mass: 0.9,
+                  stiffness: 120,
+                  damping: 14,
+                  mass: 1,
                 }}
               >
                 {ch}
@@ -577,7 +581,7 @@ export default function Sheet() {
               <Reveal
                 className="lab dim"
                 style={{ maxWidth: "38ch", marginTop: 20 }}
-                text="I like building things."
+                text="I like frisbee, music and building"
               />
             </div>
             <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>
