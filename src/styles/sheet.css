@@ -199,26 +199,26 @@
 
 /* ---- home ----------------------------------------------------------------- */
 /* ---- home ----------------------------------------------------------------- */
-.sheet .hero-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 48px;
-  align-items: center;
-  width: 100%;
-}
-@media (max-width: 1000px) { .sheet .hero-row { grid-template-columns: 1fr; gap: 26px; } }
+/* the name takes the whole width; the gif moves out of its way and sits
+   behind it at the right */
+.sheet .hero-row { position: relative; width: 100%; }
 .sheet .hero-gif {
-  width: 100%;
-  max-width: 460px;
+  position: absolute;
+  right: 0;
+  bottom: -4%;
+  z-index: -1;
+  width: min(430px, 30vw);
   height: auto;
   display: block;
-  justify-self: end;
   /* the gif is black-backed, so screen drops its field into the ground */
   mix-blend-mode: screen;
   opacity: 0;
   animation: sheet-hero-in 0.5s linear 1.15s forwards;
 }
 @keyframes sheet-hero-in { to { opacity: 1; } }
+@media (max-width: 1000px) {
+  .sheet .hero-gif { position: static; z-index: 0; width: min(430px, 72vw); margin-top: 24px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .sheet .hero-gif { opacity: 1; animation: none; }
 }
@@ -226,10 +226,10 @@
 /* ---- hero type --------------------------------------------------------------- */
 .sheet .giant {
   font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 0.88;
+  letter-spacing: -0.045em;
+  line-height: 0.82;
   margin: 0;
-  font-size: clamp(2.6rem, 15vw, 11rem);
+  font-size: clamp(3rem, 21vw, 19rem);
 }
 .sheet .giant .clip { overflow: hidden; display: inline-block; vertical-align: bottom; }
 .sheet .giant .g { display: inline-block; }

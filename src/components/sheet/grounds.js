@@ -680,28 +680,29 @@ export function initDither(canvas, src) {
     raf = requestAnimationFrame(() => { raf = 0; render(); });
   }
 
-  function resolveIn() {
-    if (reduce) { bias = 0; render(); return; }
-    const t0 = performance.now();
-    const DUR = 780;
-    requestAnimationFrame(function step(now) {
-      if (!alive) return;
-      const t = Math.min(1, (now - t0) / DUR);
-      bias = -1 + t;
-      render();
-      if (t < 1) requestAnimationFrame(step);
-    });
+  // The skyline builds with the scroll rather than on a timer: the threshold
+  // follows how far the band has come up the view, so it resolves as you
+  // arrive and breaks apart again if you scroll back.
+  let follow = 0;
+  let lastP = -1;
+  function track() {
+    follow = requestAnimationFrame(track);
+    if (!gray) return;
+    const r = canvas.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    const p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.62)));
+    if (Math.abs(p - lastP) < 0.004) return;
+    lastP = p;
+    bias = -1 + p;
+    render();
   }
 
-  let io = null;
   img.onload = () => {
     if (!alive) return;
     prepare();
+    if (reduce) { bias = 0; render(); return; }
     render();
-    io = new IntersectionObserver((es) => {
-      es.forEach((e) => { if (e.isIntersecting) { resolveIn(); io.disconnect(); } });
-    }, { threshold: 0.25 });
-    io.observe(canvas);
+    follow = requestAnimationFrame(track);
   };
   img.src = src;
 
@@ -724,7 +725,7 @@ export function initDither(canvas, src) {
   return () => {
     alive = false;
     cancelAnimationFrame(raf);
-    io?.disconnect();
+    cancelAnimationFrame(follow);
     host?.removeEventListener("pointermove", onMove);
     host?.removeEventListener("pointerleave", onLeave);
     if (scheme.removeEventListener) scheme.removeEventListener("change", onScheme);
