@@ -204,8 +204,6 @@ export const featuredIds = [
   "realtor-website",
   "live-chord-detector",
   "priority-email-labeler",
-  "mini-shell",
-  "mini-compiler",
 ];
 
 export const featuredProjects = featuredIds

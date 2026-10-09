@@ -1,37 +1,6 @@
 import PageShell from "../components/PageShell";
+import { experiences } from "../data/experiences";
 
-const experiences = [
-  {
-    role: "Software Engineer Intern",
-    org: "Kira Learning",
-    url: "https://www.kira-learning.com/",
-    image: "/kira.avif",
-    dates: "June 2026 – August 2026 · New York",
-  },
-  {
-    role: "Founding Software Engineer",
-    org: "Shown Space",
-    url: "https://shownspace.com",
-    image: "/shownspace-logo.png",
-    dates: "November 2025 – Present",
-    blurb: "Building the web app, mobile app, and data pipelines for a sports analytics platform.",
-  },
-  {
-    role: "Software Engineer",
-    org: "Yale Cancer Center — Blenman Innovation Group",
-    url: "https://blenmaninnovationgroup.org/",
-    image: "/blenman.png",
-    dates: "January 2026 – August 2026 · New Haven, CT",
-  },
-  {
-    role: "Head of Sponsorships",
-    org: "Yale AI Association",
-    url: "https://www.yale-ai.org/",
-    image: "/yale-ai.png",
-    dates: "September 2025 – Present · New Haven, CT",
-    blurb: "Leading sponsorship outreach for Yale's AI student organization.",
-  },
-];
 
 export default function Experiences() {
   return (

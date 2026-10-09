@@ -11,13 +11,17 @@ import Projects from "./pages/Projects";
 import Experiences from "./pages/Experiences";
 import Skills from "./pages/Skills";
 import ProjectDetail from "./pages/ProjectDetail";
+import Sheet from "./pages/Sheet";
 
 const router = createBrowserRouter([
+  // the long-scroll sheet is full-bleed: it sits outside Layout so it gets no
+  // navbar or footer of its own
+  { path: "/", element: <Sheet /> },
   {
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Home /> },
+      { path: "/classic", element: <Home /> },
       { path: "/about", element: <About /> },
       { path: "/projects", element: <Projects /> },
       { path: "/experiences", element: <Experiences /> },

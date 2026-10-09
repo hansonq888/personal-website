@@ -1,0 +1,854 @@
+/* ============================================================================
+   The long-scroll sheet.
+
+   Everything here is scoped under .sheet so it cannot leak into the rest of
+   the site, which is still Tailwind. One typeface at one size for every label;
+   the only type that is ever big is the hero.
+   ========================================================================== */
+
+.sheet {
+  --ground: #101013;
+  --deep: #000;
+  --ink: #fafaf7;
+  --ink-55: rgba(250, 250, 247, 0.58);
+  --ink-30: rgba(250, 250, 247, 0.32);
+  --rule: #2a2a30;
+  --pad: 30px;
+
+  color-scheme: dark;
+
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 640px) {
+  .sheet { --pad: 18px; }
+}
+
+.sheet * { box-sizing: border-box; }
+
+/* ---- the one label voice ------------------------------------------------ */
+.sheet .lab {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: var(--ink);
+}
+.sheet .lab.dim { color: var(--ink-55); }
+
+/* ---- top navigation ----------------------------------------------------- */
+/* difference blending keeps it legible over paper and over the dark sections
+   without any per-section logic */
+.sheet-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px var(--pad);
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.sheet-bar > * { pointer-events: auto; }
+.sheet-bar .sig { font-size: 12.5px; line-height: 1.35; }
+.sheet-bar nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.sheet-bar a {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.34;
+  transition: opacity 0.18s linear;
+}
+.sheet-bar a:hover,
+.sheet-bar a[aria-current="true"] { opacity: 1; }
+.sheet-bar b { font-weight: 400; font-size: 12.5px; line-height: 1.35; }
+.sheet-bar u { text-decoration: none; font-size: 10px; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .sheet-bar u { display: none; }
+  .sheet-bar nav { gap: 13px; }
+}
+@media (max-width: 520px) {
+  .sheet-bar .sig { display: none; }
+  .sheet-bar { justify-content: flex-end; }
+}
+
+.sheet-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  z-index: 61;
+  pointer-events: none;
+}
+.sheet-progress i { display: block; height: 100%; width: 0%; background: var(--ink); }
+
+/* ---- sections ----------------------------------------------------------- */
+/* a group is a run of sections sharing one ground, so the field crosses them
+   without a seam */
+.sheet .panel-group {
+  position: relative;
+  overflow: clip;
+  background: var(--ground);
+}
+.sheet .panel-group.deep { background: var(--deep); --rule: #24242a; }
+/* one run of the sheet is printed on paper; the ink flips back with it */
+.sheet .panel-group.paper {
+  background: #fafaf7;
+  --ink: #0b0b0c;
+  --ink-55: rgba(11, 11, 12, 0.56);
+  --ink-30: rgba(11, 11, 12, 0.32);
+  --rule: #e4e4e0;
+  --ground: #fafaf7;
+  color: var(--ink);
+}
+.sheet .panel-group > .panel { background: transparent; position: relative; z-index: 1; }
+
+
+.sheet .panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 92px var(--pad) 64px;
+  background: var(--ground);
+}
+.sheet .panel.tall { min-height: 100svh; }
+/* every section is dark; alternating two tones keeps the boundary between
+   them a visible hard edge instead of one unbroken field */
+.sheet .panel.deep { background: var(--deep); --rule: #24242a; }
+
+/* the layer box overhangs its section so there is room to parallax inside it */
+.sheet .layer {
+  position: absolute;
+  left: 0; right: 0;
+  top: -14%;
+  height: 128%;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.sheet canvas.layer { image-rendering: pixelated; }
+.sheet .panel > .spec,
+.sheet .panel > .body,
+.sheet .panel > .foot,
+.sheet .panel > .band,
+.sheet .panel > .sheet-foot { position: relative; z-index: 1; }
+.sheet [data-par] { will-change: transform; }
+
+/* ---- the corner pair ---------------------------------------------------- */
+.sheet .spec {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  clip-path: inset(0 100% 0 0);
+}
+/* a solid bar filling the line between the two labels, as the poster does */
+.sheet .bar {
+  flex: 1;
+  min-width: 40px;
+  height: 12px;
+  background: var(--ink);
+  opacity: 0.92;
+}
+@media (max-width: 620px) { .sheet .bar { display: none; } }
+.sheet .spec.in { clip-path: inset(0 0 0 0); transition: clip-path 0.55s steps(14, end); }
+.sheet .spec .r { text-align: right; }
+.sheet .spec b {
+  display: block;
+  font-weight: 400;
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+.sheet .spec i {
+  font-style: normal;
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--ink-55);
+}
+@media (max-width: 520px) { .sheet .spec b, .sheet .spec i { font-size: 11px; } }
+
+.sheet .body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 40px;
+  width: 100%;
+}
+.sheet .foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ---- home ----------------------------------------------------------------- */
+/* ---- home ----------------------------------------------------------------- */
+/* the name takes the whole width; the gif moves out of its way and sits
+   behind it at the right */
+.sheet .hero-row { position: relative; width: 100%; }
+.sheet .hero-gif {
+  position: absolute;
+  right: 0;
+  bottom: -4%;
+  z-index: -1;
+  width: min(430px, 30vw);
+  height: auto;
+  display: block;
+  /* the gif is black-backed, so screen drops its field into the ground */
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: sheet-hero-in 0.5s linear 1.15s forwards;
+}
+@keyframes sheet-hero-in { to { opacity: 1; } }
+@media (max-width: 1000px) {
+  .sheet .hero-gif { position: static; z-index: 0; width: min(430px, 72vw); margin-top: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet .hero-gif { opacity: 1; animation: none; }
+}
+
+/* ---- hero type --------------------------------------------------------------- */
+.sheet .giant {
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 0.84;
+  margin: 0;
+  font-size: clamp(2.8rem, 17vw, 15rem);
+}
+/* each letter rises out of its own box, so the box has to crop it */
+.sheet .giant .clip { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.sheet .giant .g { display: inline-block; will-change: transform; }
+.sheet .giant .w { display: inline-block; white-space: nowrap; }
+
+/* a section title, set against the hero but well under it */
+.sheet .sec-title {
+  /* index.css sets h1-h3 globally to the Jersey 25 pixel face; the sheet is
+     one typeface throughout, so say so explicitly */
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  margin: 0 0 44px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  font-size: clamp(2.2rem, 7vw, 4.6rem);
+}
+@media (max-width: 760px) { .sheet .sec-title { margin-bottom: 28px; } }
+/* the Projects heading keeps the metrics it has on /projects, centred over
+   the grid it belongs to */
+.sheet .sec-title.center {
+  text-align: center;
+  max-width: 1080px;
+  margin-inline: auto;
+  font-size: clamp(2.75rem, 12vw, 11rem);
+  letter-spacing: -0.035em;
+  line-height: 0.82;
+  margin-bottom: clamp(64px, 8vw, 140px);
+}
+
+/* ---- motifs --------------------------------------------------------------
+   The dotted gifs are black on transparent, so they invert on the dark runs
+   and multiply into the paper one. */
+.sheet .motif {
+  display: block;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+.sheet .motif.inv { filter: invert(1); }
+.sheet .motif.mul { mix-blend-mode: multiply; }
+.sheet .title-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.sheet .title-row .sec-title { margin-bottom: 0; }
+.sheet .title-row + * { margin-top: 44px; }
+.sheet .title-row ~ .skills, .sheet .title-row ~ .roles { margin-top: 44px; }
+
+/* the fish sits on the same line as the words, not above them */
+/* the fish sits on the same line as the words, not above them */
+.sheet #sheet-about .title-row { align-items: center; margin-bottom: clamp(16px, 2vw, 30px); }
+.sheet #sheet-about .motif { will-change: transform; }
+
+/* ---- about -------------------------------------------------------------- */
+.sheet .about-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 46px;
+  align-items: center;
+  perspective: 1500px;
+  perspective-origin: 62% 50%;
+}
+@media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
+/* the photograph sits on the page as an object: a polaroid, raised off the
+   dark ground by stacked shadows and tilted toward the cursor */
+.sheet .me-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  justify-self: end;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* a bloom behind the card that comes up as it arrives */
+.sheet .me-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 252, 240, 0.3), rgba(255, 252, 240, 0) 72%);
+  filter: blur(34px);
+  opacity: var(--near, 0);
+  transform: translateZ(-60px);
+  pointer-events: none;
+}
+@media (max-width: 760px) { .sheet .me-wrap { justify-self: start; max-width: 260px; } }
+
+/* three prints in a stack, the oldest furthest back */
+.sheet .polaroid.back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform:
+    rotate(calc(var(--fan, 0) * 6deg))
+    translate(calc(var(--fan, 0) * -62%), calc(var(--fan, 0) * -9%))
+    rotateY(calc(var(--fan, 0) * 13deg))
+    rotateX(calc(var(--fan, 0) * -3deg))
+    translateZ(calc(var(--fan, 0) * -20px));
+  filter: saturate(0.94) brightness(0.96);
+}
+.sheet .polaroid.back2 {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform:
+    rotate(calc(var(--fan, 0) * -8deg))
+    translate(calc(var(--fan, 0) * -126%), calc(var(--fan, 0) * 4%))
+    rotateY(calc(var(--fan, 0) * 22deg))
+    rotateX(calc(var(--fan, 0) * 5deg))
+    translateZ(calc(var(--fan, 0) * -70px));
+  filter: saturate(0.9) brightness(0.93);
+}
+.sheet .polaroid.back .cap,
+.sheet .polaroid.back2 .cap { opacity: 0; }
+.sheet .polaroid.front { position: relative; z-index: 1; }
+
+.sheet .polaroid {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  background: #f7f6f1;
+  padding: 14px 14px 54px;
+  border-radius: 2px;
+  transform:
+    rotate(-5deg)
+    rotateY(calc(var(--fan, 0) * -7deg))
+    rotateX(calc(var(--fan, 0) * 4deg))
+    translateZ(calc(var(--fan, 0) * 40px));
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+  will-change: transform;
+  /* three stacked shadows: contact, mid, and a long soft one for the drop */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 10px 22px rgba(0, 0, 0, 0.5),
+    0 34px 70px rgba(0, 0, 0, 0.55),
+    0 0 calc(70px * var(--near, 0)) rgba(255, 250, 235, calc(0.2 * var(--near, 0)));
+}
+.sheet .polaroid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+.sheet .polaroid .cap {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 19px;
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: rgba(11, 11, 12, 0.5);
+}
+/* the sheen tracks the cursor, which is what reads as depth rather than tilt */
+.sheet .polaroid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    280px 220px at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 62%
+  );
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet .polaroid { transform: rotate(-6deg); transition: none; }
+}
+
+/* the dithered skyline, bleeding to both edges along the floor of the page */
+.sheet .band {
+  position: relative;
+  margin: auto calc(-1 * var(--pad)) -64px;
+  padding-top: 24px;
+}
+.sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
+
+/* ---- experience: a timeline ---------------------------------------------- */
+.sheet .roles {
+  position: relative;
+  display: grid;
+  width: 100%;
+  /* capped, or the plates end up at the far edge of a wide screen */
+  max-width: 1440px;
+  perspective: 1400px;
+}
+/* the rail: a bow drawn through the nodes, filling as you read down it */
+.sheet .arc {
+  position: absolute;
+  /* the rail begins at the top of the section; how far it reaches above the
+     list is measured at runtime and written to --off */
+  left: 0;
+  top: calc(-1 * var(--off, 200px));
+  width: 560px;
+  height: calc(100% + var(--off, 200px));
+  overflow: visible;
+  pointer-events: none;
+}
+.sheet .arc path {
+  fill: none;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sheet .arc-track { stroke: var(--rule); }
+.sheet .arc-fill,
+.sheet .arc-ghost {
+  stroke: var(--ink);
+  stroke-dasharray: var(--len, 1000);
+  stroke-dashoffset: calc(var(--len, 1000) * (1 - var(--p, 0)));
+}
+.sheet .arc-fill { opacity: 0.62; }
+/* a second pass a shade off the first: graphite never lands in one clean line */
+.sheet .arc-ghost { opacity: 0.22; transform: translate(1.1px, 0.9px); }
+@media (max-width: 760px) { .sheet .arc { display: none; } }
+
+/* the hand that draws it */
+.sheet .pencil {
+  position: absolute;
+  left: 0;
+  top: calc(-1 * var(--off, 200px));
+  width: 430px;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+  opacity: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, filter;
+}
+@media (max-width: 980px) { .sheet .pencil { display: none; } }
+
+.sheet .role {
+  display: grid;
+  grid-template-columns: 300px 150px 1fr clamp(300px, 26vw, 420px);
+  gap: 28px;
+  align-items: center;
+  padding: var(--pad, 30px) 0;
+  margin-left: var(--nudge, 0px);
+  text-decoration: none;
+  color: inherit;
+  opacity: 0;
+  transform: translateX(-64px) rotateY(9deg);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: opacity 0.55s linear, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet .role.in { opacity: 1; transform: none; }
+@media (max-width: 760px) {
+  .sheet .role {
+    grid-template-columns: 1fr 132px;
+    gap: 6px 16px;
+    transform: translateX(-28px);
+  }
+  .sheet .role .node { display: none; }
+  .sheet .role .shot { grid-row: 1 / span 2; grid-column: 2; width: 132px; }
+}
+
+.sheet .role .when { font-size: clamp(14px, 1.3vw, 20px); line-height: 1.4; color: var(--ink-55); }
+.sheet .role .who { display: block; }
+
+/* A feathered pool of light under each role, so the type lifts off the
+   construction lines drifting behind it. It opens up as you pass the row. */
+.sheet .role .who,
+.sheet .role .when { position: relative; isolation: isolate; }
+.sheet .role .who::before,
+.sheet .role .when::before {
+  content: "";
+  position: absolute;
+  inset: -46% -16%;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    58% 62% at 42% 50%,
+    rgba(255, 255, 255, 0.96),
+    rgba(255, 255, 255, 0.72) 42%,
+    rgba(255, 255, 255, 0) 74%
+  );
+  filter: blur(13px);
+  opacity: 0.8;
+  transform: scale(1);
+  transition: opacity 0.3s linear, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet .role .when::before { inset: -70% -34%; }
+.sheet .role:hover .who::before,
+.sheet .role:hover .when::before { opacity: 1; transform: scale(1.1); }
+/* on a dark run the pool would be a smear, so it only exists on paper */
+.sheet .panel.dark .role .who::before,
+.sheet .panel.dark .role .when::before { display: none; }
+.sheet .role b {
+  font-weight: 700;
+  font-size: clamp(22px, 2.9vw, 46px);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+.sheet .role i {
+  font-style: normal;
+  display: block;
+  margin-top: 11px;
+  font-size: clamp(14px, 1.35vw, 21px);
+  line-height: 1.35;
+  color: var(--ink-55);
+}
+
+/* the node sits on the spine, its ring punching a hole in the line */
+.sheet .role .node {
+  justify-self: start;
+  align-self: center;
+  transform: translateX(var(--ax, 0px));
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-30);
+  box-shadow: 0 0 0 6px var(--ground);
+  transition: background 0.25s linear, transform 0.25s linear;
+}
+.sheet .role.lit .node { background: var(--ink); }
+.sheet .role:hover .node { background: var(--ink); transform: translateX(var(--ax, 0px)) scale(1.4); }
+.sheet .roles:hover .role { opacity: 0.45; }
+.sheet .roles:hover .role:hover, .sheet .roles .role:not(.in) { opacity: inherit; }
+.sheet .roles:hover .role.in:hover { opacity: 1; }
+
+/* the plate: bigger, lifted off the page, straightening as you reach it */
+.sheet .role .shot {
+  width: clamp(300px, 26vw, 420px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  justify-self: end;
+  background: var(--rule);
+  opacity: 0.72;
+  transform-style: preserve-3d;
+  transform: rotate(var(--tilt, -1.2deg));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 14px 34px rgba(0, 0, 0, 0.22);
+  transition: opacity 0.3s linear, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s ease;
+}
+.sheet .role:hover .shot {
+  opacity: 1;
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
+    translateY(-5px) scale(1.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22), 0 24px 54px rgba(0, 0, 0, 0.3);
+}
+.sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* The word runs the full width and the set stands in front of it. */
+.sheet #sheet-skills .body { justify-content: flex-start; }
+.sheet #sheet-skills .title-row {
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 40px);
+  position: relative;
+  z-index: 0;
+}
+.sheet #sheet-skills .sec-title {
+  font-size: clamp(3.4rem, 15.5vw, 14rem);
+  line-height: 0.78;
+  letter-spacing: -0.045em;
+  margin-bottom: 0;
+}
+.sheet #sheet-skills .motif { width: clamp(90px, 9vw, 170px) !important; }
+/* the word sits top left, the set stands at the bottom right and crosses it */
+.sheet #sheet-skills .tv-stage {
+  position: relative;
+  z-index: 1;
+  max-width: min(780px, 104svh);
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: clamp(-130px, -6vw, -34px);
+}
+@media (max-width: 860px) {
+  .sheet #sheet-skills .tv-stage { margin-left: 0; margin-top: 18px; max-width: 100%; }
+}
+
+/* ---- the set ---------------------------------------------------------------
+   A CRT built in CSS 3D rather than rendered, so the stack stays real text on
+   the screen: selectable, legible at any size, and still lit by the section. */
+.sheet .tv-stage {
+  --mx: 0;
+  --my: 0;
+  width: 100%;
+  /* the set has to fit the screen it sits on, chrome and all */
+  max-width: min(900px, 128svh);
+  margin: 0 auto;
+  perspective: 1700px;
+  perspective-origin: 50% 46%;
+}
+.sheet .tv {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(calc((var(--rot-y, -4) * 1deg) + (var(--mx) * 8deg)))
+             rotateX(calc((var(--rot-x, 1.5) * 1deg) + (var(--my) * -5.5deg)));
+  transition: transform 0.25s linear;
+  border-radius: 26px;
+  padding: 22px 22px 0;
+  background: linear-gradient(170deg, #3a3a3f 0%, #232327 42%, #171719 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.6),
+    0 40px 90px rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+@media (max-width: 700px) { .sheet .tv { padding: 16px 16px 0; border-radius: 20px; } }
+
+.sheet .tv-screen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: radial-gradient(120% 120% at 50% 40%, #121216 0%, #09090b 70%, #050506 100%);
+  /* the uneven radii are what give it the bowed glass */
+  border-radius: 42px / 34px;
+  box-shadow:
+    inset 0 0 0 2px #0b0b0d,
+    inset 0 0 44px rgba(0, 0, 0, 0.95),
+    inset 0 0 120px rgba(0, 0, 0, 0.75);
+}
+@media (max-width: 700px) { .sheet .tv-screen { aspect-ratio: 4 / 3; border-radius: 24px / 20px; } }
+
+.sheet .tv-content {
+  position: absolute;
+  inset: 5% 4.5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: scaleY(0.004);
+  transform-origin: 50% 50%;
+}
+.sheet .tv.on .tv-content { animation: crt-on 0.8s cubic-bezier(0.2, 0.85, 0.25, 1) forwards; }
+@keyframes crt-on {
+  0%   { opacity: 0; transform: scaleY(0.004) scaleX(1.25); filter: brightness(3); }
+  28%  { opacity: 1; transform: scaleY(0.02) scaleX(1); filter: brightness(2.4); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+
+/* scanlines and the curved sheen over the glass */
+.sheet .tv-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 3px,
+    rgba(0, 0, 0, 0.22) 4px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+.sheet .tv-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 38%),
+    radial-gradient(70% 50% at 50% 0%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%);
+}
+
+.sheet .tv-base {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 6px 14px;
+}
+.sheet .tv-brand,
+.sheet .tv-ch {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgba(250, 250, 247, 0.62);
+  white-space: nowrap;
+}
+.sheet .tv-ch { margin-left: auto; }
+.sheet .tv-dial {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #0d0d0f, #2b2b30);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+@media (max-width: 560px) { .sheet .tv-brand, .sheet .tv-ch { font-size: 9px; letter-spacing: 0.1em; } }
+
+/* the stack is on screen now, so it sets its own scale and never the page's */
+.sheet .tv-content .skills { max-width: none; }
+.sheet .tv-content .skill {
+  grid-template-columns: clamp(26px, 3.4%, 54px) clamp(90px, 22%, 210px) 1fr;
+  gap: clamp(10px, 1.6%, 24px);
+  padding: clamp(4px, 0.9%, 12px) 0;
+  border-top-color: rgba(250, 250, 247, 0.16);
+}
+.sheet .tv-content .skill:last-child { border-bottom-color: rgba(250, 250, 247, 0.16); }
+.sheet .tv-content .skill b,
+.sheet .tv-content .skill .items { font-size: clamp(9px, 1.2vw, 16px); }
+.sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 14px); }
+.sheet .tv-content .skill .items {
+  line-height: 1.45;
+  color: rgba(250, 250, 247, 0.62);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sheet .tv-content .skill b { letter-spacing: 0.01em; }
+.sheet .tv-content .skill b { color: rgba(250, 250, 247, 0.92); }
+.sheet .tv-content .skill .num { color: rgba(250, 250, 247, 0.34); }
+.sheet .tv-content .skill.lit .num { color: #fafaf7; }
+.sheet .tv-content .skill .items em { color: rgba(250, 250, 247, 0.28); }
+.sheet .tv-content .skills:hover .skill.in { opacity: 0.4; }
+.sheet .tv-content .skills:hover .skill.in:hover { opacity: 1; }
+
+/* ---- skills: a numbered index ------------------------------------------- */
+.sheet .skills { display: grid; width: 100%; max-width: 1080px; }
+.sheet .skill {
+  display: grid;
+  grid-template-columns: 54px 190px 1fr;
+  gap: 26px;
+  align-items: baseline;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+  opacity: 0;
+  transform: translateX(-44px);
+  transition: opacity 0.5s linear, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    padding-left 0.2s linear;
+}
+.sheet .skill.in { opacity: 1; transform: none; }
+.sheet .skill:last-child { border-bottom: 1px solid var(--rule); }
+.sheet .skill:hover { padding-left: 10px; }
+@media (max-width: 760px) {
+  .sheet .skill { grid-template-columns: 40px 1fr; gap: 4px 16px; transform: translateX(-20px); }
+  .sheet .skill .items { grid-column: 2; }
+}
+.sheet .skill .num {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-30);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s linear, letter-spacing 0.3s linear;
+}
+.sheet .skill.lit .num { color: var(--ink); letter-spacing: 0.08em; }
+.sheet .skills:hover .skill.in { opacity: 0.4; }
+.sheet .skills:hover .skill.in:hover { opacity: 1; }
+.sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .skill .items { display: block; font-size: 12.5px; line-height: 1.95; color: var(--ink-55); min-width: 0; }
+.sheet .skill .items > span { transition: color 0.2s linear; }
+.sheet .skill .items > span:hover { color: var(--ink); }
+.sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
+
+/* room under the last row before the section ends */
+.sheet #sheet-projects { padding-bottom: clamp(120px, 15vh, 240px); }
+
+/* ---- projects ------------------------------------------------------------
+   The cards are the ones from /projects, unchanged. Only the grid and the
+   cut-in belong to the sheet. */
+.sheet .proj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 110px 64px;
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  perspective: 1600px;
+}
+@media (max-width: 980px) { .sheet .proj-grid { grid-template-columns: repeat(2, 1fr); gap: 80px 48px; } }
+@media (max-width: 620px) { .sheet .proj-grid { grid-template-columns: 1fr; gap: 56px; } }
+/* the card is built for a white page, so the sheet re-tones its three fixed
+   colours — everything else about it is inherited and already correct */
+.sheet .proj-grid .pc-frame { background: #1b1b20; }
+.sheet .proj-grid .pc-badge { background: var(--ink); color: #000; }
+.sheet .proj-grid .pc-year { color: var(--ink-30); }
+/* on the paper run the card is already in its native colours */
+.sheet .paper .proj-grid .pc-frame { background: #f4f4f4; }
+.sheet .paper .proj-grid .pc-badge { background: #000; color: #fff; }
+.sheet .paper .proj-grid .pc-year { color: rgba(11, 11, 12, 0.45); }
+/* registration marks in two corners of every plate */
+.sheet .proj-grid .pc-frame::before,
+.sheet .proj-grid .pc-frame::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: opacity 0.3s linear;
+}
+.sheet .proj-grid .pc-frame::before { top: 9px; left: 9px; border-right: 0; border-bottom: 0; }
+.sheet .proj-grid .pc-frame::after { bottom: 9px; right: 9px; border-left: 0; border-top: 0; }
+.sheet .proj-grid .group:hover .pc-frame::before,
+.sheet .proj-grid .group:hover .pc-frame::after { opacity: 0.35; }
+/* the transform belongs to the scroll, so only opacity transitions here */
+.sheet .proj-grid > * {
+  opacity: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.sheet .proj-grid > *.in { opacity: 1; transition: opacity 0.45s linear; }
+
+/* ---- the sheet's address line ------------------------------------------- */
+.sheet .sheet-foot { display: flex; gap: 58px; flex-wrap: wrap; margin-top: auto; padding-top: 40px; }
+.sheet .sheet-foot a { font-size: 12.5px; line-height: 1.35; color: var(--ink); text-decoration: none; }
+.sheet .sheet-foot a:hover { text-decoration: underline; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet .card { opacity: 1; transform: none; }
+  .sheet .spec { clip-path: none; }
+  .sheet .giant .g { transform: none !important; }
+}
