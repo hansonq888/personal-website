@@ -521,7 +521,7 @@ export default function Sheet() {
       </div>
 
       {/* ------------- III + IV share one ground ------------- */}
-      <div className="panel-group paper" data-ground="Experience">
+      <div className="panel-group paper sparkle" data-ground="Experience">
       <section className="panel tall" id="sheet-experience" data-page="Experience">
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">

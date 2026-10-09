@@ -221,6 +221,17 @@ export function initGrounds(root) {
     const W = S.w, H = S.h;
     c.clearRect(0, 0, W, H);
     c.lineWidth = 1;
+    // long chords drifting across the whole run, under the construction
+    c.strokeStyle = faint(S);
+    for (let i = 0; i < 7; i++) {
+      const ph = i * 1.37;
+      const y0 = (((i / 7 + t * 0.0000055 + Math.sin(ph) * 0.02) % 1) + 1) % 1 * H;
+      const slope = (i % 2 ? 1 : -1) * (0.08 + (i % 3) * 0.05);
+      c.beginPath();
+      c.moveTo(0, y0);
+      c.lineTo(W, y0 + W * slope);
+      c.stroke();
+    }
     const unit = Math.min(H, Math.max(420, W * 0.62));
     const n = Math.ceil(H / unit);
     for (let i = 0; i < n; i++) {
@@ -276,6 +287,18 @@ export function initGrounds(root) {
         }
       }
 
+      // spokes, like the face of a dial
+      if (i % 3 === 2) {
+        c.strokeStyle = faint(S);
+        for (let k2 = 0; k2 < 12; k2++) {
+          const th2 = (k2 / 12) * Math.PI * 2 + t * 0.00004 * (i % 2 ? 1 : -1);
+          c.beginPath();
+          c.moveTo(Math.cos(th2) * r * 0.42, Math.sin(th2) * r * squash * 0.42);
+          c.lineTo(Math.cos(th2) * r, Math.sin(th2) * r * squash);
+          c.stroke();
+        }
+      }
+
       // a planet riding the ring
       const th = t * 0.00022 * (1 + i * 0.26) + i * 1.1;
       c.fillStyle = hair(S);
@@ -284,6 +307,19 @@ export function initGrounds(root) {
       c.fill();
       c.restore();
     }
+
+    // a second family, smaller and turning the other way
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(-t * 0.000035 - a * 0.4);
+    c.strokeStyle = faint(S);
+    for (let i = 0; i < 4; i++) {
+      const rr = maxR * (0.18 + i * 0.1);
+      c.beginPath();
+      c.ellipse(0, 0, rr, rr * (0.5 + a * 0.3), 0, 0, Math.PI * 2);
+      c.stroke();
+    }
+    c.restore();
   }
 
   /* --- V: contour rings, breathing outward --- */
@@ -344,16 +380,19 @@ export function initGrounds(root) {
   function drawSparks(S, t) {
     const c = S.sctx;
     c.clearRect(0, 0, S.w, S.h);
+    // on paper the glints are ink; on a dark ground they are light
+    const rgb = S.light ? "11,11,12" : "255,253,245";
+    const k = S.light ? 0.5 : 1;
     for (const q of S.pts) {
       const a = Math.pow(Math.max(0, Math.sin(q.ph + t * 0.0012 * q.sp)), 5);
       if (a < 0.02) continue;
-      c.fillStyle = "rgba(255,253,245," + (a * 0.95).toFixed(3) + ")";
+      c.fillStyle = "rgba(" + rgb + "," + (a * 0.95 * k).toFixed(3) + ")";
       c.beginPath();
       c.arc(q.x, q.y, q.r, 0, 6.283);
       c.fill();
       if (q.big && a > 0.45) {
         const Lr = 5 + a * 9;
-        c.strokeStyle = "rgba(255,253,245," + (a * 0.5).toFixed(3) + ")";
+        c.strokeStyle = "rgba(" + rgb + "," + (a * 0.5 * k).toFixed(3) + ")";
         c.lineWidth = 0.7;
         c.beginPath();
         c.moveTo(q.x - Lr, q.y); c.lineTo(q.x + Lr, q.y);

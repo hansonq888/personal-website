@@ -388,7 +388,7 @@
   display: grid;
   width: 100%;
   /* capped, or the plates end up at the far edge of a wide screen */
-  max-width: 1100px;
+  max-width: 1280px;
   perspective: 1400px;
 }
 /* the rail: a bow drawn through the nodes, filling as you read down it */
@@ -440,7 +440,7 @@
 
 .sheet .role {
   display: grid;
-  grid-template-columns: 150px 130px 1fr 240px;
+  grid-template-columns: 150px 150px 1fr clamp(300px, 26vw, 420px);
   gap: 28px;
   align-items: center;
   padding: var(--pad, 30px) 0;
@@ -456,22 +456,28 @@
 .sheet .role.in { opacity: 1; transform: none; }
 @media (max-width: 760px) {
   .sheet .role {
-    grid-template-columns: 1fr 104px;
+    grid-template-columns: 1fr 132px;
     gap: 6px 16px;
     transform: translateX(-28px);
   }
   .sheet .role .node { display: none; }
-  .sheet .role .shot { grid-row: 1 / span 2; grid-column: 2; width: 104px; }
+  .sheet .role .shot { grid-row: 1 / span 2; grid-column: 2; width: 132px; }
 }
 
-.sheet .role .when { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+.sheet .role .when { font-size: clamp(12.5px, 1.05vw, 16px); line-height: 1.4; color: var(--ink-55); }
 .sheet .role .who { display: block; }
-.sheet .role b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .role b {
+  font-weight: 400;
+  font-size: clamp(15px, 1.5vw, 23px);
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
 .sheet .role i {
   font-style: normal;
   display: block;
-  margin-top: 5px;
-  font-size: 12.5px;
+  margin-top: 7px;
+  font-size: clamp(12.5px, 1.05vw, 16px);
   line-height: 1.35;
   color: var(--ink-55);
 }
@@ -496,7 +502,7 @@
 
 /* the plate: bigger, lifted off the page, straightening as you reach it */
 .sheet .role .shot {
-  width: 240px;
+  width: clamp(300px, 26vw, 420px);
   aspect-ratio: 16 / 9;
   overflow: hidden;
   justify-self: end;
