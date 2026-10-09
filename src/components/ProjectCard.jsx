@@ -8,7 +8,7 @@ const INTER = '"Inter", sans-serif';
 export default function ProjectCard({ project }) {
   return (
     <Link to={`/projects/${project.id}`} className="group block">
-      <div className="relative overflow-hidden bg-[#f4f4f4] aspect-[16/9]">
+      <div className="pc-frame relative overflow-hidden bg-[#f4f4f4] aspect-[16/9]">
         <img
           src={project.image}
           alt={project.title}
@@ -20,7 +20,7 @@ export default function ProjectCard({ project }) {
           className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-colors duration-500 pointer-events-none"
         />
         <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="mono-meta w-10 h-10 bg-black text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <span className="pc-badge mono-meta w-10 h-10 bg-black text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             ↗
           </span>
         </span>
@@ -39,7 +39,7 @@ export default function ProjectCard({ project }) {
           {project.title}
         </h2>
         {project.year && (
-          <span className="mono-meta shrink-0 tracking-[0.14em] text-[9px] text-black/45">
+          <span className="pc-year mono-meta shrink-0 tracking-[0.14em] text-[9px] text-black/45">
             {project.year}
           </span>
         )}

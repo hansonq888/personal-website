@@ -15,23 +15,20 @@ const PHI = 1.6180339887;
 // gx/gy tilt the density across the frame, each lobe is
 // [freqU, freqV, amplitude, drift].
 const WEATHER = {
+  // one field for Home and About together: open cloud, tilted so it gathers
+  // toward the skyline at the foot of the run
   Home: {
-    base: 0.86, gx: 0, gy: 0, // slow open cloud
+    base: 0.88, gx: 0, gy: -0.18,
     L: [[2.3, 1.1, 0.1, 0.000045], [-1.4, 2.7, 0.07, -0.000031], [5.1, -3.3, 0.05, 0.000068]],
-  },
-  About: {
-    base: 0.9, gx: 0, gy: -0.26, // settles toward the skyline at the foot of the page
-    L: [[0.0, 3.4, 0.13, 0.000022], [0.6, 6.8, 0.06, -0.000018], [2.2, 0.3, 0.04, 0.00004]],
   },
 };
 
 // section -> [renderer, parallax factor]. Negative moves against the scroll.
 const SYSTEM = {
-  Home: ["dither", 0.05],
-  About: ["dither", 0.11],
+  Home: ["dither", 0.05],   // spans Home + About
   Experience: ["phi", -0.15],
-  Projects: [null, 0],
   Skills: ["contour", 0.13],
+  // Projects has no ground at all
 };
 
 const hair = (S) => (S.light ? "rgba(11,11,12,.125)" : "rgba(250,250,247,.155)");
@@ -40,15 +37,17 @@ const faint = (S) => (S.light ? "rgba(11,11,12,.06)" : "rgba(250,250,247,.08)");
 export function initGrounds(root) {
   if (!root) return () => {};
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const panels = [...root.querySelectorAll("[data-page]")];
+  // A ground host is not always one section: Home and About share one, so the
+  // field runs unbroken across both instead of meeting at a seam.
+  const panels = [...root.querySelectorAll("[data-ground]")];
   if (!panels.length) return () => {};
 
   const sections = panels.map((panel) => {
-    const page = panel.dataset.page;
+    const page = panel.dataset.ground;
     const [kind, par] = SYSTEM[page] || [null, 0];
-    const dark = panel.classList.contains("dark");
+    const sparkle = panel.classList.contains("sparkle");
     const S = {
-      panel, page, kind, par, dark, light: true, visible: false, last: -1e9, prog: 0,
+      panel, page, kind, par, light: true, visible: false, last: -1e9, prog: 0,
       w: 0, h: 0, cols: 0, rows: 0,
       canvas: null, ctx: null, off: null, octx: null, sparks: null, sctx: null, pts: [],
     };
@@ -59,7 +58,7 @@ export function initGrounds(root) {
       panel.prepend(S.canvas);
       S.ctx = S.canvas.getContext("2d");
     }
-    if (dark) {
+    if (sparkle) {
       S.sparks = document.createElement("canvas");
       S.sparks.className = "layer";
       S.sparks.setAttribute("aria-hidden", "true");
@@ -163,15 +162,10 @@ export function initGrounds(root) {
   }
 
   /* --- III: the golden-ratio construction, slowly turning --- */
-  function drawPhi(S, t, prog) {
-    const c = S.ctx;
-    const W = S.w, H = S.h;
-    c.clearRect(0, 0, W, H);
-    c.lineWidth = 1;
-    c.save();
-    c.translate(W / 2, H / 2);
-    c.rotate((prog - 0.5) * 0.1 + Math.sin(t * 0.00006) * 0.012);
-    c.translate(-W / 2, -H / 2);
+  // A ground can be several screens tall, and one subdivision stretched over
+  // that is just a few near-vertical lines. So the construction is drawn at a
+  // fixed aspect and tiled down the run, mirroring every other block.
+  function phiBlock(c, W, H, S) {
     let x = 0, y = 0, w = W, h = H;
     for (let i = 0; i < 8; i++) {
       c.strokeStyle = i > 2 ? faint(S) : hair(S);
@@ -197,7 +191,25 @@ export function initGrounds(root) {
     c.moveTo(0, cy); c.lineTo(W, cy);
     c.moveTo(cx, 0); c.lineTo(cx, H);
     c.stroke();
-    c.restore();
+  }
+
+  function drawPhi(S, t, prog) {
+    const c = S.ctx;
+    const W = S.w, H = S.h;
+    c.clearRect(0, 0, W, H);
+    c.lineWidth = 1;
+    const unit = Math.min(H, Math.max(420, W * 0.62));
+    const n = Math.ceil(H / unit);
+    for (let i = 0; i < n; i++) {
+      c.save();
+      c.translate(0, i * unit);
+      if (i % 2) { c.translate(W, 0); c.scale(-1, 1); }   // mirror every other block
+      c.translate(W / 2, unit / 2);
+      c.rotate((prog - 0.5) * 0.1 + Math.sin(t * 0.00006 + i) * 0.012);
+      c.translate(-W / 2, -unit / 2);
+      phiBlock(c, W, unit, S);
+      c.restore();
+    }
   }
 
   /* --- V: contour rings, breathing outward --- */

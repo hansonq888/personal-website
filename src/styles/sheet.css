@@ -7,31 +7,20 @@
    ========================================================================== */
 
 .sheet {
-  --ground: #fff;
-  --dark-ground: #0b0b0c;
-  --ink: #0b0b0c;
-  --ink-55: rgba(11, 11, 12, 0.56);
-  --ink-30: rgba(11, 11, 12, 0.32);
-  --rule: #e4e4e0;
+  --ground: #101013;
+  --deep: #000;
+  --ink: #fafaf7;
+  --ink-55: rgba(250, 250, 247, 0.58);
+  --ink-30: rgba(250, 250, 247, 0.32);
+  --rule: #2a2a30;
   --pad: 30px;
+
+  color-scheme: dark;
 
   background: var(--ground);
   color: var(--ink);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-  .sheet:not([data-theme="light"]) {
-    /* the paper has to stay distinct from the dark sections, or the
-       light/dark cut collapses into one flat colour */
-    --ground: #17171a;
-    --dark-ground: #000;
-    --ink: #fafaf7;
-    --ink-55: rgba(250, 250, 247, 0.58);
-    --ink-30: rgba(250, 250, 247, 0.32);
-    --rule: #33333a;
-  }
 }
 
 @media (max-width: 640px) {
@@ -104,6 +93,25 @@
 .sheet-progress i { display: block; height: 100%; width: 0%; background: var(--ink); }
 
 /* ---- sections ----------------------------------------------------------- */
+/* a group is a run of sections sharing one ground, so the field crosses them
+   without a seam */
+.sheet .panel-group {
+  position: relative;
+  overflow: hidden;
+  background: var(--ground);
+}
+.sheet .panel-group.deep { background: var(--deep); --rule: #24242a; }
+/* one run of the sheet is printed on paper; the ink flips back with it */
+.sheet .panel-group.paper {
+  background: #fafaf7;
+  --ink: #0b0b0c;
+  --ink-55: rgba(11, 11, 12, 0.56);
+  --ink-30: rgba(11, 11, 12, 0.32);
+  --rule: #e4e4e0;
+  color: var(--ink);
+}
+.sheet .panel-group > .panel { background: transparent; position: relative; z-index: 1; }
+
 .sheet .panel {
   position: relative;
   overflow: hidden;
@@ -114,14 +122,9 @@
   background: var(--ground);
 }
 .sheet .panel.tall { min-height: 100svh; }
-.sheet .panel.dark {
-  --ink: #fafaf7;
-  --ink-55: rgba(250, 250, 247, 0.58);
-  --ink-30: rgba(250, 250, 247, 0.32);
-  --rule: #26262a;
-  background: var(--dark-ground);
-  color: var(--ink);
-}
+/* every section is dark; alternating two tones keeps the boundary between
+   them a visible hard edge instead of one unbroken field */
+.sheet .panel.deep { background: var(--deep); --rule: #24242a; }
 
 /* the layer box overhangs its section so there is room to parallax inside it */
 .sheet .layer {
@@ -203,7 +206,74 @@
   align-items: center;
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
-.sheet .about-row .me { width: 100%; max-width: 280px; height: auto; display: block; }
+/* the photograph sits on the page as an object: a polaroid, raised off the
+   dark ground by stacked shadows and tilted toward the cursor */
+.sheet .me-wrap {
+  width: 100%;
+  max-width: 300px;
+  justify-self: end;
+  perspective: 1000px;
+}
+@media (max-width: 760px) { .sheet .me-wrap { justify-self: start; max-width: 260px; } }
+
+.sheet .polaroid {
+  position: relative;
+  background: #f7f6f1;
+  padding: 14px 14px 54px;
+  border-radius: 2px;
+  transform: rotate(-2.4deg) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+  will-change: transform;
+  /* three stacked shadows: contact, mid, and a long soft one for the drop */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 10px 22px rgba(0, 0, 0, 0.5),
+    0 34px 70px rgba(0, 0, 0, 0.55);
+}
+.sheet .me-wrap:hover .polaroid {
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    0 16px 34px rgba(0, 0, 0, 0.55),
+    0 50px 96px rgba(0, 0, 0, 0.6);
+}
+.sheet .polaroid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: 60% 35%;
+}
+.sheet .polaroid .cap {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 19px;
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: rgba(11, 11, 12, 0.5);
+}
+/* the sheen tracks the cursor, which is what reads as depth rather than tilt */
+.sheet .polaroid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    280px 220px at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 62%
+  );
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet .polaroid { transform: rotate(-2.4deg); transition: none; }
+}
 
 /* the dithered skyline, bleeding to both edges along the floor of the page */
 .sheet .band {
@@ -259,8 +329,18 @@
   gap: 80px 56px;
   width: 100%;
   max-width: 1120px;
+  margin-inline: auto;
 }
 @media (max-width: 860px) { .sheet .proj-grid { grid-template-columns: 1fr; gap: 56px; } }
+/* the card is built for a white page, so the sheet re-tones its three fixed
+   colours — everything else about it is inherited and already correct */
+.sheet .proj-grid .pc-frame { background: #1b1b20; }
+.sheet .proj-grid .pc-badge { background: var(--ink); color: #000; }
+.sheet .proj-grid .pc-year { color: var(--ink-30); }
+/* on the paper run the card is already in its native colours */
+.sheet .paper .proj-grid .pc-frame { background: #f4f4f4; }
+.sheet .paper .proj-grid .pc-badge { background: #000; color: #fff; }
+.sheet .paper .proj-grid .pc-year { color: rgba(11, 11, 12, 0.45); }
 .sheet .proj-grid > * { opacity: 0; transform: translateY(10px); }
 .sheet .proj-grid > *.in {
   opacity: 1;

@@ -75,11 +75,40 @@ export default function Sheet() {
   const rootRef = useRef(null);
   const bandRef = useRef(null);
   const gridRef = useRef(null);
+  const meRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => initGrounds(rootRef.current), []);
   useEffect(() => initDither(bandRef.current, "/vancouver-strip.jpg"), []);
+
+  // the polaroid tilts toward the cursor, with a sheen that tracks it — the
+  // parallax lives on the wrapper so the two transforms never fight
+  useEffect(() => {
+    const wrap = meRef.current;
+    if (!wrap || window.matchMedia("(pointer: coarse)").matches) return;
+    const card = wrap.querySelector(".polaroid");
+    if (!card) return;
+    const onMove = (e) => {
+      const r = wrap.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty("--ry", (x * 15).toFixed(2) + "deg");
+      card.style.setProperty("--rx", (-y * 13).toFixed(2) + "deg");
+      card.style.setProperty("--mx", (e.clientX - r.left).toFixed(0) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top).toFixed(0) + "px");
+    };
+    const onLeave = () => {
+      card.style.setProperty("--ry", "0deg");
+      card.style.setProperty("--rx", "0deg");
+    };
+    wrap.addEventListener("pointermove", onMove);
+    wrap.addEventListener("pointerleave", onLeave);
+    return () => {
+      wrap.removeEventListener("pointermove", onMove);
+      wrap.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
 
   // the project grid cuts in, one card at a time
   useEffect(() => {
@@ -107,7 +136,8 @@ export default function Sheet() {
       setProgress(max > 0 ? (top / max) * 100 : 0);
       let cur = 0;
       panels.forEach((p, i) => {
-        if (p.offsetTop - window.innerHeight * 0.4 <= top) cur = i;
+        const y = p.getBoundingClientRect().top + top;
+        if (y - window.innerHeight * 0.4 <= top) cur = i;
       });
       setCurrent(cur);
     };
@@ -121,7 +151,8 @@ export default function Sheet() {
     const el = document.getElementById("sheet-" + PAGES[i].toLowerCase());
     if (!el) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: el.offsetTop, behavior: reduce ? "auto" : "smooth" });
+    const y = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
   };
 
   return (
@@ -140,8 +171,9 @@ export default function Sheet() {
         </nav>
       </div>
 
-      {/* ---------------- I. HOME ---------------- */}
-      <section className="panel dark" id="sheet-home" data-page="Home">
+      {/* ------------- I + II share one ground ------------- */}
+      <div className="panel-group deep sparkle" data-ground="Home">
+      <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
         <div className="body" data-par=".035">
           <div>
@@ -172,7 +204,12 @@ export default function Sheet() {
                 a model that rates how you train, stats for a sport nobody tracks.
               </p>
             </div>
-            <img className="me" src="/sideeye.JPG" alt="Hanson Qin" data-par=".055" />
+            <div className="me-wrap" data-par=".055" ref={meRef}>
+              <div className="polaroid">
+                <img src="/sideeye.JPG" alt="Hanson Qin" />
+                <p className="cap">HANSON QIN &middot; VANCOUVER</p>
+              </div>
+            </div>
           </div>
         </div>
         <div className="band">
@@ -180,9 +217,11 @@ export default function Sheet() {
           <p className="lab dim band-cap">VANCOUVER.BMP</p>
         </div>
       </section>
+      </div>
 
-      {/* ---------------- III. EXPERIENCE ---------------- */}
-      <section className="panel tall dark" id="sheet-experience" data-page="Experience">
+      {/* ------------- III + IV share one ground ------------- */}
+      <div className="panel-group paper" data-ground="Experience">
+      <section className="panel tall" id="sheet-experience" data-page="Experience">
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">
           <div className="roles">
@@ -208,9 +247,10 @@ export default function Sheet() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* ---------------- V. SKILLS ---------------- */}
-      <section className="panel" id="sheet-skills" data-page="Skills">
+      <section className="panel deep" id="sheet-skills" data-page="Skills" data-ground="Skills">
         <Spec left="Skills" leftSub="Working Stack" right="STACK.TXT" rightSub="Updated 2026" />
         <div className="body">
           <div className="skills">
