@@ -543,12 +543,13 @@ export function initGrounds(root) {
 
     for (const el of meters) {
       const r = el.getBoundingClientRect();
-      // 0 when the list's top reaches the playhead, 1 when its bottom does
-      const play = vh * 0.58;
+      // the playhead sits low, so the stroke is already running as the list
+      // crests the bottom of the screen
+      const play = vh * 0.92;
       const raw = Math.max(0, Math.min(1, (play - r.top) / Math.max(1, r.height)));
       // the stroke holds at its start for the first stretch, so whatever draws
       // it can arrive and sit still before it begins
-      const HOLD = 0.2;
+      const HOLD = 0.03;
       const p = Math.max(0, Math.min(1, (raw - HOLD) / (1 - HOLD)));
       el.style.setProperty("--p", p.toFixed(4));
       el.style.setProperty("--pr", raw.toFixed(4));

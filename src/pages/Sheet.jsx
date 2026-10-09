@@ -422,7 +422,7 @@ export default function Sheet() {
       // at the end, rather than simply fading
       // it arrives and then stays: there is no exit, so it rests on the end of
       // the stroke once the line is finished
-      const IN = 0.1;
+      const IN = 0.045;
       const present = Math.max(0, Math.min(1, pr / IN));
       const e = 1 - present;
       const ease = e * e;
