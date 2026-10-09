@@ -285,6 +285,17 @@ export function initGrounds(root) {
     host: el.closest("[data-page]") || el.parentElement,
   }));
 
+  // The project grid unzips: cards converge as they reach the middle of the
+  // view and fly apart along their column's axis as they leave it.
+  const fliers = [];
+  root.querySelectorAll("[data-fly]").forEach((grid) => {
+    const cols = grid.dataset.fly.split(",").map(Number);
+    [...grid.children].forEach((el, i) => {
+      const n = cols[0] || 3;
+      fliers.push({ el, dir: (i % n) - (n - 1) / 2 });
+    });
+  });
+
   // Every layer parallaxes inside its own section's overhang, clamped so it can
   // never expose an edge.
   function parallax() {
@@ -309,10 +320,26 @@ export function initGrounds(root) {
       // 0 as the section enters from the bottom, 0.5 centred, 1 as it leaves
       const p = (vh - r.top) / (r.height + vh);
       const away = Math.min(1, Math.abs(p - 0.5) * 2.35);   // flat through the middle
-      const x = Math.pow(away, 1.7) * 165;                  // percent of its own width
+      const e = Math.pow(away, 1.7);
+      const x = e * 165;              // percent of its own width
+      const z = -e * 420;             // swings back into the scene as it leaves
+      const ry = -e * 34;             // and turns on its edge, like a door
       const rel = r.top + r.height / 2 - vh / 2;
       q.el.style.transform =
-        "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px,0)";
+        "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px," +
+        z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg)";
+      q.el.style.setProperty("--near", (1 - e).toFixed(3));
+    }
+
+    for (const q of fliers) {
+      const r = q.el.getBoundingClientRect();
+      const t = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / (vh * 0.85)));
+      const a = Math.pow(Math.abs(t), 1.6);
+      const x = q.dir * a * 190;
+      const ry = -q.dir * a * 16;
+      const z = -a * 260;
+      q.el.style.transform =
+        "translate3d(" + x.toFixed(1) + "px,0," + z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg)";
     }
   }
 

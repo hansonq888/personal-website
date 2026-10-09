@@ -76,6 +76,7 @@ export default function Sheet() {
   const bandRef = useRef(null);
   const gridRef = useRef(null);
   const meRef = useRef(null);
+  const rolesRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -108,6 +109,28 @@ export default function Sheet() {
       wrap.removeEventListener("pointermove", onMove);
       wrap.removeEventListener("pointerleave", onLeave);
     };
+  }, []);
+
+  // the timeline swings in a row at a time
+  useEffect(() => {
+    const list = rolesRef.current;
+    if (!list) return;
+    const rows = [...list.children];
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      rows.forEach((r) => r.classList.add("in"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const i = rows.indexOf(e.target);
+        setTimeout(() => e.target.classList.add("in"), Math.max(0, i) * 110);
+        io.unobserve(e.target);
+      }),
+      { threshold: 0.3 }
+    );
+    rows.forEach((r) => io.observe(r));
+    return () => io.disconnect();
   }, []);
 
   // the project grid cuts in, one card at a time
@@ -224,12 +247,15 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-experience" data-page="Experience">
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">
-          <div className="roles">
+          <div className="roles" ref={rolesRef}>
             {experiences.map((x) => (
               <a className="role" key={x.org} href={x.url} target="_blank" rel="noreferrer">
-                <span>{x.short.when}</span>
-                <b>{x.role}</b>
-                <i className="r">{x.short.where}</i>
+                <span className="when">{x.short.when}</span>
+                <span className="node" aria-hidden="true" />
+                <span className="who">
+                  <b>{x.role}</b>
+                  <i>{x.short.where}</i>
+                </span>
                 <span className="shot">
                   {x.image ? <img src={x.image} alt="" loading="lazy" /> : null}
                 </span>
@@ -243,7 +269,7 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-projects" data-page="Projects">
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
-          <div className="proj-grid" ref={gridRef}>
+          <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
               <div key={p.id}><ProjectCard project={p} /></div>
             ))}

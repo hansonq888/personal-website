@@ -108,6 +108,7 @@
   --ink-55: rgba(11, 11, 12, 0.56);
   --ink-30: rgba(11, 11, 12, 0.32);
   --rule: #e4e4e0;
+  --ground: #fafaf7;
   color: var(--ink);
 }
 .sheet .panel-group > .panel { background: transparent; position: relative; z-index: 1; }
@@ -204,16 +205,31 @@
   grid-template-columns: 1fr auto;
   gap: 46px;
   align-items: center;
+  perspective: 1500px;
+  perspective-origin: 68% 50%;
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
    dark ground by stacked shadows and tilted toward the cursor */
 .sheet .me-wrap {
+  position: relative;
   width: 100%;
   max-width: 300px;
   justify-self: end;
-  perspective: 1000px;
+  transform-style: preserve-3d;
   will-change: transform;
+}
+/* a bloom behind the card that comes up as it arrives */
+.sheet .me-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 252, 240, 0.3), rgba(255, 252, 240, 0) 72%);
+  filter: blur(34px);
+  opacity: var(--near, 0);
+  transform: translateZ(-60px);
+  pointer-events: none;
 }
 @media (max-width: 760px) { .sheet .me-wrap { justify-self: start; max-width: 260px; } }
 
@@ -230,7 +246,8 @@
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.6),
     0 10px 22px rgba(0, 0, 0, 0.5),
-    0 34px 70px rgba(0, 0, 0, 0.55);
+    0 34px 70px rgba(0, 0, 0, 0.55),
+    0 0 calc(70px * var(--near, 0)) rgba(255, 250, 235, calc(0.2 * var(--near, 0)));
 }
 .sheet .me-wrap:hover .polaroid {
   box-shadow:
@@ -285,43 +302,92 @@
 .sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
 
-/* ---- experience / skills lists ------------------------------------------ */
-.sheet .roles, .sheet .skills { display: grid; width: 100%; }
+/* ---- experience: a timeline ---------------------------------------------- */
+.sheet .roles { position: relative; display: grid; width: 100%; perspective: 1400px; }
+/* the spine, running between the first and last node */
+.sheet .roles::before {
+  content: "";
+  position: absolute;
+  left: 191px; /* 150 col + 28 gap + half the 26px node column */
+  top: 64px;
+  bottom: 64px;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--rule) 8%, var(--rule) 92%, transparent);
+}
+@media (max-width: 760px) { .sheet .roles::before { display: none; } }
+
 .sheet .role {
   display: grid;
-  grid-template-columns: 140px 1fr 1fr 92px;
-  gap: 24px;
-  align-items: baseline;
-  padding: 22px 0;
-  border-top: 1px solid var(--rule);
-  transition: padding-left 0.2s linear;
+  grid-template-columns: 150px 26px 1fr 240px;
+  gap: 28px;
+  align-items: center;
+  padding: 30px 0;
   text-decoration: none;
   color: inherit;
+  opacity: 0;
+  transform: translateX(-64px) rotateY(9deg);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: opacity 0.55s linear, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.sheet .role:last-child { border-bottom: 1px solid var(--rule); }
-.sheet .role:hover { padding-left: 10px; }
+.sheet .role.in { opacity: 1; transform: none; }
 @media (max-width: 760px) {
-  .sheet .role { grid-template-columns: 1fr 72px; gap: 4px 14px; }
-  .sheet .role .r { text-align: left; }
-  .sheet .role .shot { grid-row: 1 / span 3; grid-column: 2; }
+  .sheet .role {
+    grid-template-columns: 1fr 104px;
+    gap: 6px 16px;
+    transform: translateX(-28px);
+  }
+  .sheet .role .node { display: none; }
+  .sheet .role .shot { grid-row: 1 / span 2; grid-column: 2; width: 104px; }
 }
-/* the logo sits dim and comes up to full as you pass the row */
+
+.sheet .role .when { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
+.sheet .role .who { display: block; }
+.sheet .role b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
+.sheet .role i {
+  font-style: normal;
+  display: block;
+  margin-top: 5px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--ink-55);
+}
+
+/* the node sits on the spine, its ring punching a hole in the line */
+.sheet .role .node {
+  justify-self: center;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-30);
+  box-shadow: 0 0 0 6px var(--ground);
+  transition: background 0.25s linear, transform 0.25s linear;
+}
+.sheet .role:hover .node { background: var(--ink); transform: scale(1.25); }
+
+/* the plate: bigger, lifted off the page, straightening as you reach it */
 .sheet .role .shot {
-  width: 92px;
+  width: 240px;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  align-self: center;
+  justify-self: end;
   background: var(--rule);
-  opacity: 0.5;
-  transition: opacity 0.25s linear;
+  opacity: 0.72;
+  transform: rotate(-1.2deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 14px 34px rgba(0, 0, 0, 0.22);
+  transition: opacity 0.3s linear, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s ease;
 }
-.sheet .role:hover .shot { opacity: 1; }
+.sheet .role:hover .shot {
+  opacity: 1;
+  transform: rotate(0deg) translateY(-4px) scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22), 0 24px 54px rgba(0, 0, 0, 0.3);
+}
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sheet .role span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
-.sheet .role b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
-.sheet .role i { font-style: normal; font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
-.sheet .role .r { text-align: right; }
 
+/* ---- skills --------------------------------------------------------------- */
+.sheet .skills { display: grid; width: 100%; }
 .sheet .skill {
   display: grid;
   grid-template-columns: 140px 1fr;
@@ -339,13 +405,15 @@
    cut-in belong to the sheet. */
 .sheet .proj-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 80px 56px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 110px 64px;
   width: 100%;
-  max-width: 1120px;
+  max-width: 1080px;
   margin-inline: auto;
+  perspective: 1600px;
 }
-@media (max-width: 860px) { .sheet .proj-grid { grid-template-columns: 1fr; gap: 56px; } }
+@media (max-width: 980px) { .sheet .proj-grid { grid-template-columns: repeat(2, 1fr); gap: 80px 48px; } }
+@media (max-width: 620px) { .sheet .proj-grid { grid-template-columns: 1fr; gap: 56px; } }
 /* the card is built for a white page, so the sheet re-tones its three fixed
    colours — everything else about it is inherited and already correct */
 .sheet .proj-grid .pc-frame { background: #1b1b20; }
@@ -355,12 +423,13 @@
 .sheet .paper .proj-grid .pc-frame { background: #f4f4f4; }
 .sheet .paper .proj-grid .pc-badge { background: #000; color: #fff; }
 .sheet .paper .proj-grid .pc-year { color: rgba(11, 11, 12, 0.45); }
-.sheet .proj-grid > * { opacity: 0; transform: translateY(10px); }
-.sheet .proj-grid > *.in {
-  opacity: 1;
-  transform: none;
-  transition: opacity 0.3s linear, transform 0.3s linear;
+/* the transform belongs to the scroll, so only opacity transitions here */
+.sheet .proj-grid > * {
+  opacity: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
+.sheet .proj-grid > *.in { opacity: 1; transition: opacity 0.45s linear; }
 
 /* ---- the sheet's address line ------------------------------------------- */
 .sheet .sheet-foot { display: flex; gap: 58px; flex-wrap: wrap; margin-top: auto; padding-top: 40px; }
