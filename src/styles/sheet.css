@@ -318,6 +318,31 @@
 }
 @media (max-width: 760px) { .sheet .me-wrap { justify-self: start; max-width: 260px; } }
 
+/* three prints in a stack, the oldest furthest back */
+.sheet .polaroid.back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform:
+    rotate(calc(var(--fan, 0) * 8deg))
+    translate(calc(var(--fan, 0) * -14%), calc(var(--fan, 0) * -7%))
+    scale(calc(1 - var(--fan, 0) * 0.07));
+  filter: saturate(0.85) brightness(0.9);
+}
+.sheet .polaroid.back2 {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform:
+    rotate(calc(var(--fan, 0) * -11deg))
+    translate(calc(var(--fan, 0) * -30%), calc(var(--fan, 0) * 5%))
+    scale(calc(1 - var(--fan, 0) * 0.12));
+  filter: saturate(0.75) brightness(0.84);
+}
+.sheet .polaroid.back .cap,
+.sheet .polaroid.back2 .cap { display: none; }
+.sheet .polaroid.front { position: relative; z-index: 1; }
+
 .sheet .polaroid {
   position: relative;
   background: #f7f6f1;

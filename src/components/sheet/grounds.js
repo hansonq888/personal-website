@@ -451,6 +451,13 @@ export function initGrounds(root) {
     host: el.closest("[data-page], .panel") || el.parentElement,
   }));
 
+  // A stack that deals itself out: --fan runs 0 to 1 as the section arrives,
+  // and the cards read it to spread.
+  const fans = [...root.querySelectorAll("[data-fan]")].map((el) => ({
+    el,
+    host: el.closest("[data-page], .panel") || el.parentElement,
+  }));
+
   // Containers that publish how far they have been scrolled through, as --p.
   const meters = [...root.querySelectorAll("[data-progress]")];
 
@@ -539,6 +546,14 @@ export function initGrounds(root) {
       const x = damp(q, "_sx", p * q.f * r.width);
       const y = Math.sin(p * Math.PI * 2) * 18;
       q.el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+    }
+
+    for (const q of fans) {
+      const r = q.host.getBoundingClientRect();
+      const raw = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.95)));
+      // thrown, not slid: quick at first, settling at the end
+      const e = 1 - Math.pow(1 - raw, 3);
+      q.el.style.setProperty("--fan", e.toFixed(4));
     }
 
     for (const el of meters) {

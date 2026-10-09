@@ -159,7 +159,7 @@ export default function Sheet() {
   useEffect(() => {
     const wrap = meRef.current;
     if (!wrap || window.matchMedia("(pointer: coarse)").matches) return;
-    const card = wrap.querySelector(".polaroid");
+    const card = wrap.querySelector(".polaroid.front");
     if (!card) return;
     const onMove = (e) => {
       const r = wrap.getBoundingClientRect();
@@ -589,8 +589,14 @@ export default function Sheet() {
                 text="I build things that run in the browser and have no right to — an audio engine in C++, a model that rates how you train, stats for a sport nobody tracks."
               />
             </div>
-            <div className="me-wrap" data-slide=".055" ref={meRef}>
-              <div className="polaroid">
+            <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>
+              <div className="polaroid back2" aria-hidden="true">
+                <img src="/AboutPhoto.jpg" alt="" />
+              </div>
+              <div className="polaroid back" aria-hidden="true">
+                <img src="/sideeye.JPG" alt="" />
+              </div>
+              <div className="polaroid front">
                 <img src="/headshot.jpg" alt="Hanson Qin" />
                 <p className="cap">HANSON QIN &middot; VANCOUVER</p>
               </div>
@@ -652,7 +658,7 @@ export default function Sheet() {
           <h2 className="sec-title center">Projects</h2>
           <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
-              <div key={p.id}><ProjectCard project={p} /></div>
+              <div key={p.id}><ProjectCard project={p} demo /></div>
             ))}
           </div>
         </div>

@@ -5,9 +5,24 @@ const INTER = '"Inter", sans-serif';
 /* The project card, shared by the /projects page and the long-scroll sheet so
    the two cannot drift apart: dark wash lifting on hover, the image easing in
    a little, and a black ↗ badge in the middle. */
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, demo = false }) {
+  // `demo` sends the card straight to the thing itself; without a live link
+  // there is nothing to send it to, so it falls back to the write-up
+  const live = demo ? project.website || project.appStore : null;
+  const Shell = live
+    ? ({ children }) => (
+        <a href={live} target="_blank" rel="noreferrer" className="group block">
+          {children}
+        </a>
+      )
+    : ({ children }) => (
+        <Link to={`/projects/${project.id}`} className="group block">
+          {children}
+        </Link>
+      );
+
   return (
-    <Link to={`/projects/${project.id}`} className="group block">
+    <Shell>
       <div className="pc-frame relative overflow-hidden bg-[#f4f4f4] aspect-[16/9]">
         <img
           src={project.image}
@@ -44,6 +59,6 @@ export default function ProjectCard({ project }) {
           </span>
         )}
       </div>
-    </Link>
+    </Shell>
   );
 }
