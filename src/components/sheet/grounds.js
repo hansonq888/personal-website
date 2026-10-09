@@ -276,6 +276,15 @@ export function initGrounds(root) {
     host: el.closest("[data-page]") || el.parentElement,
   }));
 
+  // Elements that ride in from the edge, sit while their section is centred,
+  // and withdraw the way they came. The slide owns the whole transform, so its
+  // attribute value doubles as the vertical parallax factor.
+  const slides = [...root.querySelectorAll("[data-slide]")].map((el) => ({
+    el,
+    f: parseFloat(el.dataset.slide) || 0,
+    host: el.closest("[data-page]") || el.parentElement,
+  }));
+
   // Every layer parallaxes inside its own section's overhang, clamped so it can
   // never expose an edge.
   function parallax() {
@@ -294,6 +303,16 @@ export function initGrounds(root) {
       const r = q.host.getBoundingClientRect();
       const rel = r.top + r.height / 2 - vh / 2;
       q.el.style.transform = "translate3d(0," + (-rel * q.f).toFixed(1) + "px,0)";
+    }
+    for (const q of slides) {
+      const r = q.host.getBoundingClientRect();
+      // 0 as the section enters from the bottom, 0.5 centred, 1 as it leaves
+      const p = (vh - r.top) / (r.height + vh);
+      const away = Math.min(1, Math.abs(p - 0.5) * 2.35);   // flat through the middle
+      const x = Math.pow(away, 1.7) * 165;                  // percent of its own width
+      const rel = r.top + r.height / 2 - vh / 2;
+      q.el.style.transform =
+        "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px,0)";
     }
   }
 

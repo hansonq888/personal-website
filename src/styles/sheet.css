@@ -213,6 +213,7 @@
   max-width: 300px;
   justify-self: end;
   perspective: 1000px;
+  will-change: transform;
 }
 @media (max-width: 760px) { .sheet .me-wrap { justify-self: start; max-width: 260px; } }
 
@@ -288,7 +289,7 @@
 .sheet .roles, .sheet .skills { display: grid; width: 100%; }
 .sheet .role {
   display: grid;
-  grid-template-columns: 140px 1fr 200px;
+  grid-template-columns: 140px 1fr 1fr 92px;
   gap: 24px;
   align-items: baseline;
   padding: 22px 0;
@@ -300,9 +301,22 @@
 .sheet .role:last-child { border-bottom: 1px solid var(--rule); }
 .sheet .role:hover { padding-left: 10px; }
 @media (max-width: 760px) {
-  .sheet .role { grid-template-columns: 1fr; gap: 4px; }
+  .sheet .role { grid-template-columns: 1fr 72px; gap: 4px 14px; }
   .sheet .role .r { text-align: left; }
+  .sheet .role .shot { grid-row: 1 / span 3; grid-column: 2; }
 }
+/* the logo sits dim and comes up to full as you pass the row */
+.sheet .role .shot {
+  width: 92px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  align-self: center;
+  background: var(--rule);
+  opacity: 0.5;
+  transition: opacity 0.25s linear;
+}
+.sheet .role:hover .shot { opacity: 1; }
+.sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sheet .role span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
 .sheet .role b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
 .sheet .role i { font-style: normal; font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }

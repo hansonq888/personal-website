@@ -204,7 +204,7 @@ export default function Sheet() {
                 a model that rates how you train, stats for a sport nobody tracks.
               </p>
             </div>
-            <div className="me-wrap" data-par=".055" ref={meRef}>
+            <div className="me-wrap" data-slide=".055" ref={meRef}>
               <div className="polaroid">
                 <img src="/sideeye.JPG" alt="Hanson Qin" />
                 <p className="cap">HANSON QIN &middot; VANCOUVER</p>
@@ -230,6 +230,9 @@ export default function Sheet() {
                 <span>{x.short.when}</span>
                 <b>{x.role}</b>
                 <i className="r">{x.short.where}</i>
+                <span className="shot">
+                  {x.image ? <img src={x.image} alt="" loading="lazy" /> : null}
+                </span>
               </a>
             ))}
           </div>
