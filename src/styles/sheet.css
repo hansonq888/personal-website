@@ -250,38 +250,23 @@
 .sheet .skill b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
 .sheet .skill span { font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
 
-/* ---- projects ----------------------------------------------------------- */
-.sheet .grid {
+/* ---- projects ------------------------------------------------------------
+   The cards are the ones from /projects, unchanged. Only the grid and the
+   cut-in belong to the sheet. */
+.sheet .proj-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px 22px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 80px 56px;
   width: 100%;
+  max-width: 1120px;
 }
-@media (max-width: 900px) { .sheet .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .sheet .grid { grid-template-columns: 1fr; } }
-.sheet .card {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-  opacity: 0;
-  transform: translateY(10px);
-  text-decoration: none;
-  color: inherit;
-}
-.sheet .card.in {
+@media (max-width: 860px) { .sheet .proj-grid { grid-template-columns: 1fr; gap: 56px; } }
+.sheet .proj-grid > * { opacity: 0; transform: translateY(10px); }
+.sheet .proj-grid > *.in {
   opacity: 1;
   transform: none;
   transition: opacity 0.3s linear, transform 0.3s linear;
 }
-.sheet .card .frame {
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid var(--rule);
-}
-.sheet .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sheet .card .lbl { display: flex; justify-content: space-between; gap: 10px; }
-.sheet .card .lbl b { font-weight: 400; font-size: 12.5px; line-height: 1.35; text-transform: uppercase; }
-.sheet .card .lbl i { font-style: normal; font-size: 12.5px; line-height: 1.35; color: var(--ink-55); }
 
 /* ---- the sheet's address line ------------------------------------------- */
 .sheet .sheet-foot { display: flex; gap: 58px; flex-wrap: wrap; margin-top: auto; padding-top: 40px; }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { featuredProjects } from "../data/projects";
+import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import "../styles/sheet.css";
@@ -201,12 +201,9 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-projects" data-page="Projects">
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
-          <div className="grid" ref={gridRef}>
+          <div className="proj-grid" ref={gridRef}>
             {featuredProjects.map((p) => (
-              <Link className="card" key={p.id} to={`/projects/${p.id}`}>
-                <div className="frame">{p.image ? <img src={p.image} alt="" loading="lazy" /> : null}</div>
-                <div className="lbl"><b>{p.title}</b><i>{p.year}</i></div>
-              </Link>
+              <div key={p.id}><ProjectCard project={p} /></div>
             ))}
           </div>
         </div>
