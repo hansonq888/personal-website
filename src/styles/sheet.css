@@ -324,20 +324,20 @@
   inset: 0;
   z-index: 0;
   transform:
-    rotate(calc(var(--fan, 0) * 8deg))
-    translate(calc(var(--fan, 0) * -14%), calc(var(--fan, 0) * -7%))
-    scale(calc(1 - var(--fan, 0) * 0.07));
-  filter: saturate(0.85) brightness(0.9);
+    rotate(calc(var(--fan, 0) * 6deg))
+    translate(calc(var(--fan, 0) * -62%), calc(var(--fan, 0) * -9%))
+    scale(calc(1 - var(--fan, 0) * 0.04));
+  filter: saturate(0.94) brightness(0.96);
 }
 .sheet .polaroid.back2 {
   position: absolute;
   inset: 0;
   z-index: -1;
   transform:
-    rotate(calc(var(--fan, 0) * -11deg))
-    translate(calc(var(--fan, 0) * -30%), calc(var(--fan, 0) * 5%))
-    scale(calc(1 - var(--fan, 0) * 0.12));
-  filter: saturate(0.75) brightness(0.84);
+    rotate(calc(var(--fan, 0) * -8deg))
+    translate(calc(var(--fan, 0) * -126%), calc(var(--fan, 0) * 4%))
+    scale(calc(1 - var(--fan, 0) * 0.08));
+  filter: saturate(0.9) brightness(0.93);
 }
 .sheet .polaroid.back .cap,
 .sheet .polaroid.back2 .cap { display: none; }
