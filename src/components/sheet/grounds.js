@@ -388,6 +388,53 @@ export function initGrounds(root) {
     host: el.closest(".role, .skill") || el.parentElement,
   }));
 
+  // A dither dissolve over a section: paper-coloured cells that thin out as it
+  // arrives, so the page resolves into view rather than sliding into it.
+  const dissolves = [...root.querySelectorAll("[data-dissolve]")].map((el) => ({
+    el,
+    host: el.closest(".panel") || el.parentElement,
+    ctx: el.getContext("2d"),
+    w: 0, h: 0, cols: 0, rows: 0, last: -1,
+  }));
+  const DCELL = 13;
+
+  function drawDissolve(q, p) {
+    const host = q.host;
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    if (w !== q.w || h !== q.h) {
+      q.w = w; q.h = h;
+      q.cols = Math.ceil(w / DCELL); q.rows = Math.ceil(h / DCELL);
+      q.el.width = q.cols; q.el.height = q.rows;
+      q.el.style.width = w + "px"; q.el.style.height = h + "px";
+      q.ctx.imageSmoothingEnabled = false;
+    }
+    const c = q.ctx;
+    const img = c.createImageData(q.cols, q.rows);
+    const o = img.data;
+    // the section starts black and breaks up into the white page beneath it,
+    // with a scatter of lit cells so the break reads as static rather than fade
+    for (let y = 0; y < q.rows; y++) {
+      // the top of the section clears first, so it wipes as well as dissolves
+      const bias = (y / q.rows) * 0.42;
+      for (let x = 0; x < q.cols; x++) {
+        const i = y * q.cols + x;
+        // a stable per-cell threshold
+        let hsh = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+        hsh = ((hsh ^ (hsh >>> 13)) * 1274126177) >>> 0;
+        const thr = (hsh >>> 8) / 16777216;
+        const covered = thr > p * (1 + bias) - bias * 0.5;
+        if (!covered) { o[i*4+3] = 0; continue; }
+        // busiest through the middle of the break-up
+        const hot = ((hsh >>> 3) & 255) / 255 < 0.07 + Math.sin(Math.PI * p) * 0.1;
+        const v = hot ? 250 : 11;
+        o[i*4] = v; o[i*4+1] = v; o[i*4+2] = hot ? 247 : 12;
+        o[i*4+3] = 255;
+      }
+    }
+    c.putImageData(img, 0, 0);
+  }
+
   // Containers that publish how far they have been scrolled through, as --p.
   const meters = [...root.querySelectorAll("[data-progress]")];
 
@@ -457,6 +504,17 @@ export function initGrounds(root) {
       const r = q.host.getBoundingClientRect();
       const rel = r.top + r.height / 2 - vh / 2;
       q.el.style.transform = "translate3d(0," + damp(q, "_y", -rel * q.f).toFixed(1) + "px,0)";
+    }
+
+    for (const q of dissolves) {
+      const r = q.host.getBoundingClientRect();
+      // 0 as the section's top reaches the bottom of the view, 1 a third of the way up
+      const p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.68)));
+      if (p >= 0.999) { if (q.last !== 1) { q.el.style.display = "none"; q.last = 1; } continue; }
+      if (q.last === 1 || q.el.style.display === "none") q.el.style.display = "";
+      if (Math.abs(p - q.last) < 0.004) continue;
+      q.last = p;
+      drawDissolve(q, p);
     }
 
     for (const el of meters) {

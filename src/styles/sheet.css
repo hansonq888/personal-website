@@ -113,22 +113,6 @@
 }
 .sheet .panel-group > .panel { background: transparent; position: relative; z-index: 1; }
 
-/* Experience pins while Projects rides up over it. Projects needs a ground of
-   its own to do the covering, a shade off the paper so the edge reads. */
-.sheet #sheet-experience {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.sheet #sheet-projects {
-  position: relative;
-  z-index: 2;
-  background: #fff;
-  box-shadow: 0 -30px 64px rgba(0, 0, 0, 0.1);
-}
-@media (prefers-reduced-motion: reduce) {
-  .sheet #sheet-experience { position: relative; }
-}
 
 .sheet .panel {
   position: relative;
@@ -404,14 +388,14 @@
   display: grid;
   width: 100%;
   /* capped, or the plates end up at the far edge of a wide screen */
-  max-width: 980px;
+  max-width: 1100px;
   perspective: 1400px;
 }
 /* the rail: a bow drawn through the nodes, filling as you read down it */
 .sheet .arc {
   position: absolute;
-  /* the node column: the 130px date column plus the 28px grid gap */
-  left: 158px;
+  /* the rail runs down the far left now, with the roles to its right */
+  left: 0;
   top: 0;
   width: 150px;
   height: 100%;
@@ -440,7 +424,7 @@
 /* the hand that draws it */
 .sheet .pencil {
   position: absolute;
-  left: 158px;
+  left: 0;
   top: 0;
   width: 300px;
   height: auto;
@@ -456,7 +440,7 @@
 
 .sheet .role {
   display: grid;
-  grid-template-columns: 130px 150px 1fr 240px;
+  grid-template-columns: 150px 130px 1fr 240px;
   gap: 28px;
   align-items: center;
   padding: var(--pad, 30px) 0;
@@ -532,6 +516,134 @@
 }
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+/* ---- the set ---------------------------------------------------------------
+   A CRT built in CSS 3D rather than rendered, so the stack stays real text on
+   the screen: selectable, legible at any size, and still lit by the section. */
+.sheet .tv-stage {
+  --mx: 0;
+  --my: 0;
+  width: 100%;
+  /* the set has to fit the screen it sits on, chrome and all */
+  max-width: min(900px, 128svh);
+  margin: 0 auto;
+  perspective: 1700px;
+  perspective-origin: 50% 46%;
+}
+.sheet .tv {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(calc((var(--rot-y, -4) * 1deg) + (var(--mx) * 8deg)))
+             rotateX(calc((var(--rot-x, 1.5) * 1deg) + (var(--my) * -5.5deg)));
+  transition: transform 0.25s linear;
+  border-radius: 26px;
+  padding: 22px 22px 0;
+  background: linear-gradient(170deg, #3a3a3f 0%, #232327 42%, #171719 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.6),
+    0 40px 90px rgba(0, 0, 0, 0.55),
+    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+@media (max-width: 700px) { .sheet .tv { padding: 16px 16px 0; border-radius: 20px; } }
+
+.sheet .tv-screen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: radial-gradient(120% 120% at 50% 40%, #121216 0%, #09090b 70%, #050506 100%);
+  /* the uneven radii are what give it the bowed glass */
+  border-radius: 42px / 34px;
+  box-shadow:
+    inset 0 0 0 2px #0b0b0d,
+    inset 0 0 44px rgba(0, 0, 0, 0.95),
+    inset 0 0 120px rgba(0, 0, 0, 0.75);
+}
+@media (max-width: 700px) { .sheet .tv-screen { aspect-ratio: 4 / 3; border-radius: 24px / 20px; } }
+
+.sheet .tv-content {
+  position: absolute;
+  inset: 7% 6%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: scaleY(0.004);
+  transform-origin: 50% 50%;
+}
+.sheet .tv.on .tv-content { animation: crt-on 0.8s cubic-bezier(0.2, 0.85, 0.25, 1) forwards; }
+@keyframes crt-on {
+  0%   { opacity: 0; transform: scaleY(0.004) scaleX(1.25); filter: brightness(3); }
+  28%  { opacity: 1; transform: scaleY(0.02) scaleX(1); filter: brightness(2.4); }
+  100% { opacity: 1; transform: none; filter: none; }
+}
+
+/* scanlines and the curved sheen over the glass */
+.sheet .tv-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 3px,
+    rgba(0, 0, 0, 0.22) 4px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+.sheet .tv-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 38%),
+    radial-gradient(70% 50% at 50% 0%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 70%);
+}
+
+.sheet .tv-base {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 6px 14px;
+}
+.sheet .tv-brand,
+.sheet .tv-ch {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgba(250, 250, 247, 0.62);
+  white-space: nowrap;
+}
+.sheet .tv-ch { margin-left: auto; }
+.sheet .tv-dial {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #0d0d0f, #2b2b30);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+@media (max-width: 560px) { .sheet .tv-brand, .sheet .tv-ch { font-size: 9px; letter-spacing: 0.1em; } }
+
+/* the stack is on screen now, so it sets its own scale and never the page's */
+.sheet .tv-content .skills { max-width: none; }
+.sheet .tv-content .skill {
+  grid-template-columns: 42px 150px 1fr;
+  gap: 18px;
+  padding: clamp(5px, 1.1cqh, 13px) 0;
+  border-top-color: rgba(250, 250, 247, 0.16);
+}
+.sheet .tv-content .skill:last-child { border-bottom-color: rgba(250, 250, 247, 0.16); }
+.sheet .tv-content .skill b,
+.sheet .tv-content .skill .items,
+.sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 12px); }
+.sheet .tv-content .skill .items { line-height: 1.7; color: rgba(250, 250, 247, 0.6); }
+.sheet .tv-content .skill b { color: rgba(250, 250, 247, 0.92); }
+.sheet .tv-content .skill .num { color: rgba(250, 250, 247, 0.34); }
+.sheet .tv-content .skill.lit .num { color: #fafaf7; }
+.sheet .tv-content .skill .items em { color: rgba(250, 250, 247, 0.28); }
+.sheet .tv-content .skills:hover .skill.in { opacity: 0.4; }
+.sheet .tv-content .skills:hover .skill.in:hover { opacity: 1; }
+
 /* ---- skills: a numbered index ------------------------------------------- */
 .sheet .skills { display: grid; width: 100%; max-width: 1080px; }
 .sheet .skill {
@@ -569,6 +681,16 @@
 .sheet .skill .items > span { transition: color 0.2s linear; }
 .sheet .skill .items > span:hover { color: var(--ink); }
 .sheet .skill .items em { font-style: normal; color: var(--ink-30); padding: 0 9px; }
+
+/* Projects arrives through a dither dissolve: a field of paper-coloured cells
+   that thin out as the section comes up, so it resolves rather than slides. */
+.sheet .dissolve {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
 
 /* ---- projects ------------------------------------------------------------
    The cards are the ones from /projects, unchanged. Only the grid and the

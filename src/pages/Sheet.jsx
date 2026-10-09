@@ -85,6 +85,7 @@ export default function Sheet() {
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
   const arcRef = useRef(null);
+  const tvRef = useRef(null);
   const pencilRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -162,6 +163,45 @@ export default function Sheet() {
     }, [ref, step, threshold]);
 
   useStagger(rolesRef, 110, 0.3);
+
+  // the set warms up once, the way a CRT does
+  useEffect(() => {
+    const stage = tvRef.current;
+    if (!stage) return;
+    const tv = stage.querySelector(".tv");
+    if (!tv) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      tv.classList.add("on");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { tv.classList.add("on"); io.disconnect(); } }),
+      { threshold: 0.25 }
+    );
+    io.observe(stage);
+    return () => io.disconnect();
+  }, []);
+
+  // and it turns toward the pointer
+  useEffect(() => {
+    const stage = tvRef.current;
+    if (!stage || window.matchMedia("(pointer: coarse)").matches) return;
+    const onMove = (e) => {
+      const r = stage.getBoundingClientRect();
+      stage.style.setProperty("--mx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+      stage.style.setProperty("--my", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+    };
+    const onLeave = () => {
+      stage.style.setProperty("--mx", "0");
+      stage.style.setProperty("--my", "0");
+    };
+    stage.addEventListener("pointermove", onMove);
+    stage.addEventListener("pointerleave", onLeave);
+    return () => {
+      stage.removeEventListener("pointermove", onMove);
+      stage.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
 
   // The rail is a bow rather than a straight line: each node is pushed out
   // along an arc by how far down the list it sits, and the curve is drawn
@@ -505,8 +545,8 @@ export default function Sheet() {
                   "--pad": LOOSE[i % LOOSE.length].pad,
                 }}
               >
-                <span className="when">{x.short.when}</span>
                 <span className="node" aria-hidden="true" />
+                <span className="when">{x.short.when}</span>
                 <span className="who">
                   <b>{x.role}</b>
                   <i>{x.short.where}</i>
@@ -522,6 +562,7 @@ export default function Sheet() {
 
       {/* ---------------- IV. PROJECTS ---------------- */}
       <section className="panel tall" id="sheet-projects" data-page="Projects" data-ground="Projects">
+        <canvas className="dissolve" data-dissolve aria-hidden="true" />
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
           <h2 className="sec-title center">Projects</h2>
@@ -541,8 +582,12 @@ export default function Sheet() {
           <div className="title-row">
             <h2 className="sec-title">Skills</h2>
             <img className="motif inv" src="/dotted_star_shining.gif" alt=""
-                 style={{ width: "min(260px, 52vw)" }} />
+                 style={{ width: "min(220px, 44vw)" }} />
           </div>
+          <div className="tv-stage" ref={tvRef} data-tilt3d>
+          <div className="tv">
+            <div className="tv-screen">
+              <div className="tv-content">
           <div className="skills" ref={skillsRef} data-lit>
             {skillSections.map((g, i) => (
               <div className="skill" key={g.title}>
@@ -558,6 +603,17 @@ export default function Sheet() {
                 </span>
               </div>
             ))}
+          </div>
+              </div>
+              <div className="tv-scan" aria-hidden="true" />
+              <div className="tv-glare" aria-hidden="true" />
+            </div>
+            <div className="tv-base">
+              <span className="tv-brand">HANSON QIN</span>
+              <span className="tv-dial" aria-hidden="true" />
+              <span className="tv-ch">CH 005 &middot; STACK.TXT</span>
+            </div>
+          </div>
           </div>
         </div>
         <div className="sheet-foot">
