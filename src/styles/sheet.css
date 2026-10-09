@@ -431,8 +431,9 @@
   user-select: none;
   z-index: 2;
   opacity: 0;
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.22));
-  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, filter;
 }
 @media (max-width: 980px) { .sheet .pencil { display: none; } }
 

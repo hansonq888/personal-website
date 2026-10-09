@@ -263,9 +263,12 @@ export default function Sheet() {
       list._railLen = len;
     };
 
-    // the pencil's point rides the end of the drawn stroke
+    // the pencil's point rides the end of the drawn stroke, leaning into the
+    // direction it is travelling
     const pencil = pencilRef.current;
     let raf = 0;
+    const smooth = { lean: 0, ry: 0, rx: 0 };
+    const lerp = (a, b, k) => a + (b - a) * k;
     const ride = () => {
       raf = requestAnimationFrame(ride);
       if (!pencil || !fill.getPointAtLength) return;
@@ -275,23 +278,49 @@ export default function Sheet() {
       const sb = svg.getBoundingClientRect();
       const vb = svg.viewBox.baseVal;
       if (!vb || !vb.width || !vb.height) return;
-      const pt = fill.getPointAtLength(len * p);
-      // viewBox units are CSS pixels in y but scale in x, so map both
-      const x = (pt.x / vb.width) * sb.width;
-      const y = (pt.y / vb.height) * sb.height;
-      const w = pencil.offsetWidth || 190;
-      const h = pencil.offsetHeight || 107;
+
+      const at = len * p;
+      const pt = fill.getPointAtLength(at);
+      // a second sample a little further on gives the direction of travel
+      const ahead = fill.getPointAtLength(Math.min(len, at + 7));
+      const sx = sb.width / vb.width;
+      const sy = sb.height / vb.height;
+      const x = pt.x * sx;
+      const y = pt.y * sy;
+      const dx = (ahead.x - pt.x) * sx;
+      const dy = (ahead.y - pt.y) * sy;
+
+      // the rail runs downward, so measure the lean off vertical
+      const off = Math.atan2(dx, Math.max(0.001, Math.abs(dy))) * (180 / Math.PI);
+      const clamp = (v, m) => Math.max(-m, Math.min(m, v));
+      smooth.lean = lerp(smooth.lean, clamp(off * 0.5, 24), 0.16);
+      smooth.ry = lerp(smooth.ry, clamp(off * 0.8, 30), 0.14);
+      smooth.rx = lerp(smooth.rx, clamp(-dy * 1.6, 16) + 6, 0.12);
+
+      const w = pencil.offsetWidth || 300;
+      const h = pencil.offsetHeight || 169;
       // the hand swings in from the right as the stroke starts and lifts away
       // at the end, rather than simply fading
       const IN = 0.07;
       const present = Math.max(0, Math.min(1, Math.min(p / IN, (1 - p) / IN)));
       const e = 1 - present;
       const ease = e * e;
-      pencil.style.transform =
-        "translate3d(" + (x - TIP.x * w + ease * 260).toFixed(1) + "px," +
-        (y - TIP.y * h + ease * 46).toFixed(1) + "px,0) " +
-        "rotate(" + (ease * 17).toFixed(2) + "deg) scale(" + (1 - ease * 0.16).toFixed(3) + ")";
+      // a slow rock, as a wrist does while it writes
+      const bob = Math.sin(at / 26) * 2.4 * present;
+
       pencil.style.transformOrigin = TIP.x * 100 + "% " + TIP.y * 100 + "%";
+      pencil.style.transform =
+        "translate3d(" + (x - TIP.x * w + ease * 300).toFixed(1) + "px," +
+        (y - TIP.y * h + ease * 56).toFixed(1) + "px,0) " +
+        "rotateX(" + (smooth.rx * present).toFixed(2) + "deg) " +
+        "rotateY(" + (smooth.ry * present + ease * 26).toFixed(2) + "deg) " +
+        "rotateZ(" + (smooth.lean + bob + ease * 18).toFixed(2) + "deg) " +
+        "scale(" + (1 - ease * 0.18).toFixed(3) + ")";
+      // the shadow swings opposite the tilt, which is what reads as height
+      const sh = clamp(-smooth.ry * 0.7, 22);
+      pencil.style.filter =
+        "drop-shadow(" + sh.toFixed(1) + "px " + (18 + Math.abs(smooth.rx) * 0.6).toFixed(1) +
+        "px " + (20 + Math.abs(sh)).toFixed(1) + "px rgba(0,0,0," + (0.3 * present).toFixed(3) + "))";
       pencil.style.opacity = present.toFixed(3);
     };
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) raf = requestAnimationFrame(ride);
