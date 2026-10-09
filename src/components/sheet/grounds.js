@@ -25,10 +25,10 @@ const WEATHER = {
 
 // section -> [renderer, parallax factor]. Negative moves against the scroll.
 const SYSTEM = {
-  Home: ["dither", 0.05],   // spans Home + About
-  Experience: ["phi", -0.15],
+  Home: ["dither", 0.05],      // spans Home + About
+  Experience: ["phi", -0.15],  // spans Experience + Projects
+  Projects: ["orbits", 0.1],   // its own layer, over the shared one
   Skills: ["contour", 0.13],
-  // Projects has no ground at all
 };
 
 const hair = (S) => (S.light ? "rgba(11,11,12,.125)" : "rgba(250,250,247,.155)");
@@ -212,6 +212,57 @@ export function initGrounds(root) {
     }
   }
 
+  /* --- IV: orbits. rings that butterfly open and planets that ride them --- */
+  // Concentric at the middle of the section, splaying into mirrored pairs of
+  // flattened dials at either end, in step with the cards unzipping.
+  function drawOrbits(S, t, prog) {
+    const c = S.ctx;
+    const W = S.w, H = S.h;
+    c.clearRect(0, 0, W, H);
+    c.lineWidth = 1;
+    const cx = W / 2, cy = H / 2;
+    const maxR = Math.min(W, H) * 0.46;
+    const a = Math.min(1, Math.abs(prog - 0.5) * 2);   // 0 centred, 1 at either end
+    const spread = a * W * 0.17;                        // the zipper
+    const squash = 1 - a * 0.48;                        // rings flatten into dials
+    const fan = a * 0.52;                               // and fan apart
+    const N = 7;
+    for (let i = 0; i < N; i++) {
+      const f = (i + 1) / N;
+      const r = maxR * f;
+      const side = i % 2 ? 1 : -1;                      // the butterfly
+      c.save();
+      c.translate(cx + side * spread * (0.4 + f), cy);
+      c.rotate(side * fan * f);
+      c.strokeStyle = i % 3 === 0 ? hair(S) : faint(S);
+      c.beginPath();
+      c.ellipse(0, 0, r, r * squash, 0, 0, Math.PI * 2);
+      c.stroke();
+
+      // every third ring is a dial, with ticks around its rim
+      if (i % 3 === 1) {
+        c.strokeStyle = faint(S);
+        for (let k = 0; k < 36; k++) {
+          const th = (k / 36) * Math.PI * 2;
+          const co = Math.cos(th), si = Math.sin(th);
+          const len = k % 9 === 0 ? 9 : 4;
+          c.beginPath();
+          c.moveTo(co * r, si * r * squash);
+          c.lineTo(co * (r - len), si * (r - len) * squash);
+          c.stroke();
+        }
+      }
+
+      // a planet riding the ring
+      const th = t * 0.00022 * (1 + i * 0.26) + i * 1.1;
+      c.fillStyle = hair(S);
+      c.beginPath();
+      c.arc(Math.cos(th) * r, Math.sin(th) * r * squash, i % 3 === 0 ? 4 : 2.6, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+    }
+  }
+
   /* --- V: contour rings, breathing outward --- */
   function drawContour(S, t) {
     const c = S.ctx;
@@ -257,6 +308,7 @@ export function initGrounds(root) {
     if (!S.canvas) return;
     if (S.kind === "dither") drawDither(S, t);
     else if (S.kind === "phi") drawPhi(S, t, S.prog);
+    else if (S.kind === "orbits") drawOrbits(S, t, S.prog);
     else drawContour(S, t);
   }
 
@@ -273,7 +325,7 @@ export function initGrounds(root) {
   const pars = [...root.querySelectorAll("[data-par]")].map((el) => ({
     el,
     f: parseFloat(el.dataset.par),
-    host: el.closest("[data-page]") || el.parentElement,
+    host: el.closest("[data-page], .panel") || el.parentElement,
   }));
 
   // Elements that ride in from the edge, sit while their section is centred,
@@ -282,7 +334,14 @@ export function initGrounds(root) {
   const slides = [...root.querySelectorAll("[data-slide]")].map((el) => ({
     el,
     f: parseFloat(el.dataset.slide) || 0,
-    host: el.closest("[data-page]") || el.parentElement,
+    host: el.closest("[data-page], .panel") || el.parentElement,
+  }));
+
+  // Elements that swell as their section crosses the middle of the view and
+  // shrink away at either end, opening out of a clip as they come.
+  const zooms = [...root.querySelectorAll("[data-zoom]")].map((el) => ({
+    el,
+    host: el.closest(".panel") || el.parentElement,
   }));
 
   // The project grid unzips: cards converge as they reach the middle of the
@@ -330,6 +389,19 @@ export function initGrounds(root) {
         "translate3d(" + x.toFixed(1) + "%," + (-rel * q.f).toFixed(1) + "px," +
         z.toFixed(1) + "px) rotateY(" + ry.toFixed(2) + "deg) rotateZ(" + rz.toFixed(2) + "deg)";
       q.el.style.setProperty("--near", (1 - e).toFixed(3));
+    }
+
+    for (const q of zooms) {
+      const r = q.host.getBoundingClientRect();
+      const p = (vh - r.top) / (r.height + vh);
+      const d = Math.max(-1, Math.min(1, (p - 0.5) * 2));   // -1 below, 0 centred, 1 above
+      const near = 1 - Math.abs(d);
+      q.el.style.transform =
+        "perspective(1200px) translate3d(0," + (d * 70).toFixed(1) + "px,0) " +
+        "scale(" + (0.76 + near * 0.3).toFixed(3) + ") rotateX(" + (d * 9).toFixed(2) + "deg)";
+      const inset = (Math.abs(d) * 13).toFixed(1);
+      q.el.style.clipPath = "inset(" + inset + "% " + inset + "% round 2px)";
+      q.el.style.opacity = (0.25 + near * 0.75).toFixed(3);
     }
 
     for (const q of fliers) {

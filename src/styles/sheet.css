@@ -149,10 +149,19 @@
 .sheet .spec {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
   clip-path: inset(0 100% 0 0);
 }
+/* a solid bar filling the line between the two labels, as the poster does */
+.sheet .bar {
+  flex: 1;
+  min-width: 40px;
+  height: 12px;
+  background: var(--ink);
+  opacity: 0.92;
+}
+@media (max-width: 620px) { .sheet .bar { display: none; } }
 .sheet .spec.in { clip-path: inset(0 0 0 0); transition: clip-path 0.55s steps(14, end); }
 .sheet .spec .r { text-align: right; }
 .sheet .spec b {
@@ -188,28 +197,29 @@
 }
 
 /* ---- home ----------------------------------------------------------------- */
-.sheet .hero-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 48px;
+/* the reel: one screen that is only the gif, swelling as it passes */
+.sheet .panel.reel {
   align-items: center;
-  width: 100%;
+  justify-content: center;
+  gap: 26px;
 }
-@media (max-width: 1000px) { .sheet .hero-row { grid-template-columns: 1fr; gap: 26px; } }
-.sheet .hero-gif {
+.sheet .reel-wrap {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 460px;
-  height: auto;
+  max-width: 820px;
+  will-change: transform, clip-path, opacity;
+}
+.sheet .reel-gif {
   display: block;
-  justify-self: end;
+  width: 100%;
+  height: auto;
   /* the gif is black-backed, so screen drops its field into the ground */
   mix-blend-mode: screen;
-  opacity: 0;
-  animation: sheet-hero-in 0.5s linear 1.15s forwards;
 }
-@keyframes sheet-hero-in { to { opacity: 1; } }
+.sheet .reel-cap { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) {
-  .sheet .hero-gif { opacity: 1; animation: none; }
+  .sheet .reel-wrap { transform: none !important; clip-path: none !important; opacity: 1 !important; }
 }
 
 /* ---- hero type --------------------------------------------------------------- */
@@ -226,6 +236,9 @@
 
 /* a section title, set against the hero but well under it */
 .sheet .sec-title {
+  /* index.css sets h1-h3 globally to the Jersey 25 pixel face; the sheet is
+     one typeface throughout, so say so explicitly */
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   margin: 0 0 44px;
   font-weight: 700;
   letter-spacing: -0.035em;
@@ -306,7 +319,7 @@
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  object-position: 60% 35%;
+  object-position: 50% 30%;
 }
 .sheet .polaroid .cap {
   position: absolute;
@@ -487,6 +500,22 @@
 .sheet .paper .proj-grid .pc-frame { background: #f4f4f4; }
 .sheet .paper .proj-grid .pc-badge { background: #000; color: #fff; }
 .sheet .paper .proj-grid .pc-year { color: rgba(11, 11, 12, 0.45); }
+/* registration marks in two corners of every plate */
+.sheet .proj-grid .pc-frame::before,
+.sheet .proj-grid .pc-frame::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  z-index: 2;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: opacity 0.3s linear;
+}
+.sheet .proj-grid .pc-frame::before { top: 9px; left: 9px; border-right: 0; border-bottom: 0; }
+.sheet .proj-grid .pc-frame::after { bottom: 9px; right: 9px; border-left: 0; border-top: 0; }
+.sheet .proj-grid .group:hover .pc-frame::before,
+.sheet .proj-grid .group:hover .pc-frame::after { opacity: 0.35; }
 /* the transform belongs to the scroll, so only opacity transitions here */
 .sheet .proj-grid > * {
   opacity: 0;

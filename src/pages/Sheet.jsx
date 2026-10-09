@@ -42,7 +42,7 @@ function Giant({ text, delay = 0 }) {
   );
 }
 
-function Spec({ left, leftSub, right, rightSub }) {
+function Spec({ left, leftSub, right, rightSub, bar = false }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
@@ -61,6 +61,7 @@ function Spec({ left, leftSub, right, rightSub }) {
   return (
     <div className="spec" ref={ref}>
       <div><b>{left}</b><i>{leftSub}</i></div>
+      {bar ? <span className="bar" aria-hidden="true" /> : null}
       <div className="r"><b>{right}</b><i>{rightSub}</i></div>
     </div>
   );
@@ -198,13 +199,10 @@ export default function Sheet() {
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="INDEX.HTML" rightSub="1280X1080PX" />
         <div className="body" data-par=".035">
-          <div className="hero-row">
-            <div>
-              <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
-              <Giant text="Hanson" delay={120} />
-              <Giant text="Qin" delay={340} />
-            </div>
-            <img className="hero-gif" src="/ezgif.com-gif-maker.gif" alt="" />
+          <div>
+            <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
+            <Giant text="Hanson" delay={120} />
+            <Giant text="Qin" delay={340} />
           </div>
         </div>
         <div className="foot">
@@ -214,6 +212,14 @@ export default function Sheet() {
           </div>
           <p className="lab dim">Scroll</p>
         </div>
+      </section>
+
+      {/* ------------- interstitial: the reel ------------- */}
+      <section className="panel reel" id="sheet-reel" aria-label="Reel">
+        <div className="reel-wrap" data-zoom>
+          <img className="reel-gif" src="/ezgif.com-gif-maker.gif" alt="" />
+        </div>
+        <p className="lab dim reel-cap">REEL.GIF &middot; 800X400PX</p>
       </section>
 
       {/* ---------------- II. ABOUT ---------------- */}
@@ -232,7 +238,7 @@ export default function Sheet() {
             </div>
             <div className="me-wrap" data-slide=".055" ref={meRef}>
               <div className="polaroid">
-                <img src="/sideeye.JPG" alt="Hanson Qin" />
+                <img src="/AIheadshot.jpg" alt="Hanson Qin" />
                 <p className="cap">HANSON QIN &middot; VANCOUVER</p>
               </div>
             </div>
@@ -270,7 +276,7 @@ export default function Sheet() {
       </section>
 
       {/* ---------------- IV. PROJECTS ---------------- */}
-      <section className="panel tall" id="sheet-projects" data-page="Projects">
+      <section className="panel tall" id="sheet-projects" data-page="Projects" data-ground="Projects">
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
           <h2 className="sec-title center">Projects</h2>
@@ -285,7 +291,7 @@ export default function Sheet() {
 
       {/* ---------------- V. SKILLS ---------------- */}
       <section className="panel deep" id="sheet-skills" data-page="Skills" data-ground="Skills">
-        <Spec left="Skills" leftSub={`${skillSections.length} Groups`} right="STACK.TXT" rightSub="Updated 2026" />
+        <Spec left="Skills" leftSub={`${skillSections.length} Groups`} right="STACK.TXT" rightSub="Updated 2026" bar />
         <div className="body">
           <h2 className="sec-title">Skills</h2>
           <div className="skills" ref={skillsRef}>
