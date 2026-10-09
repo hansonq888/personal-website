@@ -1,13 +1,10 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import { featuredProjects } from "../data/projects";
 import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
-
-// three.js is a large chunk; it loads on its own rather than blocking the page
-const ExperienceScene = lazy(() => import("../components/sheet/ExperienceScene"));
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import "../styles/sheet.css";
 
@@ -90,23 +87,6 @@ export default function Sheet() {
   const arcRef = useRef(null);
   const tvRef = useRef(null);
 
-  // the scene only loads where it is wanted: not under reduced-motion, and not
-  // on a narrow screen where it would cost more than it gives
-  const [use3D, setUse3D] = useState(false);
-  useEffect(() => {
-    const ok =
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-      window.matchMedia("(min-width: 860px)").matches;
-    if (!ok) return;
-    const el = document.getElementById("sheet-experience");
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { setUse3D(true); io.disconnect(); } }),
-      { rootMargin: "600px 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
   const pencilRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -545,14 +525,7 @@ export default function Sheet() {
       <section className="panel tall" id="sheet-experience" data-page="Experience">
         <Spec left="Experience" leftSub={`${experiences.length} Entries`} right="ROLES.TXT" rightSub="2025—2026" />
         <div className="body">
-          <div className="xp-band">
-            {use3D ? (
-              <Suspense fallback={null}>
-                <ExperienceScene />
-              </Suspense>
-            ) : null}
-            <h2 className="sec-title">Experience</h2>
-          </div>
+          <h2 className="sec-title">Experience</h2>
           <div className="roles" ref={rolesRef} data-progress data-lit>
             <svg className="arc" ref={arcRef} aria-hidden="true" preserveAspectRatio="none">
               <path className="arc-track" />
