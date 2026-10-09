@@ -412,9 +412,9 @@ export default function Sheet() {
       const clamp = (v, m) => Math.max(-m, Math.min(m, v));
       // a lighter lean, and a slower filter on it, so the hand settles rather
       // than reacting to every kink in the line
-      smooth.lean = lerp(smooth.lean, clamp(off * 0.24, 11), 0.065);
-      smooth.ry = lerp(smooth.ry, clamp(off * 0.36, 13), 0.055);
-      smooth.rx = lerp(smooth.rx, clamp(-dy * 0.7, 7) + 3, 0.05);
+      smooth.lean = lerp(smooth.lean, clamp(off * 0.12, 6), 0.045);
+      smooth.ry = lerp(smooth.ry, clamp(off * 0.17, 7), 0.04);
+      smooth.rx = lerp(smooth.rx, clamp(-dy * 0.34, 4) + 2, 0.035);
 
       const w = pencil.offsetWidth || 300;
       const h = pencil.offsetHeight || 169;
@@ -427,7 +427,7 @@ export default function Sheet() {
       const e = 1 - present;
       const ease = e * e;
       // a slow rock, as a wrist does while it writes
-      const bob = Math.sin(at / 52) * 0.9 * present;
+      const bob = Math.sin(at / 70) * 0.4 * present;
 
       pencil.style.transformOrigin = TIP.x * 100 + "% " + TIP.y * 100 + "%";
       // it comes down from above rather than in from the corner
