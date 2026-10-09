@@ -534,7 +534,11 @@ export default function Sheet() {
       <section className="panel" id="sheet-about" data-page="About">
         <Spec left="About" leftSub="Bitmap Session" right="HEADSHOT.JPG" rightSub="800X800PX" />
         <div className="body">
-          <h2 className="sec-title">About me</h2>
+          <div className="title-row">
+            <h2 className="sec-title">About me</h2>
+            <img className="motif inv" src="/swimming_fish.gif" alt=""
+                 style={{ width: "min(320px, 24vw)" }} />
+          </div>
           <div className="about-row">
             <div>
               <Reveal className="lab" text="CS + Math @ Yale" />
@@ -544,8 +548,6 @@ export default function Sheet() {
                 style={{ maxWidth: "38ch", marginTop: 20 }}
                 text="I build things that run in the browser and have no right to — an audio engine in C++, a model that rates how you train, stats for a sport nobody tracks."
               />
-              <img className="motif inv" src="/swimming_fish.gif" alt="" data-drift=".05"
-                   style={{ width: "min(340px, 80%)", marginTop: 26 }} />
             </div>
             <div className="me-wrap" data-slide=".055" ref={meRef}>
               <div className="polaroid">
