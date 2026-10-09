@@ -387,34 +387,33 @@
   display: grid;
   width: 100%;
   /* capped, or the plates end up at the far edge of a wide screen */
-  max-width: 860px;
+  max-width: 920px;
   perspective: 1400px;
 }
-/* the spine, running between the first and last node */
-.sheet .roles::before {
-  content: "";
+/* the rail: a bow drawn through the nodes, filling as you read down it */
+.sheet .arc {
   position: absolute;
-  left: 191px; /* 150 col + 28 gap + half the 26px node column */
-  top: 64px;
-  bottom: 64px;
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--rule) 8%, var(--rule) 92%, transparent);
+  /* the node column: the 150px date column plus the 28px grid gap */
+  left: 178px;
+  top: 0;
+  width: 96px;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
 }
-@media (max-width: 760px) { .sheet .roles::before { display: none; } }
-.sheet .spine-fill {
-  position: absolute;
-  left: 191px;
-  top: 64px;
-  width: 1px;
-  height: calc((100% - 128px) * var(--p, 0));
-  background: var(--ink);
-  opacity: 0.5;
+.sheet .arc path { fill: none; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.sheet .arc-track { stroke: var(--rule); }
+.sheet .arc-fill {
+  stroke: var(--ink);
+  opacity: 0.55;
+  stroke-dasharray: var(--len, 1000);
+  stroke-dashoffset: calc(var(--len, 1000) * (1 - var(--p, 0)));
 }
-@media (max-width: 760px) { .sheet .spine-fill { display: none; } }
+@media (max-width: 760px) { .sheet .arc { display: none; } }
 
 .sheet .role {
   display: grid;
-  grid-template-columns: 150px 26px 1fr 240px;
+  grid-template-columns: 150px 96px 1fr 240px;
   gap: 28px;
   align-items: center;
   padding: 30px 0;
@@ -451,8 +450,9 @@
 
 /* the node sits on the spine, its ring punching a hole in the line */
 .sheet .role .node {
-  justify-self: center;
+  justify-self: start;
   align-self: center;
+  transform: translateX(var(--ax, 0px));
   width: 9px;
   height: 9px;
   border-radius: 50%;
@@ -461,7 +461,7 @@
   transition: background 0.25s linear, transform 0.25s linear;
 }
 .sheet .role.lit .node { background: var(--ink); }
-.sheet .role:hover .node { background: var(--ink); transform: scale(1.35); }
+.sheet .role:hover .node { background: var(--ink); transform: translateX(var(--ax, 0px)) scale(1.4); }
 .sheet .roles:hover .role { opacity: 0.45; }
 .sheet .roles:hover .role:hover, .sheet .roles .role:not(.in) { opacity: inherit; }
 .sheet .roles:hover .role.in:hover { opacity: 1; }

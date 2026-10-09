@@ -76,6 +76,7 @@ export default function Sheet() {
   const meRef = useRef(null);
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
+  const arcRef = useRef(null);
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -152,6 +153,65 @@ export default function Sheet() {
     }, [ref, step, threshold]);
 
   useStagger(rolesRef, 110, 0.3);
+
+  // The rail is a bow rather than a straight line: each node is pushed out
+  // along an arc by how far down the list it sits, and the curve is drawn
+  // through the nodes so the two can never disagree.
+  useEffect(() => {
+    const list = rolesRef.current;
+    const svg = arcRef.current;
+    if (!list || !svg) return;
+    const track = svg.querySelector(".arc-track");
+    const fill = svg.querySelector(".arc-fill");
+
+    const RAIL_W = 96;                     // matches the node column in sheet.css
+    const layout = () => {
+      const rows = [...list.querySelectorAll(".role")];
+      if (!rows.length) return;
+      const lb = list.getBoundingClientRect();
+      const bow = Math.min(RAIL_W - 18, lb.width * 0.09);
+      const pts = rows.map((row) => {
+        const node = row.querySelector(".node");
+        const nb = node.getBoundingClientRect();
+        const y = nb.top - lb.top + nb.height / 2;
+        return { row, node, y };
+      });
+      const y0 = pts[0].y;
+      const y1 = pts[pts.length - 1].y;
+      const span = Math.max(1, y1 - y0);
+      pts.forEach((pt) => {
+        // a half sine: flush at the ends, furthest out in the middle
+        pt.x = bow * Math.sin((Math.PI * (pt.y - y0)) / span);
+        pt.node.style.setProperty("--ax", pt.x.toFixed(1) + "px");
+      });
+      // run the curve past the first and last node so it reads as a rail
+      const head = { x: 0, y: Math.max(0, y0 - 44) };
+      const tail = { x: 0, y: Math.min(lb.height, y1 + 44) };
+      const all = [head, ...pts, tail];
+      let d = "M" + all[0].x.toFixed(1) + "," + all[0].y.toFixed(1);
+      for (let i = 1; i < all.length; i++) {
+        const a = all[i - 1], b = all[i];
+        const my = (a.y + b.y) / 2;
+        d += " C" + a.x.toFixed(1) + "," + my.toFixed(1) +
+             " " + b.x.toFixed(1) + "," + my.toFixed(1) +
+             " " + b.x.toFixed(1) + "," + b.y.toFixed(1);
+      }
+      // the box is the node column, not the list: with preserveAspectRatio="none"
+      // x and y scale independently, so both must map 1:1 to CSS pixels
+      svg.setAttribute("viewBox", "0 0 " + RAIL_W + " " + Math.max(1, lb.height));
+      track.setAttribute("d", d);
+      fill.setAttribute("d", d);
+      const len = fill.getTotalLength ? fill.getTotalLength() : 1000;
+      list.style.setProperty("--len", len.toFixed(1));
+    };
+
+    layout();
+    const ro = new ResizeObserver(layout);
+    ro.observe(list);
+    window.addEventListener("resize", layout);
+    const t = setTimeout(layout, 600);   // once the stagger has settled
+    return () => { ro.disconnect(); window.removeEventListener("resize", layout); clearTimeout(t); };
+  }, []);
 
   // the plates turn a little toward the pointer, the polaroid's trick at a
   // fraction of the angle
@@ -301,7 +361,10 @@ export default function Sheet() {
         <div className="body">
           <h2 className="sec-title">Experience</h2>
           <div className="roles" ref={rolesRef} data-progress data-lit>
-            <span className="spine-fill" aria-hidden="true" />
+            <svg className="arc" ref={arcRef} aria-hidden="true" preserveAspectRatio="none">
+              <path className="arc-track" />
+              <path className="arc-fill" />
+            </svg>
             {experiences.map((x, i) => (
               <a className="role" key={x.org} href={x.url} target="_blank" rel="noreferrer">
                 <span className="when">{x.short.when}</span>
