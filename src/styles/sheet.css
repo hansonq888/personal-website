@@ -97,7 +97,7 @@
    without a seam */
 .sheet .panel-group {
   position: relative;
-  overflow: hidden;
+  overflow: clip;
   background: var(--ground);
 }
 .sheet .panel-group.deep { background: var(--deep); --rule: #24242a; }
@@ -112,6 +112,23 @@
   color: var(--ink);
 }
 .sheet .panel-group > .panel { background: transparent; position: relative; z-index: 1; }
+
+/* Experience pins while Projects rides up over it. Projects needs a ground of
+   its own to do the covering, a shade off the paper so the edge reads. */
+.sheet #sheet-experience {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.sheet #sheet-projects {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  box-shadow: 0 -30px 64px rgba(0, 0, 0, 0.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet #sheet-experience { position: relative; }
+}
 
 .sheet .panel {
   position: relative;
