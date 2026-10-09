@@ -516,6 +516,27 @@
 }
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+/* The word runs the full width and the set stands in front of it. */
+.sheet #sheet-skills .title-row {
+  justify-content: center;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 40px);
+  position: relative;
+  z-index: 0;
+}
+.sheet #sheet-skills .sec-title {
+  font-size: clamp(3.4rem, 15.5vw, 14rem);
+  line-height: 0.78;
+  letter-spacing: -0.045em;
+  margin-bottom: 0;
+}
+.sheet #sheet-skills .motif { width: clamp(90px, 9vw, 170px) !important; }
+.sheet #sheet-skills .tv-stage {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(-150px, -7.5vw, -46px);
+}
+
 /* ---- the set ---------------------------------------------------------------
    A CRT built in CSS 3D rather than rendered, so the stack stays real text on
    the screen: selectable, legible at any size, and still lit by the section. */
@@ -634,7 +655,7 @@
 }
 .sheet .tv-content .skill:last-child { border-bottom-color: rgba(250, 250, 247, 0.16); }
 .sheet .tv-content .skill b,
-.sheet .tv-content .skill .items { font-size: clamp(11px, 1.62vw, 22px); }
+.sheet .tv-content .skill .items { font-size: clamp(9px, 1.2vw, 16px); }
 .sheet .tv-content .skill .num { font-size: clamp(8px, 1.05vw, 14px); }
 .sheet .tv-content .skill .items { line-height: 1.45; color: rgba(250, 250, 247, 0.62); }
 .sheet .tv-content .skill b { letter-spacing: 0.01em; }
