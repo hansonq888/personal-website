@@ -22,6 +22,15 @@ const LOOSE = [
 ];
 const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
+// what the rail reports for each chapter
+const FILES = [
+  ["INDEX.HTML", "1280X1080PX"],
+  ["HEADSHOT.JPG", "800X800PX"],
+  ["ROLES.TXT", "2025—2026"],
+  ["GRID.JPG", "1600X900PX"],
+  ["STACK.TXT", "UPDATED 2026"],
+];
+
 
 /* The hero is split per word, then per letter: each word stays in one
    unbreakable box, or the per-letter spans let it wrap mid-word. */
@@ -474,6 +483,38 @@ export default function Sheet() {
     <div className="sheet" ref={rootRef}>
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
+      {/* the rail: fixed, dark, and reporting on whatever chapter you are in */}
+      <aside className="rail" aria-label="Contents">
+        <div className="rail-top">
+          <p className="rail-sig">Hanson Qin</p>
+          <p className="rail-sub">Software Engineer</p>
+        </div>
+
+        <nav className="rail-index">
+          {PAGES.map((pg, i) => (
+            <a key={pg} href={"#sheet-" + pg.toLowerCase()} onClick={go(i)}
+               aria-current={i === current ? "true" : "false"}>
+              <b>{pg}</b><s /><u>{ROMAN[i]}</u>
+            </a>
+          ))}
+        </nav>
+
+        <div className="rail-readout">
+          <div className="rail-meter"><i style={{ height: progress.toFixed(2) + "%" }} /></div>
+          <div className="rail-file">
+            <b>{FILES[current][0]}</b>
+            <i>{FILES[current][1]}</i>
+            <i>{String(current + 1).padStart(2, "0")} / {String(PAGES.length).padStart(2, "0")}</i>
+          </div>
+        </div>
+
+        <div className="rail-foot">
+          <a href="mailto:hanson.qin@yale.edu">hanson.qin@yale.edu</a>
+          <a href="https://github.com/hansonq888" target="_blank" rel="noreferrer">github</a>
+          <a href="https://www.linkedin.com/in/hansonqin/" target="_blank" rel="noreferrer">linkedin</a>
+        </div>
+      </aside>
+
       <div className="sheet-bar">
         <span className="sig">Hanson Qin</span>
         <nav aria-label="Sections">
@@ -486,6 +527,7 @@ export default function Sheet() {
         </nav>
       </div>
 
+      <div className="sheet-col">
       {/* ------------- I + II share one ground ------------- */}
       <div className="panel-group deep sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
@@ -644,12 +686,8 @@ export default function Sheet() {
           </div>
           </div>
         </div>
-        <div className="sheet-foot">
-          <a href="mailto:hanson.qin@yale.edu">hanson.qin@yale.edu</a>
-          <a href="https://github.com/hansonq888" target="_blank" rel="noreferrer">github.com/hansonq888</a>
-          <a href="https://www.linkedin.com/in/hansonqin/" target="_blank" rel="noreferrer">linkedin</a>
-        </div>
       </section>
+      </div>
     </div>
   );
 }
