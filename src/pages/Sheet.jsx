@@ -7,6 +7,7 @@ import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
+import PaperIntro from "../components/sheet/PaperIntro";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -493,6 +494,7 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
+      <PaperIntro targetSelector="#sheet-home .tv-screen" />
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
@@ -671,8 +673,24 @@ export default function Sheet() {
             <img className="motif inv" src="/dotted_star_shining.gif" alt=""
                  style={{ width: "min(220px, 44vw)" }} />
           </div>
-          <div className="tv-stage" data-tilt3d>
+          {/* the same kind of set as Home's, built deeper: a cabinet with the
+              tube's housing stepping out behind */}
+          <div className="tv-stage stack-set" data-tilt3d>
           <div className="tv">
+            <div className="tv-body" aria-hidden="true">
+              <span className="tv-side top" />
+              <span className="tv-side bottom" />
+              <span className="tv-side left" />
+              <span className="tv-side right" />
+              <span className="tv-back" />
+            </div>
+            <div className="tv-body tv-rear" aria-hidden="true">
+              <span className="tv-side top" />
+              <span className="tv-side bottom" />
+              <span className="tv-side left" />
+              <span className="tv-side right" />
+              <span className="tv-back" />
+            </div>
             <div className="tv-screen">
               <div className="tv-content">
           <div className="skills" ref={skillsRef} data-lit>
@@ -682,7 +700,9 @@ export default function Sheet() {
                 <b>{g.title}</b>
                 <span className="items">
                   {g.skills.map((it, j) => (
-                    <span key={it}>
+                    // each skill holds together as one unit; only a long
+                    // parenthesised one (the Azure list) may wrap inside
+                    <span key={it} className={it.length > 28 ? "long" : undefined}>
                       {it}
                       {j < g.skills.length - 1 ? <em aria-hidden="true">/</em> : null}
                     </span>

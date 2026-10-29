@@ -629,6 +629,8 @@
   margin-bottom: 0;
 }
 .sheet #sheet-skills .motif { width: clamp(90px, 9vw, 170px) !important; }
+/* tucked a little closer to the word */
+.sheet #sheet-skills .title-row .motif { margin-left: -24px; }
 /* the word sits top left, the set stands at the bottom right and crosses it */
 .sheet #sheet-skills .tv-stage,
 .sheet #sheet-home .tv-stage {
@@ -647,6 +649,8 @@
 .sheet #sheet-experience .sec-title { margin-bottom: clamp(48px, 8vw, 120px); }
 /* the name a size over "Skills": it is the page's first word */
 .sheet #sheet-home .sec-title { font-size: clamp(3.6rem, 16.5vw, 15rem); }
+/* on a phone the name runs nearly the full width, rather than shrinking with it */
+@media (max-width: 600px) { .sheet #sheet-home .sec-title { font-size: 23vw; } }
 /* the hello set has a cabinet: a box running back from the bezel, so it
    reads as a solid set rather than a panel. The sides hinge on the bezel's
    edges and fold straight back; the back closes it at --depth. */
@@ -723,12 +727,18 @@
    glass is faintly lit from behind, a soft band rolls down it now and then,
    and a power light shows on the base. No mask, no flicker. */
 .sheet #sheet-home .hero-screen img {
-  filter: brightness(1.08) drop-shadow(0 0 3px rgba(235, 245, 255, 0.45)) drop-shadow(0 0 12px rgba(170, 210, 255, 0.18));
+  filter: brightness(1.18) drop-shadow(0 0 3px rgba(240, 248, 255, 0.75)) drop-shadow(0 0 14px rgba(170, 210, 255, 0.4)) drop-shadow(0 0 34px rgba(140, 190, 255, 0.22));
 }
 .sheet #sheet-home .tv-screen {
   background:
-    radial-gradient(60% 55% at 50% 48%, rgba(150, 185, 220, 0.07), rgba(150, 185, 220, 0) 70%),
-    radial-gradient(120% 120% at 50% 40%, #121216 0%, #09090b 70%, #050506 100%);
+    radial-gradient(60% 55% at 50% 48%, rgba(150, 190, 230, 0.13), rgba(150, 190, 230, 0) 72%),
+    radial-gradient(120% 120% at 50% 40%, #131419 0%, #09090b 70%, #050506 100%);
+  /* the tube's light spilling out over the bezel and into the room */
+  box-shadow:
+    inset 0 0 0 2px #0b0b0d,
+    inset 0 0 44px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(150, 195, 240, 0.12),
+    0 0 110px rgba(130, 180, 240, 0.08);
 }
 .sheet .tv-roll {
   position: absolute;
@@ -751,6 +761,16 @@
 @media (prefers-reduced-motion: reduce) {
   .sheet .tv-roll { animation: none; opacity: 0; }
 }
+/* ---- Skills: a second set ---------------------------------------------------
+   Built like Home's (cabinet, stepped tube housing, vents) but deeper, with
+   its left side swung back. */
+.sheet .stack-set .tv { --rot-y: -32; --rot-x: 5; }
+.sheet .stack-set .tv-body { --depth: 100px; }
+.sheet .stack-set .tv-body.tv-rear { --depth: 280px; transform: translateZ(-100px); }
+.sheet .stack-set .tv-screen,
+.sheet .stack-set .tv-base { position: relative; transform: translateZ(1px); }
+.sheet #sheet-skills .tv-stage.stack-set { margin-right: clamp(16px, 7vw, 120px); }
+
 /* the hello set hovers: a slow drift up and down with a little sway, under
    the pointer tilt (which turns the set itself, not the stage it floats on) */
 @keyframes tv-float {
@@ -765,7 +785,9 @@
    side swung back and the top tipped back (it still follows the pointer) */
 .sheet #sheet-home .tv { --rot-y: -34; --rot-x: 7; }
 .sheet #sheet-home .tv-stage {
-  max-width: min(640px, 82svh);
+  /* sized against both sides of the window, so a short or narrow laptop
+     gets a smaller set rather than one crowding the name */
+  max-width: min(640px, 72svh, 44vw);
   /* lifted further into the name than on Skills, and in off the right edge,
      so it clears the foot with room to spare */
   margin-top: clamp(-250px, -14.5vw, -34px);
@@ -903,13 +925,15 @@
   line-height: 1.45;
   color: rgba(250, 250, 247, 0.62);
   min-width: 0;
-  overflow-wrap: anywhere;
+  /* break between whole words only, so "HTML/CSS" never splits */
+  overflow-wrap: break-word;
 }
 .sheet .tv-content .skill b { letter-spacing: 0.01em; }
 .sheet .tv-content .skill b { color: rgba(250, 250, 247, 0.92); }
 .sheet .tv-content .skill .num { color: rgba(250, 250, 247, 0.34); }
 .sheet .tv-content .skill.lit .num { color: #fafaf7; }
 .sheet .tv-content .skill .items em { color: rgba(250, 250, 247, 0.28); }
+.sheet .tv-content .skill .items > span:not(.long) { white-space: nowrap; }
 .sheet .tv-content .skills:hover .skill.in { opacity: 0.4; }
 .sheet .tv-content .skills:hover .skill.in:hover { opacity: 1; }
 
