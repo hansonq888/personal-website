@@ -33,11 +33,16 @@ function tornEdge(cx, cy, r) {
   return pts.join(" ");
 }
 
-export default function PaperIntro({ targetSelector }) {
+export default function PaperIntro({ targetSelector, onDone }) {
   const [done, setDone] = useState(
     () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false
   );
   const polys = useRef([]);
+
+  // tell the page once the paper is gone (straight away under reduced motion)
+  useEffect(() => {
+    if (done) onDone?.();
+  }, [done, onDone]);
 
   useEffect(() => {
     if (done) return;

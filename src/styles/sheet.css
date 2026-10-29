@@ -771,6 +771,23 @@
 .sheet .stack-set .tv-base { position: relative; transform: translateZ(1px); }
 .sheet #sheet-skills .tv-stage.stack-set { margin-right: clamp(16px, 7vw, 120px); }
 
+/* the paper on the hello screen before the picture comes in */
+.sheet .tv-static {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+  transition: opacity 1.4s cubic-bezier(0.45, 0, 0.2, 1);
+}
+.sheet .tv-static.fading { opacity: 0; }
+/* and the picture fades up through it */
+.sheet .hero-screen img { animation: tv-tune-in 1.4s cubic-bezier(0.45, 0, 0.2, 1) both; }
+@keyframes tv-tune-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .sheet .hero-screen img { animation: none; }
+}
 /* the hello set hovers: a slow drift up and down with a little sway, under
    the pointer tilt (which turns the set itself, not the stage it floats on) */
 @keyframes tv-float {

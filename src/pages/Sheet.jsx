@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
@@ -8,6 +8,7 @@ import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import PaperIntro from "../components/sheet/PaperIntro";
+import TvStatic from "../components/sheet/TvStatic";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -99,6 +100,21 @@ function Reveal({ as = "p", text, className, style }) {
 
 export default function Sheet() {
   const rootRef = useRef(null);
+  const [introDone, setIntroDone] = useState(false);
+  const endIntro = useCallback(() => setIntroDone(true), []);
+  // the paper ends up on the hello screen, holds a beat, then dissolves into
+  // the GIF; with reduced motion it goes straight to the picture
+  const [tuned, setTuned] = useState(false);
+  const [snowGone, setSnowGone] = useState(false);
+  useEffect(() => {
+    if (!introDone) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // the picture comes up as the snow fades over it; the snow stops drawing
+    // only once it has faded out completely
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : 350);
+    const t2 = setTimeout(() => setSnowGone(true), still ? 0 : 350 + 1500);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [introDone]);
   const gridRef = useRef(null);
   const meRef = useRef(null);
   const bandRef = useRef(null);
@@ -494,7 +510,7 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
-      <PaperIntro targetSelector="#sheet-home .tv-screen" />
+      <PaperIntro targetSelector="#sheet-home .tv-screen" onDone={endIntro} />
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
@@ -539,8 +555,11 @@ export default function Sheet() {
                 <span className="tv-back" />
               </div>
               <div className="tv-screen">
+                {!snowGone && <TvStatic fading={tuned} />}
                 <div className="tv-content hero-screen">
-                  <img src="/ezgif.com-gif-maker.gif" alt="" />
+                  {/* mounted once the snow clears, so the GIF plays from its
+                      first frame */}
+                  {tuned && <img src="/ezgif.com-gif-maker.gif" alt="" />}
                 </div>
                 <div className="tv-scan" aria-hidden="true" />
                 <div className="tv-roll" aria-hidden="true" />
