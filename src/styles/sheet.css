@@ -780,9 +780,9 @@
 .sheet .glass-corner.tr { right: 0; top: 0; }
 .sheet .glass-corner.br { right: 0; bottom: 0; }
 .sheet .glass-corner.bl { left: 0; bottom: 0; }
-/* The paper on the hello screen, and the switch-on that replaces it: the
-   paper squeezes into a bright line across the middle of the glass, and the
-   picture then opens out of that line (crt-on, below). */
+/* The paper on the hello screen shuts off like an old set: it squeezes into
+   a bright line across the glass, the line draws in to a glowing dot, and the
+   dot fades. Then the picture pops up. */
 .sheet .tv-paper {
   position: absolute;
   inset: 0;
@@ -790,15 +790,21 @@
   transform-origin: 50% 50%;
   pointer-events: none;
 }
-.sheet .tv-paper.collapse { animation: paper-collapse 0.42s cubic-bezier(0.6, 0, 0.85, 0.4) forwards; }
-@keyframes paper-collapse {
-  0%   { transform: scale(1, 1);      filter: brightness(1);   opacity: 1; }
-  70%  { transform: scale(1, 0.012);  filter: brightness(1.6); opacity: 1; }
-  100% { transform: scale(0.9, 0.004); filter: brightness(2);  opacity: 0; }
+.sheet .tv-paper.collapse { animation: tv-shut-off 0.75s linear forwards; }
+@keyframes tv-shut-off {
+  0%   { transform: scale(1, 1);         filter: brightness(1);   opacity: 1; animation-timing-function: cubic-bezier(0.7, 0, 0.9, 0.5); }
+  38%  { transform: scale(1, 0.01);      filter: brightness(1.7); opacity: 1; animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.6); }
+  72%  { transform: scale(0.012, 0.01);  filter: brightness(2.4); opacity: 1; }
+  100% { transform: scale(0.004, 0.004); filter: brightness(2.4); opacity: 0; }
 }
 /* the picture waits for the switch-on rather than warming up on load */
 .sheet #sheet-home .tv.on .tv-content { animation: none; }
-.sheet #sheet-home .tv.on .tv-content.tuned { animation: crt-on 0.8s cubic-bezier(0.2, 0.85, 0.25, 1) forwards; }
+.sheet #sheet-home .tv.on .tv-content.tuned { animation: tv-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards; }
+@keyframes tv-pop {
+  0%   { opacity: 0; transform: scale(0.9);  filter: brightness(2.2); }
+  55%  { opacity: 1; transform: scale(1.03); filter: brightness(1.3); }
+  100% { opacity: 1; transform: none;        filter: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .sheet .tv-paper.collapse { animation: none; opacity: 0; }
   .sheet #sheet-home .tv-content.tuned { animation: none; opacity: 1; transform: none; }

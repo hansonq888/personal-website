@@ -101,16 +101,16 @@ export default function Sheet() {
   const rootRef = useRef(null);
   const [introDone, setIntroDone] = useState(false);
   const endIntro = useCallback(() => setIntroDone(true), []);
-  // Once the paper has landed on the hello screen the set switches on: the
-  // paper squeezes into a bright line across the glass, and the picture opens
-  // out of that line. With reduced motion it goes straight to the picture.
+  // Once the paper has landed on the hello screen it shuts off like an old
+  // set (line, then dot, then dark), and the picture pops up after it. With
+  // reduced motion it goes straight to the picture.
   const [tuned, setTuned] = useState(false);
   const [paperGone, setPaperGone] = useState(false);
   useEffect(() => {
     if (!introDone) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t1 = setTimeout(() => setTuned(true), still ? 0 : 360);
-    const t2 = setTimeout(() => setPaperGone(true), still ? 0 : 480);
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : 900);
+    const t2 = setTimeout(() => setPaperGone(true), still ? 0 : 800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [introDone]);
   const gridRef = useRef(null);
