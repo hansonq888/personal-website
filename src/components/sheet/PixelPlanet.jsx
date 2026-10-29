@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 /* A ringed planet, rendered as a bitmap. Each frame is worked out pixel by
    pixel on a small canvas: a lit sphere whose cloud bands and storm drift
    round as it turns, and a tilted ring whose far side passes behind the
-   planet and near side in front. Tones are picked from a short palette
+   planet and near side in front. Tones are picked from a short grey palette
    through an ordered dither, and the canvas is scaled up without smoothing,
    so it reads as pixel art. It turns in held frames, like the rest of the
    sheet. */
@@ -14,8 +14,10 @@ const R = N * 0.25;    // planet radius in pixels
 const TILT = -0.38;    // ring tilt across the screen, radians
 const FLAT = 0.3;      // how edge-on the ring is
 
-const PLANET = ["#16141c", "#3b2e2a", "#6e5038", "#a77b52", "#d6ae7c", "#f3dfb6"];
-const RING = ["#2a2530", "#5c4b44", "#9c8366", "#d2bb95", "#efe1c2"];
+// monochrome, from the ground's near-black up to the sheet's own off-white
+// ink, so the planet sits in the field rather than on it
+const PLANET = ["#0c0c0f", "#24242a", "#45454d", "#73737b", "#a9a9ae", "#e4e4e0"];
+const RING = ["#1c1c21", "#3c3c43", "#6c6c73", "#a3a3a8", "#dcdcd8"];
 
 // a 4x4 Bayer matrix: the threshold pattern that turns tone into dots
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);

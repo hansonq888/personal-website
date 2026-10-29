@@ -326,6 +326,7 @@
   aspect-ratio: 1;
   flex: none;
   image-rendering: pixelated;
+  opacity: 0.85;
 }
 @media (max-width: 760px) { .sheet .about-copy { flex-direction: column; align-items: flex-start; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
