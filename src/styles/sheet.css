@@ -102,6 +102,14 @@
   background: var(--ground);
 }
 .sheet .panel-group.deep { background: var(--deep); --rule: #24242a; }
+/* deep space behind Home and About: black with a faint far-off haze */
+.sheet .panel-group.space {
+  background:
+    radial-gradient(55% 45% at 78% 22%, rgba(70, 95, 170, 0.12), rgba(70, 95, 170, 0) 70%),
+    radial-gradient(45% 40% at 15% 70%, rgba(120, 75, 150, 0.08), rgba(120, 75, 150, 0) 70%),
+    radial-gradient(40% 35% at 60% 95%, rgba(60, 120, 150, 0.06), rgba(60, 120, 150, 0) 70%),
+    #000;
+}
 /* one run of the sheet is printed on paper; the ink flips back with it */
 .sheet .panel-group.paper {
   background: #fafaf7;
@@ -810,6 +818,52 @@
   .sheet #sheet-home .tv-content.tuned { animation: none; opacity: 1; transform: none; }
 }
 
+/* rabbit ears: a small dark base on the cabinet's top, two chrome rods in a
+   V with ball tips. They stand in the bezel's plane, pushed back to sit over
+   the cabinet rather than on the glass. */
+.sheet .tv-antenna {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 0;
+  height: 0;
+  transform: translateZ(-38px);
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.sheet .tv-antenna .hub {
+  position: absolute;
+  left: -26px;
+  top: -14px;
+  width: 52px;
+  height: 14px;
+  border-radius: 8px 8px 2px 2px;
+  background: linear-gradient(to bottom, #3a3a40, #17171a);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.sheet .tv-antenna .rod {
+  position: absolute;
+  left: -1.5px;
+  bottom: 8px;
+  width: 3px;
+  height: clamp(110px, 12vw, 190px);
+  border-radius: 2px;
+  transform-origin: 50% 100%;
+  background: linear-gradient(to right, #5d5d65, #e2e2e8 45%, #55555c);
+}
+.sheet .tv-antenna .rod.left  { transform: rotate(-27deg); }
+.sheet .tv-antenna .rod.right { transform: rotate(23deg); height: clamp(100px, 11vw, 175px); }
+.sheet .tv-antenna .rod::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f4f4f8, #6a6a72 70%);
+}
 /* the hello set hovers: a slow drift up and down with a little sway, under
    the pointer tilt (which turns the set itself, not the stage it floats on) */
 @keyframes tv-float {

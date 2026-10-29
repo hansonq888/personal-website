@@ -20,7 +20,7 @@ const ROMAN = ["I", "II", "III", "IV", "V"];
 // the stack on About; whichever is clicked comes to the front
 const PRINTS = [
   { id: "headshot", src: "/headshot.jpg", cap: "HEADSHOT.JPG" },
-  { id: "sideeye", src: "/sideeye.JPG", cap: "SIDEEYE.JPG" },
+  { id: "pier", src: "/pier.jpg", cap: "PIER.JPG" },
   { id: "baby", src: "/AboutPhoto.jpg", cap: "ABOUTPHOTO.JPG" },
 ];
 const LAYER = ["front", "back", "back2"];
@@ -531,8 +531,9 @@ export default function Sheet() {
         </nav>
       </div>
 
-      {/* ------------- I + II share one ground ------------- */}
-      <div className="panel-group deep sparkle streaks" data-ground="Home">
+      {/* ------------- I + II share one ground: deep space, the dithered
+          weather, a pixel starfield over it, and the shooting streaks ------------- */}
+      <div className="panel-group deep space sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="hansonqin.com" rightSub="New Haven, CT" />
         {/* the Skills spread, with the name as its word: title top left, the
@@ -543,6 +544,13 @@ export default function Sheet() {
           </div>
           <div className="tv-stage" data-tilt3d>
             <div className="tv">
+              {/* rabbit ears on top of the cabinet, set back from the front so
+                  they turn and float with the set */}
+              <div className="tv-antenna" aria-hidden="true">
+                <span className="rod left" />
+                <span className="rod right" />
+                <span className="hub" />
+              </div>
               {/* the cabinet behind the bezel: four sides and a back, built in
                   3D so the tilt and the float show the set has depth */}
               <div className="tv-body" aria-hidden="true">

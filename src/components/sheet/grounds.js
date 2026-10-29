@@ -47,8 +47,10 @@ export function initGrounds(root) {
     const [kind, par] = SYSTEM[page] || [null, 0];
     const sparkle = panel.classList.contains("sparkle");
     const streaks = panel.classList.contains("streaks");
+    // "space": a deep starfield in place of the blinking glints
+    const space = panel.classList.contains("space");
     const S = {
-      panel, page, kind, par, light: true, visible: false, last: -1e9, prog: 0,
+      panel, page, kind, par, space, light: true, visible: false, last: -1e9, prog: 0,
       w: 0, h: 0, cols: 0, rows: 0,
       canvas: null, ctx: null, off: null, octx: null, sparks: null, sctx: null, pts: [],
       streak: null, strCtx: null, stars: [],
@@ -117,11 +119,26 @@ export function initGrounds(root) {
       S.sparks.style.width = w + "px";
       S.sparks.style.height = h + "px";
       S.sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      S.pts = Array.from({ length: Math.round((w * h) / 6200) }, () => ({
-        x: Math.random() * w, y: Math.random() * h,
-        ph: Math.random() * 6.283, sp: 0.25 + Math.random() * 0.8,
-        r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
-      }));
+      S.pts = S.space
+        ? Array.from({ length: Math.round((w * h) / 2400) }, () => {
+            // most stars are faint pin-points; some carry a halo; a few are
+            // bright enough to throw glints. Each has its own tint and breath.
+            const roll = Math.random();
+            const tier = roll < 0.04 ? 2 : roll < 0.26 ? 1 : 0;
+            const warm = Math.random();
+            return {
+              x: Math.random() * w, y: Math.random() * h, tier,
+              base: tier === 2 ? 0.85 + Math.random() * 0.15 : tier === 1 ? 0.45 + Math.random() * 0.35 : 0.18 + Math.random() * 0.32,
+              r: tier === 2 ? 1.3 + Math.random() * 0.6 : tier === 1 ? 0.8 + Math.random() * 0.5 : 0.35 + Math.random() * 0.45,
+              ph: Math.random() * 6.283, sp: 0.3 + Math.random() * 0.9,
+              rgb: warm < 0.25 ? "255,226,196" : warm < 0.6 ? "214,228,255" : "250,250,255",
+            };
+          })
+        : Array.from({ length: Math.round((w * h) / 6200) }, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            ph: Math.random() * 6.283, sp: 0.25 + Math.random() * 0.8,
+            r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
+          }));
     }
     if (S.streak) {
       const dpr2 = Math.min(2, window.devicePixelRatio || 1);
@@ -396,9 +413,40 @@ export function initGrounds(root) {
     }
   }
 
+  // The starfield, drawn as a bitmap: every star is square pixels on a grid,
+  // faint ones a single pixel, brighter ones a 2x2 block, the brightest a
+  // little plus-shaped sparkle, and their twinkle steps between a few levels
+  // instead of fading, so it sits with the dithered field behind it.
+  const PX = 2;
+  function drawSpace(S, t) {
+    const c = S.sctx;
+    for (const q of S.pts) {
+      const breath = 0.72 + 0.28 * Math.sin(q.ph + t * 0.0009 * q.sp);
+      const a = Math.round(q.base * breath * 4) / 4; // four steps, not a fade
+      if (a <= 0) continue;
+      const x = Math.round(q.x / PX) * PX, y = Math.round(q.y / PX) * PX;
+      c.fillStyle = "rgba(" + q.rgb + "," + a.toFixed(2) + ")";
+      if (q.tier === 0) {
+        c.fillRect(x, y, PX, PX);
+      } else if (q.tier === 1) {
+        c.fillRect(x, y, PX * 2, PX * 2);
+      } else {
+        // a plus: a bright 2x2 heart with arms that grow as it brightens
+        const arm = a > 0.75 ? 3 : 2;
+        c.fillRect(x, y, PX * 2, PX * 2);
+        c.fillStyle = "rgba(" + q.rgb + "," + (a * 0.6).toFixed(2) + ")";
+        c.fillRect(x - PX * arm, y, PX * arm, PX * 2);
+        c.fillRect(x + PX * 2, y, PX * arm, PX * 2);
+        c.fillRect(x, y - PX * arm, PX * 2, PX * arm);
+        c.fillRect(x, y + PX * 2, PX * 2, PX * arm);
+      }
+    }
+  }
+
   function drawSparks(S, t) {
     const c = S.sctx;
     c.clearRect(0, 0, S.w, S.h);
+    if (S.space && !S.light) return drawSpace(S, t);
     // on paper the glints are ink; on a dark ground they are light
     const rgb = S.light ? "11,11,12" : "255,253,245";
     const k = S.light ? 0.5 : 1;

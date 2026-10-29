@@ -2,8 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /* The opening frame, as a flash: the hello set goes off like a camera. It is
    cut from flat layers, not blurred light: a starburst of hard rays in three
-   whites, each a frame behind the one above, with a long torn streak across
-   the window, all moving in held stop-motion frames. The page opens already
+   whites, each a frame behind the one above, all moving in held
+   stop-motion frames. The page opens already
    covered by it, and it steps back down into the screen. */
 
 const FPS = 12;
@@ -25,7 +25,6 @@ const LAYERS = [
   { fill: "#f3f1ec", lag: 1, grow: 1.05 },
   { fill: "#ffffff", lag: 0, grow: 1 },
 ];
-const STREAK = -0.33; // radians: the flare across the window, low left to high right
 
 const sizeAt = (k) => SIZE[Math.max(0, Math.min(SIZE.length - 1, k))];
 
@@ -40,24 +39,6 @@ function burst(cx, cy, r) {
     pts.push((cx + Math.cos(a) * rr).toFixed(1) + "," + (cy + Math.sin(a) * rr).toFixed(1));
   }
   return pts.join(" ");
-}
-
-// the streak: a long thin blade through the source, torn along both edges
-function streak(cx, cy, len, thick) {
-  if (len <= 1) return "";
-  const dx = Math.cos(STREAK), dy = Math.sin(STREAK);
-  const nx = -dy, ny = dx;
-  const top = [], bottom = [];
-  const N = 14;
-  for (let i = 0; i <= N; i++) {
-    const t = (i / N) * 2 - 1;          // -1 .. 1 along the blade
-    const taper = 1 - Math.abs(t);      // fat in the middle, sharp at the ends
-    const along = t * len;
-    const w = thick * (0.25 + taper) * (0.7 + Math.random() * 0.6);
-    top.push([cx + dx * along + nx * w, cy + dy * along + ny * w]);
-    bottom.push([cx + dx * along - nx * w, cy + dy * along - ny * w]);
-  }
-  return [...top, ...bottom.reverse()].map(([x, y]) => x.toFixed(1) + "," + y.toFixed(1)).join(" ");
 }
 
 // The glass's real outline on screen: its rounded rectangle (the curved
@@ -105,7 +86,6 @@ export default function FlashIntro({ glassSelector, onDone }) {
     () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false
   );
   const shapes = useRef([]);
-  const blade = useRef(null);
   const group = useRef(null);
   const glassClip = useRef(null);
 
@@ -127,9 +107,6 @@ export default function FlashIntro({ glassSelector, onDone }) {
         const p = shapes.current[i];
         if (p) p.setAttribute("points", burst(cx, cy, room * layer.grow * sizeAt(k - layer.lag)));
       });
-      const s = sizeAt(k);
-      blade.current?.setAttribute("points", streak(cx, cy, room * 1.6 * Math.min(1, s * 1.4), Math.max(6, room * 0.035 * s)));
-
       // the second flash happens on the screen, not in the room: from its
       // first frame everything is clipped to the glass's own outline
       const outline = glassOutline(glassSelector);
@@ -181,11 +158,6 @@ export default function FlashIntro({ glassSelector, onDone }) {
             style={{ filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22))" }}
           />
         ))}
-        <polygon
-          ref={blade}
-          fill="#ffffff"
-          style={{ filter: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18))" }}
-        />
       </g>
     </svg>
   );
