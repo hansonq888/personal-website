@@ -11,12 +11,14 @@ const RAYS = 16;
 // the burst's size each frame, as a share of the distance to the farthest
 // corner of the window: it opens fully covering the page (it is the loading
 // screen), holds a few beats, steps back down into the glass and sits there
-// lit; then the set catches power and flashes once more, out and gone
+// lit; then the set catches power and flashes once more, this time only
+// inside the glass, and is gone
 const SIZE = [
   1.7, 1.7, 1.7, 1.7, 1.45, 1.1, 0.82, 0.6, 0.43, 0.3, 0.2, 0.13, 0.08,
   0.05, 0.05, 0.05,
-  0.55, 1.25, 0.6, 0.12,
+  0.22, 0.5, 0.3, 0.1,
 ];
+const REFLASH = 16; // the frame the second flash starts, from which it is held to the glass
 const LAYERS = [
   // bottom to top: the widest and coolest trails furthest behind
   { fill: "#dde5ef", lag: 2, grow: 1.12 },
@@ -64,6 +66,8 @@ export default function FlashIntro({ glassSelector, onDone }) {
   );
   const shapes = useRef([]);
   const blade = useRef(null);
+  const group = useRef(null);
+  const glassClip = useRef(null);
 
   useEffect(() => {
     if (done) onDone?.();
@@ -85,6 +89,16 @@ export default function FlashIntro({ glassSelector, onDone }) {
       });
       const s = sizeAt(k);
       blade.current?.setAttribute("points", streak(cx, cy, room * 1.6 * Math.min(1, s * 1.4), Math.max(6, room * 0.035 * s)));
+
+      // the second flash happens on the screen, not in the room: from its
+      // first frame everything is clipped to the glass's tilted outline
+      const corners = ["tl", "tr", "br", "bl"].map((c) =>
+        document.querySelector(`${glassSelector} .glass-corner.${c}`)?.getBoundingClientRect()
+      );
+      if (corners.every(Boolean)) {
+        glassClip.current?.setAttribute("points", corners.map((m) => `${m.left.toFixed(1)},${m.top.toFixed(1)}`).join(" "));
+      }
+      if (k >= REFLASH) group.current?.setAttribute("clip-path", "url(#flash-glass)");
     };
     draw(0);
 
@@ -117,19 +131,26 @@ export default function FlashIntro({ glassSelector, onDone }) {
       height="100%"
       style={{ position: "fixed", inset: 0, zIndex: 80, pointerEvents: "none" }}
     >
-      {LAYERS.map((layer, i) => (
+      <defs>
+        <clipPath id="flash-glass">
+          <polygon ref={glassClip} />
+        </clipPath>
+      </defs>
+      <g ref={group}>
+        {LAYERS.map((layer, i) => (
+          <polygon
+            key={i}
+            ref={(n) => (shapes.current[i] = n)}
+            fill={layer.fill}
+            style={{ filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22))" }}
+          />
+        ))}
         <polygon
-          key={i}
-          ref={(n) => (shapes.current[i] = n)}
-          fill={layer.fill}
-          style={{ filter: "drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22))" }}
+          ref={blade}
+          fill="#ffffff"
+          style={{ filter: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18))" }}
         />
-      ))}
-      <polygon
-        ref={blade}
-        fill="#ffffff"
-        style={{ filter: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18))" }}
-      />
+      </g>
     </svg>
   );
 }

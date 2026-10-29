@@ -568,7 +568,7 @@ export default function Sheet() {
                 <span className="glass-corner tr" aria-hidden="true" />
                 <span className="glass-corner br" aria-hidden="true" />
                 <span className="glass-corner bl" aria-hidden="true" />
-                {!paperGone && <div className={"tv-paper" + (introDone && INTRO === "paper" ? " collapse" : "")} aria-hidden="true" />}
+                {INTRO === "paper" && !paperGone && <div className={"tv-paper" + (introDone ? " collapse" : "")} aria-hidden="true" />}
                 <div className={"tv-content hero-screen" + (tuned ? " tuned" : "")}>
                   {/* mounted as the set switches on, so the GIF plays from its
                       first frame */}
