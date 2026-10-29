@@ -3,14 +3,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 /* The opening frame, as a flash: the hello set goes off like a camera. It is
    cut from flat layers, not blurred light: a starburst of hard rays in three
    whites, each a frame behind the one above, with a long torn streak across
-   the window, all moving in held stop-motion frames. It bursts out of the
-   glass, whites out the window, then steps back down into the screen. */
+   the window, all moving in held stop-motion frames. The page opens already
+   covered by it, and it steps back down into the screen. */
 
 const FPS = 12;
 const RAYS = 16;
 // the burst's size each frame, as a share of the distance to the farthest
-// corner of the window: out fast, hold, then back down into the glass
-const SIZE = [0.06, 0.3, 0.75, 1.3, 1.7, 1.7, 1.45, 1.1, 0.82, 0.6, 0.43, 0.3, 0.2, 0.13, 0.08, 0.04];
+// corner of the window: it opens fully covering the page (it is the loading
+// screen), holds a few beats, then steps back down into the glass
+const SIZE = [1.7, 1.7, 1.7, 1.7, 1.45, 1.1, 0.82, 0.6, 0.43, 0.3, 0.2, 0.13, 0.08, 0.04];
 const LAYERS = [
   // bottom to top: the widest and coolest trails furthest behind
   { fill: "#dde5ef", lag: 2, grow: 1.12 },
