@@ -29,41 +29,30 @@ const LOOSE = [
 const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 
-/* The hero is split per word, then per letter: each word stays in one
-   unbreakable box, or the per-letter spans let it wrap mid-word. The letters
-   rise from behind their own baseline on one firm curve. No spring, no blur,
-   no rotation: a single decisive reveal rather than a cascade of effects. */
-function Giant({ text, delay = 0 }) {
-  const still = useReducedMotion();
-  const words = text.split(" ");
-  let n = 0;
+
+
+function Spec({ left, leftSub, right, rightSub, bar = false }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // observe the section, not the label: a clip-path on the target zeroes its
+    // own intersection ratio, so observing .spec directly would never fire
+    const host = el.closest("[data-page]") || el;
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }),
+      { threshold: 0.12 }
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <p className="giant">
-      {words.map((word, wi) => (
-        <span className="w" key={wi}>
-          {[...word].map((ch, ci) => {
-            const i = n++;
-            return (
-              <span className="clip" key={ci}>
-                <motion.span
-                  className="g"
-                  initial={still ? false : { y: "112%" }}
-                  animate={{ y: 0 }}
-                  transition={{
-                    delay: (delay + i * 20) / 1000,
-                    duration: 0.78,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  {ch}
-                </motion.span>
-              </span>
-            );
-          })}
-          {wi < words.length - 1 ? " " : null}
-        </span>
-      ))}
-    </p>
+    <div className="spec" ref={ref}>
+      <div><b>{left}</b><i>{leftSub}</i></div>
+      {bar ? <span className="bar" aria-hidden="true" /> : null}
+      <div className="r"><b>{right}</b><i>{rightSub}</i></div>
+    </div>
   );
 }
 
@@ -107,43 +96,17 @@ function Reveal({ as = "p", text, className, style }) {
   );
 }
 
-function Spec({ left, leftSub, right, rightSub, bar = false }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    // observe the section, not the label: a clip-path on the target zeroes its
-    // own intersection ratio, so observing .spec directly would never fire
-    const host = el.closest("[data-page]") || el;
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }),
-      { threshold: 0.12 }
-    );
-    io.observe(host);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div className="spec" ref={ref}>
-      <div><b>{left}</b><i>{leftSub}</i></div>
-      {bar ? <span className="bar" aria-hidden="true" /> : null}
-      <div className="r"><b>{right}</b><i>{rightSub}</i></div>
-    </div>
-  );
-}
-
 export default function Sheet() {
   const rootRef = useRef(null);
-  const bandRef = useRef(null);
   const gridRef = useRef(null);
   const meRef = useRef(null);
+  const bandRef = useRef(null);
   const [order, setOrder] = useState([0, 1, 2]);
   const bringToFront = (idx) =>
     setOrder((o) => [idx, ...o.filter((x) => x !== idx)]);
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
   const arcRef = useRef(null);
-  const tvRef = useRef(null);
 
   const pencilRef = useRef(null);
   const [current, setCurrent] = useState(0);
@@ -162,6 +125,7 @@ export default function Sheet() {
       touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
+
     let raf = 0;
     const tick = (t) => { lenis.raf(t); raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
@@ -197,43 +161,48 @@ export default function Sheet() {
 
   useStagger(rolesRef, 110, 0.3);
 
-  // the set warms up once, the way a CRT does
+  // every set on the sheet (the hello screen on Home, the stack on Skills)
+  // warms up once as it comes into view, the way a CRT does
   useEffect(() => {
-    const stage = tvRef.current;
-    if (!stage) return;
-    const tv = stage.querySelector(".tv");
-    if (!tv) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      tv.classList.add("on");
-      return;
-    }
+    const stages = [...(rootRef.current?.querySelectorAll(".tv-stage") ?? [])];
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { tv.classList.add("on"); io.disconnect(); } }),
+      (es) => es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.querySelector(".tv")?.classList.add("on");
+        io.unobserve(e.target);
+      }),
       { threshold: 0.25 }
     );
-    io.observe(stage);
+    stages.forEach((stage) => {
+      if (still) stage.querySelector(".tv")?.classList.add("on");
+      else io.observe(stage);
+    });
     return () => io.disconnect();
   }, []);
 
-  // and it turns toward the pointer
+  // and each one turns toward the pointer while it is over it
   useEffect(() => {
-    const stage = tvRef.current;
-    if (!stage || window.matchMedia("(pointer: coarse)").matches) return;
-    const onMove = (e) => {
-      const r = stage.getBoundingClientRect();
-      stage.style.setProperty("--mx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
-      stage.style.setProperty("--my", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
-    };
-    const onLeave = () => {
-      stage.style.setProperty("--mx", "0");
-      stage.style.setProperty("--my", "0");
-    };
-    stage.addEventListener("pointermove", onMove);
-    stage.addEventListener("pointerleave", onLeave);
-    return () => {
-      stage.removeEventListener("pointermove", onMove);
-      stage.removeEventListener("pointerleave", onLeave);
-    };
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const stages = [...(rootRef.current?.querySelectorAll(".tv-stage") ?? [])];
+    const offs = stages.map((stage) => {
+      const onMove = (e) => {
+        const r = stage.getBoundingClientRect();
+        stage.style.setProperty("--mx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+        stage.style.setProperty("--my", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+      };
+      const onLeave = () => {
+        stage.style.setProperty("--mx", "0");
+        stage.style.setProperty("--my", "0");
+      };
+      stage.addEventListener("pointermove", onMove);
+      stage.addEventListener("pointerleave", onLeave);
+      return () => {
+        stage.removeEventListener("pointermove", onMove);
+        stage.removeEventListener("pointerleave", onLeave);
+      };
+    });
+    return () => offs.forEach((off) => off());
   }, []);
 
   // The rail is a bow rather than a straight line: each node is pushed out
@@ -527,7 +496,6 @@ export default function Sheet() {
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
-        <span className="sig">Hanson Qin</span>
         <nav aria-label="Sections">
           {PAGES.map((p, i) => (
             <a key={p} href={"#sheet-" + p.toLowerCase()} onClick={go(i)}
@@ -542,14 +510,46 @@ export default function Sheet() {
       <div className="panel-group deep sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="hansonqin.com" rightSub="New Haven, CT" />
-        <div className="body" data-par=".035">
-          <div className="hero-row">
-            <div>
-              <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
-              <Giant text="Hanson" delay={120} />
-              <Giant text="Qin" delay={340} />
+        {/* the Skills spread, with the name as its word: title top left, the
+            set below it on the right, crossing up into it */}
+        <div className="body">
+          <div className="title-row">
+            <h1 className="sec-title">Hanson<br />Qin</h1>
+          </div>
+          <div className="tv-stage" data-tilt3d>
+            <div className="tv">
+              {/* the cabinet behind the bezel: four sides and a back, built in
+                  3D so the tilt and the float show the set has depth */}
+              <div className="tv-body" aria-hidden="true">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              {/* and the tube's housing behind it: narrower and lower, stepping
+                  back out of the cabinet the way an old set's rear does */}
+              <div className="tv-body tv-rear" aria-hidden="true">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              <div className="tv-screen">
+                <div className="tv-content hero-screen">
+                  <img src="/ezgif.com-gif-maker.gif" alt="" />
+                </div>
+                <div className="tv-scan" aria-hidden="true" />
+                <div className="tv-roll" aria-hidden="true" />
+                <div className="tv-glare" aria-hidden="true" />
+              </div>
+              <div className="tv-base">
+                <span className="tv-led" aria-hidden="true" />
+                <span className="tv-dial" aria-hidden="true" />
+                <span className="tv-ch">CH 001 &middot; HELLO.GIF</span>
+              </div>
             </div>
-            <img className="hero-gif" src="/ezgif.com-gif-maker.gif" alt="" />
           </div>
         </div>
         <div className="foot">
@@ -560,6 +560,7 @@ export default function Sheet() {
           <p className="lab dim">Scroll</p>
         </div>
       </section>
+
 
       {/* ---------------- II. ABOUT ---------------- */}
       <section className="panel" id="sheet-about" data-page="About">
@@ -600,8 +601,8 @@ export default function Sheet() {
           </div>
         </div>
         <div className="band">
-          <canvas ref={bandRef} data-cols="168" aria-hidden="true" />
-          <p className="lab dim band-cap">VANCOUVER.BMP</p>
+          <canvas ref={bandRef} data-cols="168" data-hover="lens" aria-hidden="true" />
+          <p className="lab dim band-cap">VANCOUVER.BMP<span className="band-arrow" aria-hidden="true">&darr;</span></p>
         </div>
       </section>
       </div>
@@ -654,7 +655,7 @@ export default function Sheet() {
           <h2 className="sec-title center">Projects</h2>
           <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
-              <div key={p.id}><ProjectCard project={p} demo /></div>
+              <div key={p.id}><ProjectCard project={p} from="/" /></div>
             ))}
           </div>
         </div>
@@ -670,7 +671,7 @@ export default function Sheet() {
             <img className="motif inv" src="/dotted_star_shining.gif" alt=""
                  style={{ width: "min(220px, 44vw)" }} />
           </div>
-          <div className="tv-stage" ref={tvRef} data-tilt3d>
+          <div className="tv-stage" data-tilt3d>
           <div className="tv">
             <div className="tv-screen">
               <div className="tv-content">
@@ -703,9 +704,9 @@ export default function Sheet() {
           </div>
         </div>
         <div className="sheet-foot">
-          <a href="mailto:hanson.qin@yale.edu">hanson.qin@yale.edu</a>
+          <a href="mailto:hansonq888@gmail.com">hansonq888@gmail.com</a>
           <a href="https://github.com/hansonq888" target="_blank" rel="noreferrer">github.com/hansonq888</a>
-          <a href="https://www.linkedin.com/in/hansonqin/" target="_blank" rel="noreferrer">linkedin</a>
+          <a href="https://www.linkedin.com/in/hanson-q/" target="_blank" rel="noreferrer">linkedin</a>
         </div>
       </section>
     </div>

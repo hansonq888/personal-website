@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { projects, featuredProjects } from "../data/projects";
 import PageShell from "../components/PageShell";
-
-const INTER = '"Inter", sans-serif';
-const linkStyle = {
-  fontFamily: INTER,
-  fontWeight: 500,
-  fontSize: 9,
-  letterSpacing: "0.2em",
-  textTransform: "uppercase",
-  borderBottom: "1px solid rgba(0,0,0,0.25)",
-  paddingBottom: 2,
-};
+import PageFrame from "../components/PageFrame";
+import { Label, MediaTile } from "../components/Media";
+import { INTER, LIGHT } from "../data/media";
 
 const LINKS = [
   ["website", "Live site"],
@@ -24,12 +16,12 @@ const LINKS = [
   ["download", "Download"],
 ];
 
-function Label({ children }) {
-  return <p className="mono-meta tracking-[0.18em] text-[9px] text-black/35 mb-2.5">{children}</p>;
-}
-
+/* One project, in the front page's voice: the pictures do the talking on the
+   left, a narrow column of facts sits on the right, and the long write-up
+   waits underneath for anyone who wants it. */
 export default function ProjectDetail() {
   const { id } = useParams();
+  const { state } = useLocation();
   const project = projects.find((p) => p.id === id);
   const [content, setContent] = useState("");
 
@@ -45,12 +37,10 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <PageShell>
-        <div className="min-h-screen bg-white text-black px-4 sm:px-8 md:px-12 pt-16 max-w-5xl mx-auto">
-          <p className="text-black/60" style={{ fontFamily: INTER, fontWeight: 300 }}>
-            Project not found.
-          </p>
-          <Link to="/projects" className="inline-block mt-6 text-black/70 hover:text-black transition-colors" style={linkStyle}>
-            All projects →
+        <div className="px-3 sm:px-4 pt-4">
+          <p className="text-sm text-black/60" style={LIGHT}>Project not found.</p>
+          <Link to="/projects" className="inline-block mt-4 text-sm underline underline-offset-2" style={LIGHT}>
+            All projects
           </Link>
         </div>
       </PageShell>
@@ -58,131 +48,87 @@ export default function ProjectDetail() {
   }
 
   const links = LINKS.filter(([key]) => project[key]);
-  const headline = [project.year, project.type, project.category].filter(Boolean);
+  const media = [project.image, ...(project.gallery || [])];
+
+  // the next few projects in order, wrapping round, so every page ends on more work
   const idx = featuredProjects.findIndex((p) => p.id === project.id);
-  const prev = idx > 0 ? featuredProjects[idx - 1] : null;
-  const next = idx > -1 && idx < featuredProjects.length - 1 ? featuredProjects[idx + 1] : null;
+  const others = featuredProjects.filter((p) => p.id !== project.id);
+  const start = idx > -1 ? idx : 0;
+  const more = [...others.slice(start), ...others.slice(0, start)].slice(0, 4);
 
   return (
     <PageShell>
-      <div className="min-h-screen bg-white text-black px-4 sm:px-8 md:px-12 pt-12 md:pt-16 pb-28 md:pb-40 min-w-0 overflow-x-clip">
-        <div className="w-full max-w-5xl mx-auto">
-          {/* Masthead — meta above the name, as on the index */}
-          {headline.length > 0 && (
-            <p className="mono-meta tracking-[0.18em] text-[10px] text-black/40 mb-4">
-              {headline.join("  ·  ")}
-            </p>
-          )}
-          <h1
-            className="leading-[0.88] tracking-tight"
-            style={{ fontFamily: INTER, fontWeight: 700, fontSize: "clamp(2rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
-          >
-            {project.title}
-          </h1>
-
-          {/* Body — one column, with stack and links as a band under the lead */}
-          <div className="mt-10 md:mt-14 min-w-0">
-            <div className="overflow-hidden bg-[#f4f4f4] aspect-[16/9] max-w-3xl">
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover object-top block"
-              />
-            </div>
-
-            <p
-              className="mt-8 md:mt-10 text-base sm:text-lg leading-relaxed text-black/75 max-w-[62ch]"
-              style={{ fontFamily: INTER, fontWeight: 300 }}
-            >
+      <PageFrame
+        title={project.title}
+        titleSize="clamp(2.75rem, 5.2vw, 5.75rem)"
+        aside={
+          <>
+            <p className="text-[15px] leading-relaxed text-black/75 max-w-[48ch]" style={LIGHT}>
               {project.longDescription || project.description}
             </p>
 
-            <div className="mt-10 md:mt-12 flex flex-wrap gap-x-20 gap-y-8">
-              <div>
-                <Label>Stack</Label>
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1.5 max-w-[46ch]">
-                  {project.tech?.map((t, j) => (
-                    <span key={t} className="inline-flex items-baseline gap-2">
-                      <span className="mono-meta text-[10px] text-black/70 tracking-[0.06em]">{t}</span>
-                      {j < project.tech.length - 1 && (
-                        <span aria-hidden className="text-[10px] text-black/25">/</span>
-                      )}
-                    </span>
+            {project.tech?.length > 0 && (
+              <div className="mt-8 max-w-[48ch]">
+                <Label fit>Stack</Label>
+                <p className="text-sm leading-relaxed text-black/75" style={LIGHT}>
+                  {project.tech.join(", ")}
+                </p>
+              </div>
+            )}
+
+            {links.length > 0 && (
+              <div className="mt-8 max-w-[48ch]">
+                <Label fit>Links</Label>
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                  {links.map(([key, label]) => (
+                    <a
+                      key={key}
+                      href={project[key]}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm underline underline-offset-2 hover:opacity-60 transition-opacity"
+                      style={LIGHT}
+                    >
+                      {label}
+                    </a>
                   ))}
                 </div>
               </div>
-
-              {links.length > 0 && (
-                <div>
-                  <Label>Links</Label>
-                  <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                    {links.map(([key, label]) => (
-                      <a
-                        key={key}
-                        href={project[key]}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-black/70 hover:text-black transition-colors"
-                        style={linkStyle}
-                      >
-                        {label} →
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
+            )}
+          </>
+        }
+      >
+        {/* Pictures */}
+        <div className="flex flex-col gap-1.5">
+          {media.map((src) => (
+            <div key={src} className="overflow-hidden rounded-lg bg-[#f4f4f4]">
+              <img src={src} alt={project.title} className="w-full h-auto block" />
             </div>
-
-            {content && (
-              <div className="project-detail-markdown mt-14 md:mt-20 max-w-[68ch]">
-                <ReactMarkdown rehypePlugins={[rehypeRaw]}>{content}</ReactMarkdown>
-              </div>
-            )}
-
-            {project.gallery?.length > 0 && (
-              <div className="mt-12 space-y-6 max-w-3xl">
-                {project.gallery.map((src) => (
-                  <div key={src} className="overflow-hidden bg-[#f4f4f4]">
-                    <img src={src} alt="" loading="lazy" className="w-full h-auto block" />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Walk to the neighbouring projects */}
-          {(prev || next) && (
-            <nav className="mt-20 md:mt-32 grid grid-cols-2 gap-6 items-start">
-              <div>
-                {prev && (
-                  <Link to={`/projects/${prev.id}`} className="group block">
-                    <p className="mono-meta tracking-[0.18em] text-[9px] text-black/35 mb-2">← Previous</p>
-                    <p
-                      className="mono-meta text-black/70 group-hover:text-black transition-colors"
-                      style={{ fontWeight: 700, fontSize: "clamp(0.85rem, 1.2vw, 1rem)" }}
-                    >
-                      {prev.title}
-                    </p>
-                  </Link>
-                )}
-              </div>
-              <div className="text-right">
-                {next && (
-                  <Link to={`/projects/${next.id}`} className="group block">
-                    <p className="mono-meta tracking-[0.18em] text-[9px] text-black/35 mb-2">Next →</p>
-                    <p
-                      className="mono-meta text-black/70 group-hover:text-black transition-colors"
-                      style={{ fontWeight: 700, fontSize: "clamp(0.85rem, 1.2vw, 1rem)" }}
-                    >
-                      {next.title}
-                    </p>
-                  </Link>
-                )}
-              </div>
-            </nav>
-          )}
+          ))}
         </div>
-      </div>
+
+        {/* The write-up, for anyone still reading */}
+        {content && (
+          <div className="mt-14">
+            <Label>Notes</Label>
+            <div className="project-detail-markdown mt-4 max-w-[68ch]">
+              <ReactMarkdown rehypePlugins={[rehypeRaw]}>{content}</ReactMarkdown>
+            </div>
+          </div>
+        )}
+
+        {/* More work */}
+        {more.length > 0 && (
+          <div className="mt-14">
+            <Label to="/projects">More projects</Label>
+            <div className="grid grid-cols-2 gap-1.5">
+              {more.map((p) => (
+                <MediaTile key={p.id} to={`/projects/${p.id}`} state={state} src={p.image} label={p.title} className="aspect-[4/3]" />
+              ))}
+            </div>
+          </div>
+        )}
+      </PageFrame>
     </PageShell>
   );
 }

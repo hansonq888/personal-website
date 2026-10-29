@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./App.css";
 import { LoadingScreen } from "./components/LoadingScreen";
@@ -12,15 +12,20 @@ import Experiences from "./pages/Experiences";
 import Skills from "./pages/Skills";
 import ProjectDetail from "./pages/ProjectDetail";
 import Sheet from "./pages/Sheet";
+import Magazine from "./pages/Magazine";
 
 const router = createBrowserRouter([
   // the long-scroll sheet is full-bleed: it sits outside Layout so it gets no
   // navbar or footer of its own
+  // the live site stays on the sheet while the light redesign is tried out at /new
   { path: "/", element: <Sheet /> },
   {
     path: "/",
     element: <Layout />,
     children: [
+      { path: "/new", element: <Magazine /> },
+      { path: "/sheet", element: <Navigate to="/" replace /> },
+      { path: "/magazine", element: <Navigate to="/new" replace /> },
       { path: "/classic", element: <Home /> },
       { path: "/about", element: <About /> },
       { path: "/projects", element: <Projects /> },

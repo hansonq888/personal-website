@@ -5,6 +5,23 @@ import ProjectJournal from "../components/ProjectJournal";
 
 export const projects = [
   {
+    id: "the-fifth-official",
+    year: "2026",
+    category: "AI & ML",
+    type: "Web app",
+    title: "The Fifth Official",
+    description: "Every moment explained. Every claim checked.",
+    journalFile: "the-fifth-official",
+    image: "https://raw.githubusercontent.com/hansonq888/the-fifth-official/main/docs/media/social-preview.png",
+    gallery: ["https://raw.githubusercontent.com/hansonq888/the-fifth-official/main/docs/media/hero.gif"],
+    longDescription:
+      "Football analytics that explains itself. It turns a match into moments fans can understand: you can replay a goal touch by touch on a tactics board, follow any player\u2019s live stats with the reason behind each change, and learn what each number means. Numbers come from code and the words come from AI agents. Nothing reaches the screen until two independent checks pass. Built solo for Inside the Game, the Microsoft x Premier League developer hackathon.",
+    tech: ["Python", "FastAPI", "Microsoft Agent Framework", "Microsoft Foundry", "React", "TypeScript", "Vite", "Azure Container Apps", "Azure Event Hubs", "Azure Web PubSub", "Azure Cosmos DB", "Application Insights"],
+    website: "https://livecards.mangorock-d6a7d3f2.northcentralus.azurecontainerapps.io",
+    github: "https://github.com/hansonq888/the-fifth-official",
+    video: "https://www.youtube.com/watch?v=jbQIHVtHFuc",
+  },
+  {
     id: "webrack",
     year: "2026",
     category: "Systems",
@@ -95,7 +112,7 @@ export const projects = [
     title: "Realtor Website",
     description: "A personal realtor website made with React",
     journalFile: "realtor-website",
-    image: "/realtor.png",
+    image: "/realtor-home.webp",
     longDescription:
       "A professional realtor site built with React, Tailwind, and Firebase. Admin authentication and Firestore let the owner add and manage property listings without touching code, and the layout holds up for buyers browsing on their phones.",
     tech: ["React", "Tailwind", "Firebase"],
@@ -195,6 +212,7 @@ export const projects = [
 // Which projects appear on /projects, in order. Shared with ProjectDetail so
 // each page can link through to its neighbours.
 export const featuredIds = [
+  "the-fifth-official",
   "shown-space",
   "webrack",
   "kudex",

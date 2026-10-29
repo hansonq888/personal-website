@@ -13,7 +13,8 @@
   --ink-55: rgba(250, 250, 247, 0.58);
   --ink-30: rgba(250, 250, 247, 0.32);
   --rule: #2a2a30;
-  --pad: 30px;
+  /* the side margin for every section, nav and corner labels alike */
+  --pad: clamp(36px, 4vw, 64px);
 
   color-scheme: dark;
 
@@ -59,7 +60,7 @@
 }
 .sheet-bar > * { pointer-events: auto; }
 .sheet-bar .sig { font-size: 12.5px; line-height: 1.35; }
-.sheet-bar nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.sheet-bar nav { display: flex; gap: 20px; flex-wrap: wrap; margin-left: auto; }
 .sheet-bar a {
   display: flex;
   align-items: baseline;
@@ -222,6 +223,19 @@
 @media (prefers-reduced-motion: reduce) {
   .sheet .hero-gif { opacity: 1; animation: none; }
 }
+
+.sheet .hero-screen { align-items: center; }
+.sheet .hero-screen img {
+  display: block;
+  width: 86%;
+  height: auto;
+  /* the gif is black-backed, so screen lets the glass show through; its
+     drawing sits left of centre in the frame, so nudge it back */
+  mix-blend-mode: screen;
+  /* and it sits low in its frame, so lift it to the middle of the glass */
+  transform: translate(9%, -10%);
+}
+
 
 /* ---- hero type --------------------------------------------------------------- */
 .sheet .giant {
@@ -420,6 +434,8 @@
 }
 .sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
+/* an arrow under the caption, pointing down at the strip it names */
+.sheet .band-arrow { display: block; margin-top: 6px; font-size: 14px; line-height: 1; }
 
 /* ---- experience: a timeline ---------------------------------------------- */
 .sheet .roles {
@@ -593,7 +609,9 @@
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* The word runs the full width and the set stands in front of it. */
-.sheet #sheet-skills .body { justify-content: flex-start; }
+/* Home is the Skills spread with the name as its word, so the two share rules */
+.sheet #sheet-skills .body,
+.sheet #sheet-home .body { justify-content: flex-start; }
 .sheet #sheet-skills .title-row {
   justify-content: flex-start;
   align-items: baseline;
@@ -601,7 +619,10 @@
   position: relative;
   z-index: 0;
 }
-.sheet #sheet-skills .sec-title {
+.sheet #sheet-skills .sec-title,
+.sheet #sheet-home .sec-title,
+.sheet #sheet-about .sec-title,
+.sheet #sheet-experience .sec-title {
   font-size: clamp(3.4rem, 15.5vw, 14rem);
   line-height: 0.78;
   letter-spacing: -0.045em;
@@ -609,7 +630,8 @@
 }
 .sheet #sheet-skills .motif { width: clamp(90px, 9vw, 170px) !important; }
 /* the word sits top left, the set stands at the bottom right and crosses it */
-.sheet #sheet-skills .tv-stage {
+.sheet #sheet-skills .tv-stage,
+.sheet #sheet-home .tv-stage {
   position: relative;
   z-index: 1;
   max-width: min(780px, 104svh);
@@ -617,8 +639,144 @@
   margin-right: 0;
   margin-top: clamp(-130px, -6vw, -34px);
 }
+/* on two lines the name is short enough for the set to cross into it as on
+   Skills; the set is a size smaller so the section still fits one screen */
+/* on two lines the name is short enough for the set to cross into it as on
+   Skills; the set is a size smaller so the section still fits one screen */
+/* Experience has no title row to hold space under it, so the word itself does */
+.sheet #sheet-experience .sec-title { margin-bottom: clamp(48px, 8vw, 120px); }
+/* the name a size over "Skills": it is the page's first word */
+.sheet #sheet-home .sec-title { font-size: clamp(3.6rem, 16.5vw, 15rem); }
+/* the hello set has a cabinet: a box running back from the bezel, so it
+   reads as a solid set rather than a panel. The sides hinge on the bezel's
+   edges and fold straight back; the back closes it at --depth. */
+.sheet .tv-body {
+  --depth: 70px;
+  position: absolute;
+  inset: 10px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+/* the tube's housing: set in from the top and sides, close to the bottom, and
+   starting where the shallow front cabinet ends */
+.sheet .tv-body.tv-rear {
+  --depth: 260px;
+  inset: 15% 10% 7% 10%;
+  transform: translateZ(-70px);
+}
+.sheet .tv-rear .tv-back { border-radius: 10px; }
+.sheet .tv-side,
+.sheet .tv-back {
+  position: absolute;
+  background: linear-gradient(170deg, #2e2e33 0%, #1c1c20 60%, #121214 100%);
+}
+.sheet .tv-side.top {
+  left: 0; right: 0; top: 0; height: var(--depth);
+  transform-origin: top; transform: rotateX(-90deg);
+  /* a grille of vent slots across the middle, then the panel falling into shadow */
+  background:
+    repeating-linear-gradient(to right, rgba(0, 0, 0, 0) 0 14px, rgba(0, 0, 0, 0.6) 14px 18px) 50% 62% / 60% 34% no-repeat,
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 3px) top / 100% 3px no-repeat,
+    linear-gradient(to bottom, #3a3a40, #1d1d21 70%, #121214);
+}
+.sheet .tv-side.bottom {
+  left: 0; right: 0; bottom: 0; height: var(--depth);
+  transform-origin: bottom; transform: rotateX(90deg);
+  /* two rubber feet, set back from the front */
+  background:
+    radial-gradient(closest-side, #050506 82%, rgba(5, 5, 6, 0)) 14% 40% / 12% 22% no-repeat,
+    radial-gradient(closest-side, #050506 82%, rgba(5, 5, 6, 0)) 86% 40% / 12% 22% no-repeat,
+    linear-gradient(to top, #18181b, #0c0c0e);
+}
+.sheet .tv-side.left {
+  top: 0; bottom: 0; left: 0; width: var(--depth);
+  transform-origin: left; transform: rotateY(90deg);
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 10px, rgba(0, 0, 0, 0.65) 10px 14px) 74% 50% / 38% 56% no-repeat,
+    linear-gradient(to right, #2a2a2f, #151518 55%, #0e0e10);
+}
+.sheet .tv-side.right {
+  top: 0; bottom: 0; right: 0; width: var(--depth);
+  transform-origin: right; transform: rotateY(-90deg);
+  /* front is the right edge of this face: a lit lip, the seam where the bezel
+     meets the cabinet, two screws, a block of cooling vents toward the back,
+     and the whole side darkening as it runs away */
+  background:
+    linear-gradient(to left, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 3px) right / 3px 100% no-repeat,
+    linear-gradient(to left, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.7) 1px, rgba(255, 255, 255, 0.06) 2px, rgba(0, 0, 0, 0) 3px) 76% 0 / 3px 100% no-repeat,
+    radial-gradient(circle, #45454c 0 2px, #0b0b0d 2.5px 3.5px, rgba(0, 0, 0, 0) 4px) 70% 10% / 10px 10px no-repeat,
+    radial-gradient(circle, #45454c 0 2px, #0b0b0d 2.5px 3.5px, rgba(0, 0, 0, 0) 4px) 70% 90% / 10px 10px no-repeat,
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 10px, rgba(0, 0, 0, 0.65) 10px 14px) 26% 50% / 38% 56% no-repeat,
+    linear-gradient(to left, #2c2c31, #1a1a1d 55%, #0e0e10);
+}
+.sheet .tv-back {
+  inset: 0;
+  border-radius: 18px;
+  transform: translateZ(calc(-1 * var(--depth)));
+  background: #0e0e10;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+}
+/* the front and its parts sit on top of the cabinet */
+.sheet #sheet-home .tv-screen,
+.sheet #sheet-home .tv-base { position: relative; transform: translateZ(1px); }
+/* the hello set is switched on, quietly: the picture glows a little, the
+   glass is faintly lit from behind, a soft band rolls down it now and then,
+   and a power light shows on the base. No mask, no flicker. */
+.sheet #sheet-home .hero-screen img {
+  filter: brightness(1.08) drop-shadow(0 0 3px rgba(235, 245, 255, 0.45)) drop-shadow(0 0 12px rgba(170, 210, 255, 0.18));
+}
+.sheet #sheet-home .tv-screen {
+  background:
+    radial-gradient(60% 55% at 50% 48%, rgba(150, 185, 220, 0.07), rgba(150, 185, 220, 0) 70%),
+    radial-gradient(120% 120% at 50% 40%, #121216 0%, #09090b 70%, #050506 100%);
+}
+.sheet .tv-roll {
+  position: absolute;
+  left: 0; right: 0;
+  top: -30%;
+  height: 30%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(220, 235, 255, 0.035) 50%, rgba(255, 255, 255, 0));
+  animation: tv-roll 9s linear infinite;
+}
+@keyframes tv-roll { to { transform: translateY(440%); } }
+.sheet .tv-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: none;
+  background: #6dff9a;
+  box-shadow: 0 0 5px #6dff9a, 0 0 12px rgba(109, 255, 154, 0.45);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet .tv-roll { animation: none; opacity: 0; }
+}
+/* the hello set hovers: a slow drift up and down with a little sway, under
+   the pointer tilt (which turns the set itself, not the stage it floats on) */
+@keyframes tv-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -12px, 0) rotate(-0.6deg); }
+}
+.sheet #sheet-home .tv-stage { animation: tv-float 7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sheet #sheet-home .tv-stage { animation: none; }
+}
+/* the hello set rests turned further away at its top-left corner: the left
+   side swung back and the top tipped back (it still follows the pointer) */
+.sheet #sheet-home .tv { --rot-y: -34; --rot-x: 7; }
+.sheet #sheet-home .tv-stage {
+  max-width: min(640px, 82svh);
+  /* lifted further into the name than on Skills, and in off the right edge,
+     so it clears the foot with room to spare */
+  margin-top: clamp(-250px, -14.5vw, -34px);
+  margin-right: clamp(16px, 7vw, 120px);
+}
+/* and less padding underneath, so the facts at the foot stay on the first screen */
+.sheet #sheet-home { padding-bottom: 28px; }
+.sheet #sheet-home .body { padding-bottom: 0; }
+
 @media (max-width: 860px) {
-  .sheet #sheet-skills .tv-stage { margin-left: 0; margin-top: 18px; max-width: 100%; }
+  .sheet #sheet-skills .tv-stage, .sheet #sheet-home .tv-stage { margin-left: 0; margin-top: 18px; max-width: 100%; }
 }
 
 /* ---- the set ---------------------------------------------------------------

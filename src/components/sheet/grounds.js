@@ -596,8 +596,13 @@ export function initGrounds(root) {
       el.style.setProperty("--pr", raw.toFixed(4));
     }
 
+    // The playhead sits a little under the middle, but the last rows on the
+    // page can never scroll that high, so over the final stretch of the page
+    // it slides down to the bottom edge and lights everything left on screen.
+    const left = document.documentElement.scrollHeight - window.scrollY - vh;
+    const end = Math.max(0, Math.min(1, 1 - left / (vh * 0.6)));
+    const play = vh * (0.58 + 0.42 * end);
     for (const el of lits) {
-      const play = vh * 0.58;
       for (const child of el.children) {
         if (child.dataset.lit === undefined && !child.matches(".role, .skill")) continue;
         const r = child.getBoundingClientRect();
@@ -674,6 +679,9 @@ export function initGrounds(root) {
    up with smoothing off, so the pixels stay square. It resolves in by sweeping
    the threshold, and the cursor carries a torch across it.
    ========================================================================== */
+// radius of the colour lens, in strip cells
+const LENS = 11;
+
 export function initDither(canvas, src) {
   if (!canvas) return () => {};
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -681,6 +689,9 @@ export function initDither(canvas, src) {
   const ctx = canvas.getContext("2d");
   const img = new Image();
   let rows = 0, gray = null, off = null, octx = null;
+  // what the cursor does over the strip: "ink" darkens the dither around it,
+  // "lens" melts the dither back into the smooth photograph, "off" nothing
+  const mode = canvas.dataset.hover || "ink";
   let bias = -1;              // -1 (blank paper) .. 0 (the true image)
   let px = -999, py = -999;   // pointer, in grid space
   let raf = 0, alive = true;
@@ -722,7 +733,7 @@ export function initDither(canvas, src) {
         const i = y * cols + x;
         let v = buf[i] - bias * 0.55;
         const dx = x - px, dy = y - py, d2 = dx * dx + dy * dy;
-        if (d2 < 225) v -= (1 - Math.sqrt(d2) / 15) * 0.34;
+        if (mode === "ink" && d2 < 225) v -= (1 - Math.sqrt(d2) / 15) * 0.34;
         const bit = v > 0.5 ? 1 : 0; // 1 = paper, 0 = ink
         const err = v - bit;
         if (x + 1 < cols) buf[i + 1] += (err * 7) / 16;
@@ -730,6 +741,16 @@ export function initDither(canvas, src) {
           if (x > 0) buf[i + cols - 1] += (err * 3) / 16;
           buf[i + cols] += (err * 5) / 16;
           if (x + 1 < cols) buf[i + cols + 1] += (err * 1) / 16;
+        }
+        if (mode === "lens" && d2 < LENS * LENS) {
+          // inside the lens the cell is the photograph's own tone rather than
+          // a 1-bit dot, fading back to the dither toward the rim
+          const t = Math.max(0, Math.min(1, gray[i] - bias * 0.55));
+          const edge = Math.min(1, (1 - Math.sqrt(d2) / LENS) * 2.2);
+          const a = (1 - t) * 255;
+          o[i * 4] = ir; o[i * 4 + 1] = ig; o[i * 4 + 2] = ib;
+          o[i * 4 + 3] = Math.round(a * edge + (bit ? 0 : 255) * (1 - edge));
+          continue;
         }
         o[i * 4] = ir; o[i * 4 + 1] = ig; o[i * 4 + 2] = ib;
         o[i * 4 + 3] = bit ? 0 : 255;
@@ -780,8 +801,10 @@ export function initDither(canvas, src) {
     schedule();
   };
   const onLeave = () => { px = -999; py = -999; schedule(); };
-  host?.addEventListener("pointermove", onMove);
-  host?.addEventListener("pointerleave", onLeave);
+  if (mode !== "off") {
+    host?.addEventListener("pointermove", onMove);
+    host?.addEventListener("pointerleave", onLeave);
+  }
 
   const scheme = window.matchMedia("(prefers-color-scheme: dark)");
   const onScheme = () => render();
