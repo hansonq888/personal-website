@@ -318,6 +318,16 @@
   perspective-origin: 62% 50%;
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
+/* the lines and the planet turning beside them */
+.sheet .about-copy { display: flex; align-items: center; gap: clamp(28px, 4vw, 72px); }
+.sheet .pixel-planet {
+  width: clamp(150px, 15vw, 240px);
+  height: auto;
+  aspect-ratio: 1;
+  flex: none;
+  image-rendering: pixelated;
+}
+@media (max-width: 760px) { .sheet .about-copy { flex-direction: column; align-items: flex-start; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
    dark ground by stacked shadows and tilted toward the cursor */
 .sheet .me-wrap {

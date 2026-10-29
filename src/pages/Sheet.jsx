@@ -9,6 +9,7 @@ import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import PaperIntro from "../components/sheet/PaperIntro";
 import FlashIntro from "../components/sheet/FlashIntro";
+import PixelPlanet from "../components/sheet/PixelPlanet";
 
 // Which opening plays: "flash" (the set goes off like a camera) or "paper"
 // (torn sheets drawn into the screen). Both hand over to the same screen.
@@ -614,14 +615,18 @@ export default function Sheet() {
                  style={{ width: "min(320px, 24vw)" }} />
           </div>
           <div className="about-row">
-            <div>
-              <Reveal className="lab" text="CS + Math @ Yale" />
-              <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
-              <Reveal
-                className="lab dim"
-                style={{ maxWidth: "38ch", marginTop: 20 }}
-                text="I like frisbee, music and building"
-              />
+            {/* the lines, with a pixel planet turning beside them */}
+            <div className="about-copy">
+              <div>
+                <Reveal className="lab" text="CS + Math @ Yale" />
+                <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
+                <Reveal
+                  className="lab dim"
+                  style={{ maxWidth: "38ch", marginTop: 20 }}
+                  text="I like frisbee, music and building"
+                />
+              </div>
+              <PixelPlanet />
             </div>
             <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>
               {order.map((idx, pos) => {
