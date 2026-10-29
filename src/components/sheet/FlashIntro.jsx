@@ -60,6 +60,46 @@ function streak(cx, cy, len, thick) {
   return [...top, ...bottom.reverse()].map(([x, y]) => x.toFixed(1) + "," + y.toFixed(1)).join(" ");
 }
 
+// The glass's real outline on screen: its rounded rectangle (the curved
+// corners included) traced in its own flat coordinates, then carried onto the
+// tilted set by stretching it between the four projected corner markers. A
+// hair inside the edge, so nothing lights the bezel.
+function glassOutline(selector) {
+  const glass = document.querySelector(selector);
+  const marks = ["tl", "tr", "br", "bl"].map((c) =>
+    document.querySelector(`${selector} .glass-corner.${c}`)?.getBoundingClientRect()
+  );
+  if (!glass || marks.some((m) => !m)) return null;
+  const [tl, tr, br, bl] = marks.map((m) => [m.left, m.top]);
+  const W = glass.offsetWidth, H = glass.offsetHeight;
+  const [rx = 0, ry = rx] = getComputedStyle(glass).borderTopLeftRadius.split(" ").map(parseFloat);
+  const inset = 2;
+  const ax = Math.max(0, rx - inset), ay = Math.max(0, ry - inset);
+
+  // the flat outline, clockwise from the top-left curve
+  const local = [];
+  const arc = (cx, cy, from) => {
+    for (let i = 0; i <= 10; i++) {
+      const t = from + (i / 10) * (Math.PI / 2);
+      local.push([cx + Math.cos(t) * ax, cy + Math.sin(t) * ay]);
+    }
+  };
+  arc(inset + ax, inset + ay, Math.PI);               // top-left
+  arc(W - inset - ax, inset + ay, Math.PI * 1.5);     // top-right
+  arc(W - inset - ax, H - inset - ay, 0);             // bottom-right
+  arc(inset + ax, H - inset - ay, Math.PI * 0.5);     // bottom-left
+
+  // stretch each flat point between the projected corners
+  return local
+    .map(([x, y]) => {
+      const u = x / W, v = y / H;
+      const px = (1 - u) * (1 - v) * tl[0] + u * (1 - v) * tr[0] + u * v * br[0] + (1 - u) * v * bl[0];
+      const py = (1 - u) * (1 - v) * tl[1] + u * (1 - v) * tr[1] + u * v * br[1] + (1 - u) * v * bl[1];
+      return px.toFixed(1) + "," + py.toFixed(1);
+    })
+    .join(" ");
+}
+
 export default function FlashIntro({ glassSelector, onDone }) {
   const [done, setDone] = useState(
     () => window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false
@@ -91,13 +131,9 @@ export default function FlashIntro({ glassSelector, onDone }) {
       blade.current?.setAttribute("points", streak(cx, cy, room * 1.6 * Math.min(1, s * 1.4), Math.max(6, room * 0.035 * s)));
 
       // the second flash happens on the screen, not in the room: from its
-      // first frame everything is clipped to the glass's tilted outline
-      const corners = ["tl", "tr", "br", "bl"].map((c) =>
-        document.querySelector(`${glassSelector} .glass-corner.${c}`)?.getBoundingClientRect()
-      );
-      if (corners.every(Boolean)) {
-        glassClip.current?.setAttribute("points", corners.map((m) => `${m.left.toFixed(1)},${m.top.toFixed(1)}`).join(" "));
-      }
+      // first frame everything is clipped to the glass's own outline
+      const outline = glassOutline(glassSelector);
+      if (outline) glassClip.current?.setAttribute("points", outline);
       if (k >= REFLASH) group.current?.setAttribute("clip-path", "url(#flash-glass)");
     };
     draw(0);
