@@ -10,8 +10,13 @@ const FPS = 12;
 const RAYS = 16;
 // the burst's size each frame, as a share of the distance to the farthest
 // corner of the window: it opens fully covering the page (it is the loading
-// screen), holds a few beats, then steps back down into the glass
-const SIZE = [1.7, 1.7, 1.7, 1.7, 1.45, 1.1, 0.82, 0.6, 0.43, 0.3, 0.2, 0.13, 0.08, 0.04];
+// screen), holds a few beats, steps back down into the glass and sits there
+// lit; then the set catches power and flashes once more, out and gone
+const SIZE = [
+  1.7, 1.7, 1.7, 1.7, 1.45, 1.1, 0.82, 0.6, 0.43, 0.3, 0.2, 0.13, 0.08,
+  0.05, 0.05, 0.05,
+  0.55, 1.25, 0.6, 0.12,
+];
 const LAYERS = [
   // bottom to top: the widest and coolest trails furthest behind
   { fill: "#dde5ef", lag: 2, grow: 1.12 },
@@ -89,6 +94,7 @@ export default function FlashIntro({ glassSelector, onDone }) {
     const loop = (ts) => {
       if (start === null) start = ts;
       const k = Math.floor((ts - start) / (1000 / FPS));
+      // two extra frames, so the trailing layers finish their own last steps
       if (k >= SIZE.length + 2) {
         setDone(true);
         return;

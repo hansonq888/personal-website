@@ -106,16 +106,18 @@ export default function Sheet() {
   const rootRef = useRef(null);
   const [introDone, setIntroDone] = useState(false);
   const endIntro = useCallback(() => setIntroDone(true), []);
-  // Once the paper has landed on the hello screen it shuts off like an old
-  // set (line, then dot, then dark), and the picture pops up after it. With
-  // reduced motion it goes straight to the picture.
+  // After the paper intro the screen's paper shuts off like an old set (line,
+  // then dot, then dark); after the flash, which already flashed the set on,
+  // the screen just sits dark a beat. Either way the picture then pops up.
+  // With reduced motion it goes straight to the picture.
   const [tuned, setTuned] = useState(false);
   const [paperGone, setPaperGone] = useState(false);
   useEffect(() => {
     if (!introDone) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t1 = setTimeout(() => setTuned(true), still ? 0 : 900);
-    const t2 = setTimeout(() => setPaperGone(true), still ? 0 : 800);
+    const paper = INTRO === "paper";
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : paper ? 900 : 420);
+    const t2 = setTimeout(() => setPaperGone(true), still || !paper ? 0 : 800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [introDone]);
   const gridRef = useRef(null);
@@ -566,7 +568,7 @@ export default function Sheet() {
                 <span className="glass-corner tr" aria-hidden="true" />
                 <span className="glass-corner br" aria-hidden="true" />
                 <span className="glass-corner bl" aria-hidden="true" />
-                {!paperGone && <div className={"tv-paper" + (introDone ? " collapse" : "")} aria-hidden="true" />}
+                {!paperGone && <div className={"tv-paper" + (introDone && INTRO === "paper" ? " collapse" : "")} aria-hidden="true" />}
                 <div className={"tv-content hero-screen" + (tuned ? " tuned" : "")}>
                   {/* mounted as the set switches on, so the GIF plays from its
                       first frame */}
