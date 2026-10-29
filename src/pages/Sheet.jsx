@@ -8,6 +8,11 @@ import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import PaperIntro from "../components/sheet/PaperIntro";
+import FlashIntro from "../components/sheet/FlashIntro";
+
+// Which opening plays: "flash" (the set goes off like a camera) or "paper"
+// (torn sheets drawn into the screen). Both hand over to the same screen.
+const INTRO = "flash";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -508,7 +513,9 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
-      <PaperIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />
+      {INTRO === "paper"
+        ? <PaperIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />
+        : <FlashIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />}
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">

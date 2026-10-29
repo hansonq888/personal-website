@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /* The opening frame: the page starts covered in paper, and the paper is drawn
    into the hello set's screen in held, stop-motion frames until it lies
@@ -71,7 +71,9 @@ export default function PaperIntro({ glassSelector, onDone }) {
     if (done) onDone?.();
   }, [done, onDone]);
 
-  useEffect(() => {
+  // a layout effect, so the first sheet is down before the browser paints and
+  // the page never shows for a frame ahead of the paper
+  useLayoutEffect(() => {
     if (done) return;
     const w = window.innerWidth, h = window.innerHeight;
 
