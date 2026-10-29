@@ -8,7 +8,6 @@ import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
 import PaperIntro from "../components/sheet/PaperIntro";
-import TvStatic from "../components/sheet/TvStatic";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -102,17 +101,16 @@ export default function Sheet() {
   const rootRef = useRef(null);
   const [introDone, setIntroDone] = useState(false);
   const endIntro = useCallback(() => setIntroDone(true), []);
-  // the paper ends up on the hello screen, holds a beat, then dissolves into
-  // the GIF; with reduced motion it goes straight to the picture
+  // Once the paper has landed on the hello screen the set switches on: the
+  // paper squeezes into a bright line across the glass, and the picture opens
+  // out of that line. With reduced motion it goes straight to the picture.
   const [tuned, setTuned] = useState(false);
-  const [snowGone, setSnowGone] = useState(false);
+  const [paperGone, setPaperGone] = useState(false);
   useEffect(() => {
     if (!introDone) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // the picture comes up as the snow fades over it; the snow stops drawing
-    // only once it has faded out completely
-    const t1 = setTimeout(() => setTuned(true), still ? 0 : 350);
-    const t2 = setTimeout(() => setSnowGone(true), still ? 0 : 350 + 1500);
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : 360);
+    const t2 = setTimeout(() => setPaperGone(true), still ? 0 : 480);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [introDone]);
   const gridRef = useRef(null);
@@ -561,9 +559,9 @@ export default function Sheet() {
                 <span className="glass-corner tr" aria-hidden="true" />
                 <span className="glass-corner br" aria-hidden="true" />
                 <span className="glass-corner bl" aria-hidden="true" />
-                {!snowGone && <TvStatic fading={tuned} />}
-                <div className="tv-content hero-screen">
-                  {/* mounted once the snow clears, so the GIF plays from its
+                {!paperGone && <div className={"tv-paper" + (introDone ? " collapse" : "")} aria-hidden="true" />}
+                <div className={"tv-content hero-screen" + (tuned ? " tuned" : "")}>
+                  {/* mounted as the set switches on, so the GIF plays from its
                       first frame */}
                   {tuned && <img src="/ezgif.com-gif-maker.gif" alt="" />}
                 </div>

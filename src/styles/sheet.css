@@ -434,6 +434,10 @@
 }
 .sheet .band canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 .sheet .band-cap { position: absolute; left: var(--pad); bottom: calc(100% - 12px); }
+/* About runs shorter: the strip (and the section's edge with it) comes up
+   to sit just under the prints instead of after a band of empty ground */
+.sheet #sheet-about .body { padding-bottom: 0; }
+.sheet #sheet-about .band { margin-top: -40px; }
 /* an arrow under the caption, pointing down at the strip it names */
 .sheet .band-arrow { display: block; margin-top: 6px; font-size: 14px; line-height: 1; }
 
@@ -776,23 +780,30 @@
 .sheet .glass-corner.tr { right: 0; top: 0; }
 .sheet .glass-corner.br { right: 0; bottom: 0; }
 .sheet .glass-corner.bl { left: 0; bottom: 0; }
-/* the paper on the hello screen before the picture comes in */
-.sheet .tv-static {
+/* The paper on the hello screen, and the switch-on that replaces it: the
+   paper squeezes into a bright line across the middle of the glass, and the
+   picture then opens out of that line (crt-on, below). */
+.sheet .tv-paper {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
+  background: #f3f1ec;
+  transform-origin: 50% 50%;
   pointer-events: none;
-  transition: opacity 1.4s cubic-bezier(0.45, 0, 0.2, 1);
 }
-.sheet .tv-static.fading { opacity: 0; }
-/* and the picture fades up through it */
-.sheet .hero-screen img { animation: tv-tune-in 1.4s cubic-bezier(0.45, 0, 0.2, 1) both; }
-@keyframes tv-tune-in { from { opacity: 0; } to { opacity: 1; } }
+.sheet .tv-paper.collapse { animation: paper-collapse 0.42s cubic-bezier(0.6, 0, 0.85, 0.4) forwards; }
+@keyframes paper-collapse {
+  0%   { transform: scale(1, 1);      filter: brightness(1);   opacity: 1; }
+  70%  { transform: scale(1, 0.012);  filter: brightness(1.6); opacity: 1; }
+  100% { transform: scale(0.9, 0.004); filter: brightness(2);  opacity: 0; }
+}
+/* the picture waits for the switch-on rather than warming up on load */
+.sheet #sheet-home .tv.on .tv-content { animation: none; }
+.sheet #sheet-home .tv.on .tv-content.tuned { animation: crt-on 0.8s cubic-bezier(0.2, 0.85, 0.25, 1) forwards; }
 @media (prefers-reduced-motion: reduce) {
-  .sheet .hero-screen img { animation: none; }
+  .sheet .tv-paper.collapse { animation: none; opacity: 0; }
+  .sheet #sheet-home .tv-content.tuned { animation: none; opacity: 1; transform: none; }
 }
+
 /* the hello set hovers: a slow drift up and down with a little sway, under
    the pointer tilt (which turns the set itself, not the stage it floats on) */
 @keyframes tv-float {
