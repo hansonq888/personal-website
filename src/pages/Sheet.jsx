@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
@@ -7,6 +7,13 @@ import ProjectCard from "../components/ProjectCard";
 import { experiences } from "../data/experiences";
 import { skillSections } from "../data/skills";
 import { initGrounds, initDither } from "../components/sheet/grounds";
+import PaperIntro from "../components/sheet/PaperIntro";
+import FlashIntro from "../components/sheet/FlashIntro";
+import PixelPlanet from "../components/sheet/PixelPlanet";
+
+// Which opening plays: "flash" (the set goes off like a camera) or "paper"
+// (torn sheets drawn into the screen). Both hand over to the same screen.
+const INTRO = "flash";
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -14,7 +21,7 @@ const ROMAN = ["I", "II", "III", "IV", "V"];
 // the stack on About; whichever is clicked comes to the front
 const PRINTS = [
   { id: "headshot", src: "/headshot.jpg", cap: "HEADSHOT.JPG" },
-  { id: "sideeye", src: "/sideeye.JPG", cap: "SIDEEYE.JPG" },
+  { id: "pier", src: "/pier.jpg", cap: "PIER.JPG" },
   { id: "baby", src: "/AboutPhoto.jpg", cap: "ABOUTPHOTO.JPG" },
 ];
 const LAYER = ["front", "back", "back2"];
@@ -29,41 +36,30 @@ const LOOSE = [
 const PAGES = ["Home", "About", "Experience", "Projects", "Skills"];
 
 
-/* The hero is split per word, then per letter: each word stays in one
-   unbreakable box, or the per-letter spans let it wrap mid-word. The letters
-   rise from behind their own baseline on one firm curve. No spring, no blur,
-   no rotation: a single decisive reveal rather than a cascade of effects. */
-function Giant({ text, delay = 0 }) {
-  const still = useReducedMotion();
-  const words = text.split(" ");
-  let n = 0;
+
+
+function Spec({ left, leftSub, right, rightSub, bar = false }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // observe the section, not the label: a clip-path on the target zeroes its
+    // own intersection ratio, so observing .spec directly would never fire
+    const host = el.closest("[data-page]") || el;
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }),
+      { threshold: 0.12 }
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <p className="giant">
-      {words.map((word, wi) => (
-        <span className="w" key={wi}>
-          {[...word].map((ch, ci) => {
-            const i = n++;
-            return (
-              <span className="clip" key={ci}>
-                <motion.span
-                  className="g"
-                  initial={still ? false : { y: "112%" }}
-                  animate={{ y: 0 }}
-                  transition={{
-                    delay: (delay + i * 20) / 1000,
-                    duration: 0.78,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                >
-                  {ch}
-                </motion.span>
-              </span>
-            );
-          })}
-          {wi < words.length - 1 ? " " : null}
-        </span>
-      ))}
-    </p>
+    <div className="spec" ref={ref}>
+      <div><b>{left}</b><i>{leftSub}</i></div>
+      {bar ? <span className="bar" aria-hidden="true" /> : null}
+      <div className="r"><b>{right}</b><i>{rightSub}</i></div>
+    </div>
   );
 }
 
@@ -107,43 +103,35 @@ function Reveal({ as = "p", text, className, style }) {
   );
 }
 
-function Spec({ left, leftSub, right, rightSub, bar = false }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    // observe the section, not the label: a clip-path on the target zeroes its
-    // own intersection ratio, so observing .spec directly would never fire
-    const host = el.closest("[data-page]") || el;
-    const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("in"); io.disconnect(); } }),
-      { threshold: 0.12 }
-    );
-    io.observe(host);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div className="spec" ref={ref}>
-      <div><b>{left}</b><i>{leftSub}</i></div>
-      {bar ? <span className="bar" aria-hidden="true" /> : null}
-      <div className="r"><b>{right}</b><i>{rightSub}</i></div>
-    </div>
-  );
-}
-
 export default function Sheet() {
   const rootRef = useRef(null);
-  const bandRef = useRef(null);
+  const [introDone, setIntroDone] = useState(false);
+  const endIntro = useCallback(() => setIntroDone(true), []);
+  // After the paper intro the screen's paper shuts off like an old set (line,
+  // then dot, then dark) before the picture starts; after the flash, which
+  // already flashed the set on, the screen sits dark a beat and the picture
+  // starts. With reduced motion it goes straight to the picture.
+  const [tuned, setTuned] = useState(false);
+  const [paperGone, setPaperGone] = useState(false);
+  useEffect(() => {
+    if (!introDone) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const paper = INTRO === "paper";
+    // after the flash the screen sits dark a beat before the GIF starts;
+    // after the paper it waits for the shut-off to finish
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : paper ? 900 : 420);
+    const t2 = setTimeout(() => setPaperGone(true), still || !paper ? 0 : 800);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [introDone]);
   const gridRef = useRef(null);
   const meRef = useRef(null);
+  const bandRef = useRef(null);
   const [order, setOrder] = useState([0, 1, 2]);
   const bringToFront = (idx) =>
     setOrder((o) => [idx, ...o.filter((x) => x !== idx)]);
   const rolesRef = useRef(null);
   const skillsRef = useRef(null);
   const arcRef = useRef(null);
-  const tvRef = useRef(null);
 
   const pencilRef = useRef(null);
   const [current, setCurrent] = useState(0);
@@ -162,6 +150,7 @@ export default function Sheet() {
       touchMultiplier: 1.5,
     });
     lenisRef.current = lenis;
+
     let raf = 0;
     const tick = (t) => { lenis.raf(t); raf = requestAnimationFrame(tick); };
     raf = requestAnimationFrame(tick);
@@ -197,43 +186,48 @@ export default function Sheet() {
 
   useStagger(rolesRef, 110, 0.3);
 
-  // the set warms up once, the way a CRT does
+  // every set on the sheet (the hello screen on Home, the stack on Skills)
+  // warms up once as it comes into view, the way a CRT does
   useEffect(() => {
-    const stage = tvRef.current;
-    if (!stage) return;
-    const tv = stage.querySelector(".tv");
-    if (!tv) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      tv.classList.add("on");
-      return;
-    }
+    const stages = [...(rootRef.current?.querySelectorAll(".tv-stage") ?? [])];
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const io = new IntersectionObserver(
-      (es) => es.forEach((e) => { if (e.isIntersecting) { tv.classList.add("on"); io.disconnect(); } }),
+      (es) => es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.querySelector(".tv")?.classList.add("on");
+        io.unobserve(e.target);
+      }),
       { threshold: 0.25 }
     );
-    io.observe(stage);
+    stages.forEach((stage) => {
+      if (still) stage.querySelector(".tv")?.classList.add("on");
+      else io.observe(stage);
+    });
     return () => io.disconnect();
   }, []);
 
-  // and it turns toward the pointer
+  // and each one turns toward the pointer while it is over it
   useEffect(() => {
-    const stage = tvRef.current;
-    if (!stage || window.matchMedia("(pointer: coarse)").matches) return;
-    const onMove = (e) => {
-      const r = stage.getBoundingClientRect();
-      stage.style.setProperty("--mx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
-      stage.style.setProperty("--my", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
-    };
-    const onLeave = () => {
-      stage.style.setProperty("--mx", "0");
-      stage.style.setProperty("--my", "0");
-    };
-    stage.addEventListener("pointermove", onMove);
-    stage.addEventListener("pointerleave", onLeave);
-    return () => {
-      stage.removeEventListener("pointermove", onMove);
-      stage.removeEventListener("pointerleave", onLeave);
-    };
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const stages = [...(rootRef.current?.querySelectorAll(".tv-stage") ?? [])];
+    const offs = stages.map((stage) => {
+      const onMove = (e) => {
+        const r = stage.getBoundingClientRect();
+        stage.style.setProperty("--mx", ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
+        stage.style.setProperty("--my", ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
+      };
+      const onLeave = () => {
+        stage.style.setProperty("--mx", "0");
+        stage.style.setProperty("--my", "0");
+      };
+      stage.addEventListener("pointermove", onMove);
+      stage.addEventListener("pointerleave", onLeave);
+      return () => {
+        stage.removeEventListener("pointermove", onMove);
+        stage.removeEventListener("pointerleave", onLeave);
+      };
+    });
+    return () => offs.forEach((off) => off());
   }, []);
 
   // The rail is a bow rather than a straight line: each node is pushed out
@@ -524,10 +518,12 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
+      {INTRO === "paper"
+        ? <PaperIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />
+        : <FlashIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />}
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
-        <span className="sig">Hanson Qin</span>
         <nav aria-label="Sections">
           {PAGES.map((p, i) => (
             <a key={p} href={"#sheet-" + p.toLowerCase()} onClick={go(i)}
@@ -538,18 +534,67 @@ export default function Sheet() {
         </nav>
       </div>
 
-      {/* ------------- I + II share one ground ------------- */}
-      <div className="panel-group deep sparkle streaks" data-ground="Home">
+      {/* ------------- I + II share one ground: deep space, the dithered
+          weather, a pixel starfield over it, and the shooting streaks ------------- */}
+      <div className="panel-group deep space sparkle streaks" data-ground="Home">
       <section className="panel" id="sheet-home" data-page="Home">
         <Spec left="Hanson Qin" leftSub="Software Engineer" right="hansonqin.com" rightSub="New Haven, CT" />
-        <div className="body" data-par=".035">
-          <div className="hero-row">
-            <div>
-              <p className="lab dim" style={{ marginBottom: 14 }}>Hi, I'm</p>
-              <Giant text="Hanson" delay={120} />
-              <Giant text="Qin" delay={340} />
+        {/* the Skills spread, with the name as its word: title top left, the
+            set below it on the right, crossing up into it */}
+        <div className="body">
+          <div className="title-row">
+            <h1 className="sec-title">Hanson<br />Qin</h1>
+          </div>
+          <div className="tv-stage" data-tilt3d>
+            <div className="tv">
+              {/* rabbit ears on top of the cabinet, set back from the front so
+                  they turn and float with the set */}
+              <div className="tv-antenna" aria-hidden="true">
+                <span className="rod left" />
+                <span className="rod right" />
+                <span className="hub" />
+              </div>
+              {/* the cabinet behind the bezel: four sides and a back, built in
+                  3D so the tilt and the float show the set has depth */}
+              <div className="tv-body" aria-hidden="true">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              {/* and the tube's housing behind it: narrower and lower, stepping
+                  back out of the cabinet the way an old set's rear does */}
+              <div className="tv-body tv-rear" aria-hidden="true">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              <div className="tv-screen">
+                {/* four invisible corner marks, read by the paper intro so the
+                    paper can land exactly on the tilted glass */}
+                <span className="glass-corner tl" aria-hidden="true" />
+                <span className="glass-corner tr" aria-hidden="true" />
+                <span className="glass-corner br" aria-hidden="true" />
+                <span className="glass-corner bl" aria-hidden="true" />
+                {INTRO === "paper" && !paperGone && <div className={"tv-paper" + (introDone ? " collapse" : "")} aria-hidden="true" />}
+                <div className={"tv-content hero-screen" + (tuned ? " tuned" : "")}>
+                  {/* mounted as the set switches on, so the GIF plays from its
+                      first frame */}
+                  {tuned && <img src="/ezgif.com-gif-maker.gif" alt="" />}
+                </div>
+                <div className="tv-scan" aria-hidden="true" />
+                <div className="tv-roll" aria-hidden="true" />
+                <div className="tv-glare" aria-hidden="true" />
+              </div>
+              <div className="tv-base">
+                <span className="tv-led" aria-hidden="true" />
+                <span className="tv-dial" aria-hidden="true" />
+                <span className="tv-ch">CH 001 &middot; HELLO.GIF</span>
+              </div>
             </div>
-            <img className="hero-gif" src="/ezgif.com-gif-maker.gif" alt="" />
           </div>
         </div>
         <div className="foot">
@@ -561,6 +606,7 @@ export default function Sheet() {
         </div>
       </section>
 
+
       {/* ---------------- II. ABOUT ---------------- */}
       <section className="panel" id="sheet-about" data-page="About">
         <Spec left="About" leftSub="Bitmap Session" right="HEADSHOT.JPG" rightSub="800X800PX" />
@@ -571,14 +617,18 @@ export default function Sheet() {
                  style={{ width: "min(320px, 24vw)" }} />
           </div>
           <div className="about-row">
-            <div>
-              <Reveal className="lab" text="CS + Math @ Yale" />
-              <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
-              <Reveal
-                className="lab dim"
-                style={{ maxWidth: "38ch", marginTop: 20 }}
-                text="I like frisbee, music and building"
-              />
+            {/* the lines, with a pixel planet turning beside them */}
+            <div className="about-copy">
+              <div>
+                <Reveal className="lab" text="CS + Math @ Yale" />
+                <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
+                <Reveal
+                  className="lab dim"
+                  style={{ maxWidth: "38ch", marginTop: 20 }}
+                  text="I like frisbee, music and building"
+                />
+              </div>
+              <PixelPlanet />
             </div>
             <div className="me-wrap" data-slide=".055" data-fan ref={meRef}>
               {order.map((idx, pos) => {
@@ -600,8 +650,8 @@ export default function Sheet() {
           </div>
         </div>
         <div className="band">
-          <canvas ref={bandRef} data-cols="168" aria-hidden="true" />
-          <p className="lab dim band-cap">VANCOUVER.BMP</p>
+          <canvas ref={bandRef} data-cols="168" data-hover="lens" aria-hidden="true" />
+          <p className="lab dim band-cap">VANCOUVER.BMP<span className="band-arrow" aria-hidden="true">&darr;</span></p>
         </div>
       </section>
       </div>
@@ -654,7 +704,7 @@ export default function Sheet() {
           <h2 className="sec-title center">Projects</h2>
           <div className="proj-grid" data-fly="3" ref={gridRef}>
             {featuredProjects.map((p) => (
-              <div key={p.id}><ProjectCard project={p} demo /></div>
+              <div key={p.id}><ProjectCard project={p} from="/" /></div>
             ))}
           </div>
         </div>
@@ -670,8 +720,24 @@ export default function Sheet() {
             <img className="motif inv" src="/dotted_star_shining.gif" alt=""
                  style={{ width: "min(220px, 44vw)" }} />
           </div>
-          <div className="tv-stage" ref={tvRef} data-tilt3d>
+          {/* the same kind of set as Home's, built deeper: a cabinet with the
+              tube's housing stepping out behind */}
+          <div className="tv-stage stack-set" data-tilt3d>
           <div className="tv">
+            <div className="tv-body" aria-hidden="true">
+              <span className="tv-side top" />
+              <span className="tv-side bottom" />
+              <span className="tv-side left" />
+              <span className="tv-side right" />
+              <span className="tv-back" />
+            </div>
+            <div className="tv-body tv-rear" aria-hidden="true">
+              <span className="tv-side top" />
+              <span className="tv-side bottom" />
+              <span className="tv-side left" />
+              <span className="tv-side right" />
+              <span className="tv-back" />
+            </div>
             <div className="tv-screen">
               <div className="tv-content">
           <div className="skills" ref={skillsRef} data-lit>
@@ -681,7 +747,9 @@ export default function Sheet() {
                 <b>{g.title}</b>
                 <span className="items">
                   {g.skills.map((it, j) => (
-                    <span key={it}>
+                    // each skill holds together as one unit; only a long
+                    // parenthesised one (the Azure list) may wrap inside
+                    <span key={it} className={it.length > 28 ? "long" : undefined}>
                       {it}
                       {j < g.skills.length - 1 ? <em aria-hidden="true">/</em> : null}
                     </span>
@@ -703,9 +771,9 @@ export default function Sheet() {
           </div>
         </div>
         <div className="sheet-foot">
-          <a href="mailto:hanson.qin@yale.edu">hanson.qin@yale.edu</a>
+          <a href="mailto:hansonq888@gmail.com">hansonq888@gmail.com</a>
           <a href="https://github.com/hansonq888" target="_blank" rel="noreferrer">github.com/hansonq888</a>
-          <a href="https://www.linkedin.com/in/hansonqin/" target="_blank" rel="noreferrer">linkedin</a>
+          <a href="https://www.linkedin.com/in/hanson-q/" target="_blank" rel="noreferrer">linkedin</a>
         </div>
       </section>
     </div>

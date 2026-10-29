@@ -1,42 +1,56 @@
+import { FaEnvelope, FaGithub, FaLinkedin, FaInstagram } from "react-icons/fa";
 import PageShell from "../components/PageShell";
+import PageFrame from "../components/PageFrame";
+import { Label, MediaTile } from "../components/Media";
+import { LIGHT } from "../data/media";
 
-const INTER = { fontFamily: '"Inter", sans-serif', fontWeight: 300 };
+const CONTACT = [
+  { label: "Email", href: "mailto:hansonq888@gmail.com", icon: FaEnvelope },
+  { label: "GitHub", href: "https://github.com/hansonq888", icon: FaGithub },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/hanson-q/", icon: FaLinkedin },
+  { label: "Instagram", href: "https://www.instagram.com/hanson.q888/?hl=en", icon: FaInstagram },
+];
 
+/* About in the shared frame: the facts and the way to get in touch under the
+   giant title, the photo as the page's one big object. */
 export default function About() {
   return (
     <PageShell>
-      <div className="min-h-[calc(100vh-2.75rem)] sm:min-h-[calc(100vh-3rem)] w-full min-w-0 bg-white text-black overflow-x-hidden flex flex-col">
-        {/* Body */}
-        <div className="flex-1 px-3 sm:px-5 pt-6 md:pt-8 pb-6 flex flex-col">
-          <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
-              <div>
-                <h1
-                  className="leading-[0.9]"
-                  style={{ fontFamily: '"Inter", sans-serif', fontWeight: 700, fontSize: "clamp(2.75rem, 12vw, 10rem)", letterSpacing: "-0.02em" }}
-                >
-                  About
-                </h1>
-
-                <div className="mt-4 md:mt-5 space-y-1" style={INTER}>
-                  <p className="text-sm tracking-wide">--CS + MATH @ YALE</p>
-                  <p className="text-sm tracking-wide">--VANCOUVER, BC x NEW HAVEN, CT</p>
-                </div>
-              </div>
-
-              <div className="w-full flex md:justify-end">
-                <img
-                  src="/sideeye.JPG"
-                  alt="Hanson Qin"
-                  className="w-full max-w-[380px] h-auto block"
-                />
+      <PageFrame
+        title="About"
+        aside={
+          <>
+            <div className="space-y-2 text-[17px] text-black/75" style={LIGHT}>
+              <p>CS and Math at Yale</p>
+              <p>Vancouver and New Haven</p>
+              <p>I like frisbee, music and building</p>
+            </div>
+            <div className="mt-10 max-w-sm">
+              <Label>Contact</Label>
+              <div className="mt-4 flex flex-col gap-3">
+                {CONTACT.map(({ label, href, icon }) => {
+                  const Icon = icon;
+                  return (
+                    <a
+                      key={label}
+                      href={href}
+                      target={href.startsWith("mailto:") ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 text-[15px] hover:opacity-60 transition-opacity"
+                      style={LIGHT}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" aria-hidden />
+                      {label}
+                    </a>
+                  );
+                })}
               </div>
             </div>
-
-          </div>
-        </div>
-
-      </div>
+          </>
+        }
+      >
+        <MediaTile src="/about-yale.jpg" label="Hanson Qin" position="50% 38%" quiet className="aspect-[4/3]" />
+      </PageFrame>
     </PageShell>
   );
 }

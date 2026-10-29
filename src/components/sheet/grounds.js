@@ -47,8 +47,10 @@ export function initGrounds(root) {
     const [kind, par] = SYSTEM[page] || [null, 0];
     const sparkle = panel.classList.contains("sparkle");
     const streaks = panel.classList.contains("streaks");
+    // "space": a deep starfield in place of the blinking glints
+    const space = panel.classList.contains("space");
     const S = {
-      panel, page, kind, par, light: true, visible: false, last: -1e9, prog: 0,
+      panel, page, kind, par, space, light: true, visible: false, last: -1e9, prog: 0,
       w: 0, h: 0, cols: 0, rows: 0,
       canvas: null, ctx: null, off: null, octx: null, sparks: null, sctx: null, pts: [],
       streak: null, strCtx: null, stars: [],
@@ -117,11 +119,26 @@ export function initGrounds(root) {
       S.sparks.style.width = w + "px";
       S.sparks.style.height = h + "px";
       S.sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      S.pts = Array.from({ length: Math.round((w * h) / 6200) }, () => ({
-        x: Math.random() * w, y: Math.random() * h,
-        ph: Math.random() * 6.283, sp: 0.25 + Math.random() * 0.8,
-        r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
-      }));
+      S.pts = S.space
+        ? Array.from({ length: Math.round((w * h) / 2400) }, () => {
+            // most stars are faint pin-points; some carry a halo; a few are
+            // bright enough to throw glints. Each has its own tint and breath.
+            const roll = Math.random();
+            const tier = roll < 0.04 ? 2 : roll < 0.26 ? 1 : 0;
+            const warm = Math.random();
+            return {
+              x: Math.random() * w, y: Math.random() * h, tier,
+              base: tier === 2 ? 0.85 + Math.random() * 0.15 : tier === 1 ? 0.45 + Math.random() * 0.35 : 0.18 + Math.random() * 0.32,
+              r: tier === 2 ? 1.3 + Math.random() * 0.6 : tier === 1 ? 0.8 + Math.random() * 0.5 : 0.35 + Math.random() * 0.45,
+              ph: Math.random() * 6.283, sp: 0.3 + Math.random() * 0.9,
+              rgb: warm < 0.25 ? "255,226,196" : warm < 0.6 ? "214,228,255" : "250,250,255",
+            };
+          })
+        : Array.from({ length: Math.round((w * h) / 6200) }, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            ph: Math.random() * 6.283, sp: 0.25 + Math.random() * 0.8,
+            r: 0.4 + Math.random() * 1.1, big: Math.random() < 0.14,
+          }));
     }
     if (S.streak) {
       const dpr2 = Math.min(2, window.devicePixelRatio || 1);
@@ -396,9 +413,40 @@ export function initGrounds(root) {
     }
   }
 
+  // The starfield, drawn as a bitmap: every star is square pixels on a grid,
+  // faint ones a single pixel, brighter ones a 2x2 block, the brightest a
+  // little plus-shaped sparkle, and their twinkle steps between a few levels
+  // instead of fading, so it sits with the dithered field behind it.
+  const PX = 2;
+  function drawSpace(S, t) {
+    const c = S.sctx;
+    for (const q of S.pts) {
+      const breath = 0.72 + 0.28 * Math.sin(q.ph + t * 0.0009 * q.sp);
+      const a = Math.round(q.base * breath * 4) / 4; // four steps, not a fade
+      if (a <= 0) continue;
+      const x = Math.round(q.x / PX) * PX, y = Math.round(q.y / PX) * PX;
+      c.fillStyle = "rgba(" + q.rgb + "," + a.toFixed(2) + ")";
+      if (q.tier === 0) {
+        c.fillRect(x, y, PX, PX);
+      } else if (q.tier === 1) {
+        c.fillRect(x, y, PX * 2, PX * 2);
+      } else {
+        // a plus: a bright 2x2 heart with arms that grow as it brightens
+        const arm = a > 0.75 ? 3 : 2;
+        c.fillRect(x, y, PX * 2, PX * 2);
+        c.fillStyle = "rgba(" + q.rgb + "," + (a * 0.6).toFixed(2) + ")";
+        c.fillRect(x - PX * arm, y, PX * arm, PX * 2);
+        c.fillRect(x + PX * 2, y, PX * arm, PX * 2);
+        c.fillRect(x, y - PX * arm, PX * 2, PX * arm);
+        c.fillRect(x, y + PX * 2, PX * 2, PX * arm);
+      }
+    }
+  }
+
   function drawSparks(S, t) {
     const c = S.sctx;
     c.clearRect(0, 0, S.w, S.h);
+    if (S.space && !S.light) return drawSpace(S, t);
     // on paper the glints are ink; on a dark ground they are light
     const rgb = S.light ? "11,11,12" : "255,253,245";
     const k = S.light ? 0.5 : 1;
@@ -596,8 +644,13 @@ export function initGrounds(root) {
       el.style.setProperty("--pr", raw.toFixed(4));
     }
 
+    // The playhead sits a little under the middle, but the last rows on the
+    // page can never scroll that high, so over the final stretch of the page
+    // it slides down to the bottom edge and lights everything left on screen.
+    const left = document.documentElement.scrollHeight - window.scrollY - vh;
+    const end = Math.max(0, Math.min(1, 1 - left / (vh * 0.6)));
+    const play = vh * (0.58 + 0.42 * end);
     for (const el of lits) {
-      const play = vh * 0.58;
       for (const child of el.children) {
         if (child.dataset.lit === undefined && !child.matches(".role, .skill")) continue;
         const r = child.getBoundingClientRect();
@@ -674,6 +727,9 @@ export function initGrounds(root) {
    up with smoothing off, so the pixels stay square. It resolves in by sweeping
    the threshold, and the cursor carries a torch across it.
    ========================================================================== */
+// radius of the colour lens, in strip cells
+const LENS = 11;
+
 export function initDither(canvas, src) {
   if (!canvas) return () => {};
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -681,6 +737,9 @@ export function initDither(canvas, src) {
   const ctx = canvas.getContext("2d");
   const img = new Image();
   let rows = 0, gray = null, off = null, octx = null;
+  // what the cursor does over the strip: "ink" darkens the dither around it,
+  // "lens" melts the dither back into the smooth photograph, "off" nothing
+  const mode = canvas.dataset.hover || "ink";
   let bias = -1;              // -1 (blank paper) .. 0 (the true image)
   let px = -999, py = -999;   // pointer, in grid space
   let raf = 0, alive = true;
@@ -722,7 +781,7 @@ export function initDither(canvas, src) {
         const i = y * cols + x;
         let v = buf[i] - bias * 0.55;
         const dx = x - px, dy = y - py, d2 = dx * dx + dy * dy;
-        if (d2 < 225) v -= (1 - Math.sqrt(d2) / 15) * 0.34;
+        if (mode === "ink" && d2 < 225) v -= (1 - Math.sqrt(d2) / 15) * 0.34;
         const bit = v > 0.5 ? 1 : 0; // 1 = paper, 0 = ink
         const err = v - bit;
         if (x + 1 < cols) buf[i + 1] += (err * 7) / 16;
@@ -730,6 +789,16 @@ export function initDither(canvas, src) {
           if (x > 0) buf[i + cols - 1] += (err * 3) / 16;
           buf[i + cols] += (err * 5) / 16;
           if (x + 1 < cols) buf[i + cols + 1] += (err * 1) / 16;
+        }
+        if (mode === "lens" && d2 < LENS * LENS) {
+          // inside the lens the cell is the photograph's own tone rather than
+          // a 1-bit dot, fading back to the dither toward the rim
+          const t = Math.max(0, Math.min(1, gray[i] - bias * 0.55));
+          const edge = Math.min(1, (1 - Math.sqrt(d2) / LENS) * 2.2);
+          const a = (1 - t) * 255;
+          o[i * 4] = ir; o[i * 4 + 1] = ig; o[i * 4 + 2] = ib;
+          o[i * 4 + 3] = Math.round(a * edge + (bit ? 0 : 255) * (1 - edge));
+          continue;
         }
         o[i * 4] = ir; o[i * 4 + 1] = ig; o[i * 4 + 2] = ib;
         o[i * 4 + 3] = bit ? 0 : 255;
@@ -780,8 +849,10 @@ export function initDither(canvas, src) {
     schedule();
   };
   const onLeave = () => { px = -999; py = -999; schedule(); };
-  host?.addEventListener("pointermove", onMove);
-  host?.addEventListener("pointerleave", onLeave);
+  if (mode !== "off") {
+    host?.addEventListener("pointermove", onMove);
+    host?.addEventListener("pointerleave", onLeave);
+  }
 
   const scheme = window.matchMedia("(prefers-color-scheme: dark)");
   const onScheme = () => render();
