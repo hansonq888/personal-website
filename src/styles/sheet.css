@@ -328,7 +328,8 @@
   image-rendering: pixelated;
   opacity: 0.85;
 }
-@media (max-width: 760px) { .sheet .about-copy { flex-direction: column; align-items: flex-start; } }
+/* on a tablet or phone the planet drops under the lines rather than squeezing them */
+@media (max-width: 1000px) { .sheet .about-copy { flex-direction: column; align-items: flex-start; gap: 24px; } }
 /* the photograph sits on the page as an object: a polaroid, raised off the
    dark ground by stacked shadows and tilted toward the cursor */
 .sheet .me-wrap {
@@ -853,13 +854,14 @@
   left: -1.5px;
   bottom: 8px;
   width: 3px;
-  height: clamp(110px, 12vw, 190px);
+  /* short on a phone, where the set sits right under the name */
+  height: clamp(44px, 12vw, 190px);
   border-radius: 2px;
   transform-origin: 50% 100%;
   background: linear-gradient(to right, #5d5d65, #e2e2e8 45%, #55555c);
 }
 .sheet .tv-antenna .rod.left  { transform: rotate(-27deg); }
-.sheet .tv-antenna .rod.right { transform: rotate(23deg); height: clamp(100px, 11vw, 175px); }
+.sheet .tv-antenna .rod.right { transform: rotate(23deg); height: clamp(40px, 11vw, 175px); }
 .sheet .tv-antenna .rod::after {
   content: "";
   position: absolute;

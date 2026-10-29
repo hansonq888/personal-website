@@ -109,17 +109,17 @@ export default function Sheet() {
   const endIntro = useCallback(() => setIntroDone(true), []);
   // After the paper intro the screen's paper shuts off like an old set (line,
   // then dot, then dark) before the picture starts; after the flash, which
-  // already flashed the set on, the picture starts at once. With reduced
-  // motion it goes straight to the picture.
+  // already flashed the set on, the screen sits dark a beat and the picture
+  // starts. With reduced motion it goes straight to the picture.
   const [tuned, setTuned] = useState(false);
   const [paperGone, setPaperGone] = useState(false);
   useEffect(() => {
     if (!introDone) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const paper = INTRO === "paper";
-    // after the flash the GIF starts straight away; after the paper it waits
-    // for the shut-off to finish
-    const t1 = setTimeout(() => setTuned(true), still || !paper ? 0 : 900);
+    // after the flash the screen sits dark a beat before the GIF starts;
+    // after the paper it waits for the shut-off to finish
+    const t1 = setTimeout(() => setTuned(true), still ? 0 : paper ? 900 : 420);
     const t2 = setTimeout(() => setPaperGone(true), still || !paper ? 0 : 800);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [introDone]);
