@@ -319,7 +319,7 @@
 }
 @media (max-width: 760px) { .sheet .about-row { grid-template-columns: 1fr; gap: 24px; } }
 /* the lines and the planet turning beside them */
-.sheet .about-copy { display: flex; align-items: center; gap: clamp(28px, 4vw, 72px); }
+.sheet .about-copy { display: flex; align-items: center; gap: clamp(60px, 9vw, 160px); }
 .sheet .pixel-planet {
   width: clamp(150px, 15vw, 240px);
   height: auto;
