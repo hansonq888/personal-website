@@ -25,9 +25,10 @@ export default function TvStatic({ fading = false }) {
       if (ts - last < 1000 / FPS) return;
       last = ts;
       for (let i = 0; i < d.length; i += 4) {
-        // paper, not snow: a narrow band of warm whites
-        const v = 222 + Math.random() * 30;
-        d[i] = v; d[i + 1] = v - 2; d[i + 2] = v - 9; d[i + 3] = 255;
+        // paper, not snow: a narrow band of warm whites around the top
+        // sheet's own tone (#f3f1ec), so the hand-over has no step in it
+        const v = 236 + Math.random() * 16;
+        d[i] = v; d[i + 1] = v - 2; d[i + 2] = v - 7; d[i + 3] = 255;
       }
       ctx.putImageData(frame, 0, 0);
     };

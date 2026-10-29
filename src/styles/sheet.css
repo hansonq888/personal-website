@@ -771,6 +771,11 @@
 .sheet .stack-set .tv-base { position: relative; transform: translateZ(1px); }
 .sheet #sheet-skills .tv-stage.stack-set { margin-right: clamp(16px, 7vw, 120px); }
 
+.sheet .glass-corner { position: absolute; width: 0; height: 0; pointer-events: none; }
+.sheet .glass-corner.tl { left: 0; top: 0; }
+.sheet .glass-corner.tr { right: 0; top: 0; }
+.sheet .glass-corner.br { right: 0; bottom: 0; }
+.sheet .glass-corner.bl { left: 0; bottom: 0; }
 /* the paper on the hello screen before the picture comes in */
 .sheet .tv-static {
   position: absolute;

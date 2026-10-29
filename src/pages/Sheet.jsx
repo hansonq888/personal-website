@@ -510,7 +510,7 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
-      <PaperIntro targetSelector="#sheet-home .tv-screen" onDone={endIntro} />
+      <PaperIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
@@ -555,6 +555,12 @@ export default function Sheet() {
                 <span className="tv-back" />
               </div>
               <div className="tv-screen">
+                {/* four invisible corner marks, read by the paper intro so the
+                    paper can land exactly on the tilted glass */}
+                <span className="glass-corner tl" aria-hidden="true" />
+                <span className="glass-corner tr" aria-hidden="true" />
+                <span className="glass-corner br" aria-hidden="true" />
+                <span className="glass-corner bl" aria-hidden="true" />
                 {!snowGone && <TvStatic fading={tuned} />}
                 <div className="tv-content hero-screen">
                   {/* mounted once the snow clears, so the GIF plays from its
