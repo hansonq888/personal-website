@@ -78,6 +78,9 @@
 @media (max-width: 760px) {
   .sheet-bar u { display: none; }
   .sheet-bar nav { gap: 13px; }
+  /* a finger-sized hit area around each link, without moving the type */
+  .sheet-bar nav { gap: 0; margin-right: -6.5px; }
+  .sheet-bar a { padding: 12px 6.5px; margin: -12px 0; }
 }
 @media (max-width: 520px) {
   .sheet-bar .sig { display: none; }
@@ -631,6 +634,14 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22), 0 24px 54px rgba(0, 0, 0, 0.3);
 }
 .sheet .role .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* On a phone the timeline sits straight: no hand-laid nudge pushing rows off
+   the left edge, and the plate held to its narrow column. These come after
+   the plate's own rules, or its full width would win and cover the text. */
+@media (max-width: 760px) {
+  .sheet .roles .role { margin-left: 0; padding: 22px 0; }
+  .sheet .roles .role .shot { width: 132px; justify-self: end; transform: rotate(calc(var(--tilt, -1.2deg) * 0.5)); }
+  .sheet .roles .role b { font-size: clamp(18px, 5.4vw, 24px); }
+}
 
 /* The word runs the full width and the set stands in front of it. */
 /* Home is the Skills spread with the name as its word, so the two share rules */
