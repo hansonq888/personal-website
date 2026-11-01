@@ -1049,6 +1049,30 @@
 .sheet .tv-content .skill .items > span:not(.long) { white-space: nowrap; }
 .sheet .tv-content .skills:hover .skill.in { opacity: 0.4; }
 .sheet .tv-content .skills:hover .skill.in:hover { opacity: 1; }
+/* the stack's screen keeps the set's shape as its least, and grows taller
+   when the list needs it, so no row is ever cut off by the glass */
+.sheet .stack-set .tv-screen { aspect-ratio: auto; }
+.sheet .stack-set .tv-content {
+  position: relative;
+  inset: auto;
+  aspect-ratio: 16 / 10;
+  padding: 5% 4.5%;
+  box-sizing: border-box;
+}
+@media (max-width: 700px) { .sheet .stack-set .tv-content { aspect-ratio: 4 / 3; } }
+/* on a phone each group stacks: number and name, then its items below */
+@media (max-width: 760px) {
+  .sheet .tv-content .skill {
+    grid-template-columns: 20px 1fr;
+    gap: 2px 8px;
+    padding: 7px 0;
+  }
+  .sheet .tv-content .skill .items { grid-column: 2; }
+  .sheet .tv-content .skill b,
+  .sheet .tv-content .skill .items { font-size: 11px; }
+  .sheet .tv-content .skill .num { font-size: 9px; }
+  .sheet .tv-content .skill .items em { padding: 0 6px; }
+}
 
 /* ---- skills: a numbered index ------------------------------------------- */
 .sheet .skills { display: grid; width: 100%; max-width: 1080px; }
