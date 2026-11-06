@@ -19,7 +19,7 @@ export const experiences = [
     short: { when: "Jun–Aug 2026", where: "Kira Learning, New York" },
   },
   {
-    role: "Software Engineer",
+    role: "Part-time Software Engineer",
     org: "Yale Cancer Center — Blenman Innovation Group",
     url: "https://blenmaninnovationgroup.org/",
     image: "/blenman.png",

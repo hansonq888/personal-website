@@ -77,10 +77,18 @@
 .sheet-bar u { text-decoration: none; font-size: 10px; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) {
   .sheet-bar u { display: none; }
-  .sheet-bar nav { gap: 13px; }
-  /* a finger-sized hit area around each link, without moving the type */
-  .sheet-bar nav { gap: 0; margin-right: -6.5px; }
-  .sheet-bar a { padding: 12px 6.5px; margin: -12px 0; }
+  /* content scrolls under the bar on a phone, so it gets a ground of its own
+     instead of blending: the same on the dark runs and the paper one, with
+     finger-sized links spread across it */
+  .sheet-bar {
+    padding: 0 var(--pad);
+    mix-blend-mode: normal;
+    background: rgba(10, 10, 12, 0.82);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  .sheet-bar nav { width: 100%; justify-content: space-between; gap: 0; flex-wrap: nowrap; }
+  .sheet-bar a { padding: 14px 0; opacity: 0.55; }
 }
 @media (max-width: 520px) {
   .sheet-bar .sig { display: none; }
@@ -502,7 +510,7 @@
 .sheet .arc-fill { opacity: 0.62; }
 /* a second pass a shade off the first: graphite never lands in one clean line */
 .sheet .arc-ghost { opacity: 0.22; transform: translate(1.1px, 0.9px); }
-@media (max-width: 760px) { .sheet .arc { display: none; } }
+@media (max-width: 900px) { .sheet .arc { display: none; } }
 
 /* the hand that draws it */
 .sheet .pencil {
@@ -537,7 +545,7 @@
   transition: opacity 0.55s linear, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .sheet .role.in { opacity: 1; transform: none; }
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .sheet .role {
     grid-template-columns: 1fr 132px;
     gap: 6px 16px;
@@ -637,7 +645,7 @@
 /* On a phone the timeline sits straight: no hand-laid nudge pushing rows off
    the left edge, and the plate held to its narrow column. These come after
    the plate's own rules, or its full width would win and cover the text. */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .sheet .roles .role { margin-left: 0; padding: 22px 0; }
   .sheet .roles .role .shot { width: 132px; justify-self: end; transform: rotate(calc(var(--tilt, -1.2deg) * 0.5)); }
   .sheet .roles .role b { font-size: clamp(18px, 5.4vw, 24px); }
@@ -1060,19 +1068,9 @@
   box-sizing: border-box;
 }
 @media (max-width: 700px) { .sheet .stack-set .tv-content { aspect-ratio: 4 / 3; } }
-/* on a phone each group stacks: number and name, then its items below */
-@media (max-width: 760px) {
-  .sheet .tv-content .skill {
-    grid-template-columns: 20px 1fr;
-    gap: 2px 8px;
-    padding: 7px 0;
-  }
-  .sheet .tv-content .skill .items { grid-column: 2; }
-  .sheet .tv-content .skill b,
-  .sheet .tv-content .skill .items { font-size: 11px; }
-  .sheet .tv-content .skill .num { font-size: 9px; }
-  .sheet .tv-content .skill .items em { padding: 0 6px; }
-}
+
+/* only phones show this set; see the phone rules */
+.sheet .skills-set { display: none; }
 
 /* ---- skills: a numbered index ------------------------------------------- */
 .sheet .skills { display: grid; width: 100%; max-width: 1080px; }
@@ -1161,10 +1159,251 @@
 }
 .sheet .proj-grid > *.in { opacity: 1; transition: opacity 0.45s linear; }
 
+/* The mosaic. Fixed to featuredIds' order: the first three are the highlights,
+   and one large tile beside two a third of its area keeps every tile 16:9, so
+   the screenshots are barely cropped. */
+.sheet .proj-grid.bento {
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(10px, 1.2vw, 18px);
+  max-width: 1400px;
+  perspective: none;
+}
+.sheet .bento-tile { grid-column: span 4; display: block; text-decoration: none; color: #fff; }
+.sheet .bento-tile:nth-child(1) { grid-column: span 8; grid-row: span 2; }
+.sheet .bento-tile:nth-child(n + 4):nth-child(-n + 7) { grid-column: span 3; }
+.sheet .bento-tile .pc-frame {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+}
+.sheet .bento-tile:nth-child(1) .pc-frame { aspect-ratio: auto; }
+.sheet .bento-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.sheet .bento-tile:hover img { transform: scale(1.035); }
+.sheet .bento-cap {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 40px 16px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.74), rgba(0, 0, 0, 0));
+}
+.sheet .bento-cap h3 {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+.sheet .bento-cap span { flex: none; font-size: 10px; letter-spacing: 0.14em; opacity: 0.72; }
+/* the highlights say so in their type */
+.sheet .bento-tile:nth-child(-n + 3) .bento-cap h3 { font-size: clamp(1rem, 1.7vw, 1.5rem); }
+.sheet .bento-tile:nth-child(1) .bento-cap { padding: 70px 24px 20px; }
+.sheet .bento-tile:nth-child(1) .bento-cap h3 { font-size: clamp(1.15rem, 2.2vw, 2rem); letter-spacing: -0.02em; }
+.sheet .bento-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+.sheet .bento-tile:hover .bento-badge { opacity: 1; }
+/* the corner marks would sit under the badge */
+.sheet .proj-grid.bento .pc-frame::after { display: none; }
+@media (max-width: 980px) {
+  .sheet .proj-grid.bento { grid-template-columns: repeat(2, 1fr); }
+  .sheet .bento-tile,
+  .sheet .bento-tile:nth-child(n + 4):nth-child(-n + 7) { grid-column: span 1; }
+  .sheet .bento-tile:nth-child(1) { grid-column: span 2; grid-row: auto; }
+  .sheet .bento-tile:nth-child(1) .pc-frame { aspect-ratio: 16 / 9; }
+  /* an odd tile left at the end takes the whole row rather than leave a hole */
+  .sheet .bento-tile:last-child:nth-child(even) { grid-column: span 2; }
+}
+@media (max-width: 620px) {
+  /* on a phone all three highlights run full width, and the rest pair up */
+  .sheet .bento-tile:nth-child(-n + 3) { grid-column: span 2; }
+  .sheet .bento-tile:nth-child(n + 4) .bento-cap { padding: 28px 10px 8px; }
+  .sheet .bento-tile:nth-child(n + 4) .bento-cap h3 { font-size: 11px; }
+  .sheet .bento-tile:nth-child(n + 4) .bento-cap span { display: none; }
+}
+
 /* ---- the sheet's address line ------------------------------------------- */
 .sheet .sheet-foot { display: flex; gap: 58px; flex-wrap: wrap; margin-top: auto; padding-top: 40px; }
 .sheet .sheet-foot a { font-size: 12.5px; line-height: 1.35; color: var(--ink); text-decoration: none; }
 .sheet .sheet-foot a:hover { text-decoration: underline; }
+
+/* ---- phones ---------------------------------------------------------------
+   One column, sections only as tall as what's in them, no file labels. Home
+   stays a full screen. */
+@media (max-width: 760px) {
+  .sheet .panel:not(#sheet-home) { min-height: 0; padding-top: 72px; padding-bottom: 56px; }
+  .sheet .panel > .spec { display: none; }
+  .sheet .panel:not(#sheet-home) .body { padding-block: 0; justify-content: flex-start; }
+
+  /* Home, bold: the name big on two lines at the top left, and the set too large
+     for the screen, tilted, clear of the name and running off the right */
+  .sheet #sheet-home { padding-top: 72px; }
+  .sheet #sheet-home .sec-title { font-size: 28vw; line-height: 0.82; }
+  .sheet #sheet-home .tv { --rot-y: -30; --rot-x: 7; }
+  .sheet #sheet-home .tv-stage { flex: none; width: 112vw; max-width: none; margin: 10px 0 0 16vw; rotate: -5deg; }
+
+  /* About, centred and in one piece: the word, the lines, then the prints with
+     the planet rising from behind them. The fish keeps to wider screens. */
+  .sheet .panel#sheet-about { padding-bottom: 0; }
+  .sheet .panel#sheet-about .body { padding-bottom: 72px; }
+  .sheet #sheet-about .band { margin-top: 0; }
+  .sheet #sheet-about .title-row { justify-content: center; margin-bottom: 18px; }
+  .sheet #sheet-about .title-row .motif { display: none; }
+  .sheet #sheet-about .sec-title { text-align: center; }
+  .sheet .about-row { position: relative; gap: 0; perspective: none; }
+  .sheet .about-copy { display: block; text-align: center; }
+  .sheet .about-copy .lab { margin-inline: auto; }
+  .sheet .pixel-planet { position: absolute; right: -4px; bottom: 212px; width: 104px; z-index: 0; }
+  .sheet .me-wrap { z-index: 1; justify-self: center; max-width: 212px; margin-top: 64px; transform: none !important; }
+  .sheet .polaroid.back {
+    transform: rotate(calc(var(--fan, 0) * -9deg)) translate(calc(var(--fan, 0) * -24%), calc(var(--fan, 0) * 2%));
+  }
+  .sheet .polaroid.back2 {
+    transform: rotate(calc(var(--fan, 0) * 9deg)) translate(calc(var(--fan, 0) * 24%), calc(var(--fan, 0) * 2%));
+  }
+  .sheet .band-cap { left: 0; right: 0; text-align: center; }
+
+  /* Experience: one big card to a role, plate first */
+  .sheet #sheet-experience .sec-title { margin-bottom: 56px; }
+  .sheet .roles { grid-template-columns: minmax(0, 1fr); gap: 34px; perspective: none; }
+  .sheet .roles .role {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 0;
+    /* in place from the start: a card must never wait off the edge for a reveal */
+    opacity: 1;
+    transform: none;
+  }
+  .sheet .roles .role .shot {
+    order: -1;
+    width: 100%;
+    margin-bottom: 9px;
+    border-radius: 12px;
+    opacity: 1;
+    transform: none !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  }
+  .sheet .roles .role .who,
+  .sheet .roles .role .when { width: 100%; }
+  .sheet .roles .role .who { order: 0; }
+  .sheet .roles .role .when { order: 1; font-size: 13px; }
+  .sheet .roles .role b { display: block; font-size: 22px; line-height: 1.1; letter-spacing: -0.03em; }
+  .sheet .roles .role i { margin-top: 4px; font-size: 14px; }
+
+  /* Projects */
+  .sheet #sheet-projects { padding-bottom: 56px; }
+  .sheet #sheet-projects .sec-title.center {
+    text-align: left;
+    margin-inline: 0;
+    margin-bottom: 56px;
+    font-size: clamp(3.4rem, 15.5vw, 14rem);
+    letter-spacing: -0.045em;
+    line-height: 0.78;
+  }
+
+  /* Skills, the same bold move: the big word top left, an oversized set running
+     off the right, and the list on the page under it where nothing gets cut off.
+     The list stays inside its set's markup, so that set's parts are undone here. */
+  .sheet #sheet-skills .title-row { justify-content: flex-start; align-items: center; }
+  .sheet #sheet-skills .sec-title { font-size: 24vw; }
+  .sheet #sheet-skills .title-row .motif { display: none; }
+  /* a small set beside the word, covering nothing */
+  .sheet #sheet-skills .tv-stage.skills-set { display: block; flex: none; width: 30vw; max-width: none; margin: -21vw 4vw 0 auto; rotate: -5deg; }
+  .sheet .skills-set .tv { --rot-y: -28; --rot-x: 6; padding: 6px 6px 0; border-radius: 8px; }
+  .sheet .skills-set .tv-screen { border-radius: 8px / 6px; }
+  .sheet .skills-set .tv-body { --depth: 14px; }
+  .sheet .skills-set .tv-body.tv-rear { --depth: 34px; transform: translateZ(-14px); }
+  .sheet .skills-set .tv-antenna .rod,
+  .sheet .skills-set .tv-antenna .rod.right { height: 20px; }
+  .sheet .skills-set .tv-base { padding: 3px 2px 4px; gap: 4px; }
+  .sheet .skills-set .tv-ch { display: none; }
+  /* both simply there on a phone, not waiting on a scroll reveal */
+  .sheet #sheet-skills .skills-set .tv-content { justify-content: center; align-items: center; opacity: 1; transform: none; animation: none; }
+  .sheet #sheet-skills .skill { opacity: 1; transform: none; }
+  .sheet .skills-set .tv-content img { width: 62%; height: auto; filter: invert(1); }
+  .sheet #sheet-skills .tv-stage.stack-set { max-width: none; margin: 44px 0 0; animation: none; perspective: none; }
+  .sheet #sheet-skills .stack-set .tv {
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    transform: none !important;
+  }
+  .sheet #sheet-skills .stack-set .tv::before,
+  .sheet #sheet-skills .stack-set .tv::after,
+  .sheet #sheet-skills .stack-set .tv-body,
+  .sheet #sheet-skills .stack-set .tv-base,
+  .sheet #sheet-skills .stack-set .tv-scan,
+  .sheet #sheet-skills .stack-set .tv-roll,
+  .sheet #sheet-skills .stack-set .tv-glare,
+  .sheet #sheet-skills .stack-set .tv-antenna { display: none; }
+  .sheet #sheet-skills .stack-set .tv-screen {
+    aspect-ratio: auto;
+    overflow: visible;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    transform: none;
+  }
+  .sheet #sheet-skills .stack-set .tv-content,
+  .sheet #sheet-skills .stack-set .tv.on .tv-content {
+    position: static;
+    aspect-ratio: auto;
+    padding: 0;
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  /* each group a label over its skills as chips */
+  .sheet .tv-content .skill,
+  .sheet .tv-content .skill:last-child { display: block; padding: 14px 0; }
+  .sheet .tv-content .skill:hover { padding-left: 0; }
+  .sheet .tv-content .skill .num { display: none; }
+  .sheet .tv-content .skill b { display: block; margin-bottom: 8px; font-size: 12px; color: var(--ink-55); }
+  .sheet .tv-content .skill .items > span {
+    display: inline-block;
+    margin: 0 5px 6px 0;
+    padding: 5px 10px;
+    border: 1px solid var(--ink-30);
+    border-radius: 99px;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .sheet .tv-content .skill .items em { display: none; }
+  .sheet .sheet-foot { flex-direction: column; gap: 0; padding-top: 36px; }
+  .sheet .sheet-foot a { font-size: 14px; padding: 8px 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .sheet .card { opacity: 1; transform: none; }

@@ -10,10 +10,21 @@ import { initGrounds, initDither } from "../components/sheet/grounds";
 import PaperIntro from "../components/sheet/PaperIntro";
 import FlashIntro from "../components/sheet/FlashIntro";
 import PixelPlanet from "../components/sheet/PixelPlanet";
+import BentoTile from "../components/sheet/BentoTile";
 
 // Which opening plays: "flash" (the set goes off like a camera) or "paper"
 // (torn sheets drawn into the screen). Both hand over to the same screen.
 const INTRO = "flash";
+// How Projects is laid out: "bento" (a mosaic led by the three highlights) or
+// "grid" (the even three-column cards that unzip on scroll).
+const PROJECTS = "bento";
+
+// The opening plays once a visit: a reload, or coming back from a project page,
+// goes straight to the picture. A new tab is a new visit.
+const INTRO_SEEN = "sheet-intro-seen";
+const introSeen = () => {
+  try { return sessionStorage.getItem(INTRO_SEEN) === "1"; } catch { return false; }
+};
 import "../styles/sheet.css";
 
 const ROMAN = ["I", "II", "III", "IV", "V"];
@@ -105,13 +116,17 @@ function Reveal({ as = "p", text, className, style }) {
 
 export default function Sheet() {
   const rootRef = useRef(null);
-  const [introDone, setIntroDone] = useState(false);
-  const endIntro = useCallback(() => setIntroDone(true), []);
+  const [skipIntro] = useState(introSeen);
+  const [introDone, setIntroDone] = useState(skipIntro);
+  const endIntro = useCallback(() => {
+    try { sessionStorage.setItem(INTRO_SEEN, "1"); } catch { /* it just plays again */ }
+    setIntroDone(true);
+  }, []);
   // After the paper intro the screen's paper shuts off like an old set (line,
   // then dot, then dark) before the picture starts; after the flash, which
   // already flashed the set on, the screen sits dark a beat and the picture
   // starts. With reduced motion it goes straight to the picture.
-  const [tuned, setTuned] = useState(false);
+  const [tuned, setTuned] = useState(skipIntro);
   const [paperGone, setPaperGone] = useState(false);
   useEffect(() => {
     if (!introDone) return;
@@ -518,9 +533,9 @@ export default function Sheet() {
 
   return (
     <div className="sheet" ref={rootRef}>
-      {INTRO === "paper"
+      {!skipIntro && (INTRO === "paper"
         ? <PaperIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />
-        : <FlashIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />}
+        : <FlashIntro glassSelector="#sheet-home .tv-screen" onDone={endIntro} />)}
       <div className="sheet-progress"><i style={{ width: progress.toFixed(2) + "%" }} /></div>
 
       <div className="sheet-bar">
@@ -543,7 +558,7 @@ export default function Sheet() {
             set below it on the right, crossing up into it */}
         <div className="body">
           <div className="title-row">
-            <h1 className="sec-title">Hanson<br />Qin</h1>
+            <h1 className="sec-title">Hanson <br />Qin</h1>
           </div>
           <div className="tv-stage" data-tilt3d>
             <div className="tv">
@@ -620,7 +635,7 @@ export default function Sheet() {
             {/* the lines, with a pixel planet turning beside them */}
             <div className="about-copy">
               <div>
-                <Reveal className="lab" text="CS + Math @ Yale" />
+                <Reveal className="lab" text="CS + Math + Economics @ Yale" />
                 <Reveal className="lab dim" text="Vancouver, BC x New Haven, CT" />
                 <Reveal
                   className="lab dim"
@@ -702,11 +717,17 @@ export default function Sheet() {
         <Spec left="Projects" leftSub={`${featuredProjects.length} Entries`} right="GRID.JPG" rightSub="1600X900PX" />
         <div className="body">
           <h2 className="sec-title center">Projects</h2>
-          <div className="proj-grid" data-fly="3" ref={gridRef}>
-            {featuredProjects.map((p) => (
-              <div key={p.id}><ProjectCard project={p} from="/" /></div>
-            ))}
-          </div>
+          {PROJECTS === "bento" ? (
+            <div className="proj-grid bento" ref={gridRef}>
+              {featuredProjects.map((p) => <BentoTile key={p.id} project={p} from="/" />)}
+            </div>
+          ) : (
+            <div className="proj-grid" data-fly="3" ref={gridRef}>
+              {featuredProjects.map((p) => (
+                <div key={p.id}><ProjectCard project={p} from="/" /></div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
       </div>
@@ -719,6 +740,44 @@ export default function Sheet() {
             <h2 className="sec-title">Skills</h2>
             <img className="motif inv" src="/dotted_star_shining.gif" alt=""
                  style={{ width: "min(220px, 44vw)" }} />
+          </div>
+          {/* phones only: the list below drops its set so nothing on it gets cut
+              off, and this one stands in, oversized and running off the edge */}
+          <div className="tv-stage skills-set" aria-hidden="true">
+            <div className="tv">
+              <div className="tv-antenna">
+                <span className="rod left" />
+                <span className="rod right" />
+                <span className="hub" />
+              </div>
+              <div className="tv-body">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              <div className="tv-body tv-rear">
+                <span className="tv-side top" />
+                <span className="tv-side bottom" />
+                <span className="tv-side left" />
+                <span className="tv-side right" />
+                <span className="tv-back" />
+              </div>
+              <div className="tv-screen">
+                <div className="tv-content">
+                  <img src="/dotted_star_shining.gif" alt="" loading="lazy" />
+                </div>
+                <div className="tv-scan" />
+                <div className="tv-roll" />
+                <div className="tv-glare" />
+              </div>
+              <div className="tv-base">
+                <span className="tv-led" />
+                <span className="tv-dial" />
+                <span className="tv-ch">CH 005 · STACK.TXT</span>
+              </div>
+            </div>
           </div>
           {/* the same kind of set as Home's, built deeper: a cabinet with the
               tube's housing stepping out behind */}
