@@ -21,7 +21,7 @@ export default function About() {
         aside={
           <>
             <div className="space-y-2 text-[17px] text-black/75" style={LIGHT}>
-              <p>CS and Math at Yale</p>
+              <p>CS, Math and Economics at Yale</p>
               <p>Vancouver and New Haven</p>
               <p>I like frisbee, music and building</p>
             </div>

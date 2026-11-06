@@ -78,6 +78,7 @@ export const projects = [
   },
   {
     id: "sample8",
+    year: "2026",
     category: "Full-stack",
     type: "Web app",
     title: "SAMPLE 8",
